@@ -3,7 +3,6 @@ extends EditorPlugin
 
 
 func _enter_tree():
-    # Initialization of the plugin goes here.
     # Add the new type with a name, a parent type, a script and an icon.
     add_custom_type("MPFWindow", "Node2D", preload("classes/mpf_window.gd"), null)
     add_custom_type("MPFDisplay", "Node2D", preload("classes/mpf_display.gd"), null)

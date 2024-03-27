@@ -8,7 +8,6 @@ var slides := {}
 var widgets := {}
 
 func _init() -> void:
-    print("Initializng MC")
     self.traverse_tree_for("slides", slides)
     self.traverse_tree_for("widgets", widgets)
 
@@ -23,7 +22,7 @@ func play(payload: Dictionary) -> void:
         "slides_play":
             self.window.play_slides(payload)
 
-func get_slide(slide_name: String, preload_only: bool = false) -> Node2D:
+func get_slide(slide_name: String, preload_only: bool = false) -> MPFSlide:
     assert(slide_name in slides, "Unknown slide name '%s'" % slide_name)
     # If this is the first access, load the scene
     if slides[slide_name] is String:
