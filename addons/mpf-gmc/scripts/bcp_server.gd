@@ -9,6 +9,7 @@ extends Node
 
 signal bonus(payload)
 signal mpf_timer(payload)
+signal options(payload)
 signal player_var(value, prev_value, change, player_num)
 signal service(payload)
 
@@ -23,6 +24,8 @@ var _logger
 var port := 5052
 # The polling frequency to poll the server for data
 var poll_fps: int = 120
+# The process ID for a spawned MPF
+var mpf_pid: int
 
 # A library of static methods for parsing the incoming BCP data
 var _bcp_parse = preload("bcp_parse.gd")
@@ -43,7 +46,6 @@ var _thread: Thread
 func _ready() -> void:
   # Wait until a server is actively listening before polling for clients
   set_process(false)
-
 
 func _exit_tree():
   self.stop(true)
@@ -97,6 +99,7 @@ func _process(_delta: float) -> void:
     if err != OK:
       MPF.log.error("Error spawning BCP poll thread: %s", err)
     else:
+      MPF.log.info("Client connected!")
       # No need to run _process() while we have an active client connection
       set_process(false)
 

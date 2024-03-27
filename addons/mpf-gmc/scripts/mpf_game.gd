@@ -30,6 +30,8 @@ var settings: Dictionary = {}
 # Some settings use floats as their keys. These settings are
 # not predictable, so explicitly provide the their names here.
 var settings_with_floats = []
+# Store a string of the version
+var version: String
 
 
 signal player_update(variable_name, value)
@@ -159,7 +161,7 @@ func update_settings(result: Dictionary) -> void:
       elif key == "false":
         key = "0"
       # The default interpretation uses strings as keys, convert to ints or floats
-      s.options[cvrt.call_func(key)] = value
+      s.options[cvrt.call(key)] = value
     # The default brightness settings include percent signs, update them for string printing
     if s.label == "brightness":
       for key in s.options.keys():

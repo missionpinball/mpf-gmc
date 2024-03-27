@@ -1,0 +1,60 @@
+[gd_scene load_steps=3 format=3 uid="uid://belkug6sa4arr"]
+
+[ext_resource type="Script" path="res://addons/mpf-gmc/slides/startup.gd" id="1_do72m"]
+[ext_resource type="Texture2D" uid="uid://dounln3l35d26" path="res://addons/mpf-gmc/images/logo_mpf.png" id="2_v374h"]
+
+[node name="startup" type="Node2D"]
+script = ExtResource("1_do72m")
+
+[node name="ColorRect" type="ColorRect" parent="."]
+offset_right = 1280.0
+offset_bottom = 720.0
+color = Color(1, 0.705882, 0.658824, 1)
+
+[node name="LogoMpf" type="Sprite2D" parent="."]
+position = Vector2(640, 360)
+texture = ExtResource("2_v374h")
+
+[node name="version" type="Label" parent="."]
+offset_right = 40.0
+offset_bottom = 23.0
+
+[node name="status_main" type="Label" parent="."]
+offset_left = 2.0
+offset_top = 532.0
+offset_right = 1280.0
+offset_bottom = 589.0
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+theme_override_font_sizes/font_size = 32
+text = "Loading Stuff"
+horizontal_alignment = 1
+
+[node name="status_sub" type="Label" parent="."]
+offset_left = 2.0
+offset_top = 598.0
+offset_right = 1280.0
+offset_bottom = 655.0
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+theme_override_font_sizes/font_size = 24
+text = "Loading Stuff"
+horizontal_alignment = 1
+
+[node name="error_main" type="Label" parent="."]
+offset_left = 2.0
+offset_top = 532.0
+offset_right = 1280.0
+offset_bottom = 589.0
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+theme_override_font_sizes/font_size = 32
+text = "Loading Stuff"
+horizontal_alignment = 1
+
+[node name="error_sub" type="Label" parent="."]
+offset_left = 2.0
+offset_top = 598.0
+offset_right = 1280.0
+offset_bottom = 655.0
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+theme_override_font_sizes/font_size = 24
+text = "Loading Stuff"
+horizontal_alignment = 1
