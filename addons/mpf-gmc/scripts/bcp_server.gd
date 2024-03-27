@@ -248,7 +248,6 @@ func _thread_poll(_userdata=null) -> void:
           continue
         MPF.log.verbose("Received BCP command: %s", message_raw)
         var message: Dictionary = _bcp_parse.parse(message_raw)
-        MPF.log.info("Decoded BCP message: %s", message)
         # Log any errors
         if message.has("error"):
           MPF.log.error(message.error)

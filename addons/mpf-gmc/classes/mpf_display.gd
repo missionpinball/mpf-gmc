@@ -54,14 +54,13 @@ func play_slide(slide_name: String, settings: Dictionary, context: String, prior
     self._update_stack()
 
 func _update_stack() -> void:
-    # Sort the stack
+    # Sort the stack by priority
     self._slide_stack.sort_custom(
-        # For descending order use > 0
         func(a: Node, b: Node): return a.priority < b.priority
     )
     # Update the children
     for s in self.get_children():
-        var idx = self._slide_stack.find(s.name)
+        var idx = self._slide_stack.find(s)
         if idx == -1:
             self.remove_child(s)
             s.queue_free()
