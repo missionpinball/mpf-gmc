@@ -109,16 +109,20 @@ func _process(_delta: float) -> void:
 
 func deferred_game(method: String, result=null) -> void:
   var callable = Callable(MPF.game, method)
-  print("DEFERRED calling method %s on game singleton with result %s" % [method, result])
   if result:
     callable.call(result)
   else:
     callable.call()
 
+func deferred_mc(method: String, result=null) -> void:
+  var callable = Callable(MPF.mc, method)
+  if result:
+    callable.call(result)
+  else:
+    callable.call()
 
 func deferred_game_player(result) -> void:
   MPF.game.update_player(result)
-
 
 func deferred_scene(scene_res: String) -> void:
   get_tree().change_scene_to_file(scene_res)
@@ -244,7 +248,7 @@ func _thread_poll(_userdata=null) -> void:
           continue
         MPF.log.verbose("Received BCP command: %s", message_raw)
         var message: Dictionary = _bcp_parse.parse(message_raw)
-
+        MPF.log.info("Decoded BCP message: %s", message)
         # Log any errors
         if message.has("error"):
           MPF.log.error(message.error)
@@ -317,10 +321,16 @@ func _thread_poll(_userdata=null) -> void:
             call_deferred("deferred_game", "update_settings", message)
           "signal":
             call_deferred("emit_signal", message.name, message)
+          "slides_play":
+            call_deferred("deferred_mc", "play_slides", message)
           "sounds_clear":
             pass
+          "sounds_play":
+            call_deferred("deferred_mc", "play_sounds", message)
           "timer":
             call_deferred("emit_signal", "mpf_timer", message)
+          "widgets_play":
+            call_deferred("deferred_mc", "play_widgets", message)
           _:
             MPF.log.warn("No action defined for BCP message %s" % message_raw)
     # Free the mutex in case the main thread is trying to shut down

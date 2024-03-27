@@ -13,6 +13,15 @@ func _init() -> void:
     self.traverse_tree_for("slides", slides)
     self.traverse_tree_for("widgets", widgets)
 
+    MPF.log.info("Generated slide lookups: %s", slides)
+
+func play_slides(payload: Dictionary) -> void:
+    MPF.log.info("Playing slide with payload %s", payload)
+    for slide_name in payload.settings.keys():
+        if slide_name in slides:
+            ## TODO: add a slide stack
+            pass
+
 func register_window(inst: Node) -> void:
     window = inst
     # Identify the children of the window of type MPFDisplay
