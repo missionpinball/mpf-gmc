@@ -1,3 +1,13 @@
-[gd_scene format=3 uid="uid://ds4gduf8660uj"]
+[gd_scene load_steps=4 format=3 uid="uid://ds4gduf8660uj"]
 
-[node name="Window" type="Node2D"]
+[ext_resource type="Script" path="res://addons/mpf-gmc/classes/mpf_window.gd" id="1_ixxnq"]
+[ext_resource type="Script" path="res://addons/mpf-gmc/classes/mpf_display.gd" id="2_clr31"]
+[ext_resource type="PackedScene" uid="uid://belkug6sa4arr" path="res://addons/mpf-gmc/slides/startup.tscn" id="3_8nbga"]
+
+[node name="MPFWindow" type="Node2D"]
+script = ExtResource("1_ixxnq")
+
+[node name="MPFDisplay" type="Node2D" parent="."]
+script = ExtResource("2_clr31")
+is_default = true
+initial_slide = ExtResource("3_8nbga")
