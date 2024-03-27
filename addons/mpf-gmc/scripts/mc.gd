@@ -23,14 +23,14 @@ func play(payload: Dictionary) -> void:
         "slides_play":
             self.window.play_slides(payload)
 
-func get_slide(slide_name: String, preload_only: bool = false) -> MPFSlide:
+func get_slide(slide_name: String, preload_only: bool = false) -> Node2D:
     assert(slide_name in slides, "Unknown slide name '%s'" % slide_name)
     # If this is the first access, load the scene
     if slides[slide_name] is String:
         slides[slide_name] = load(slides[slide_name])
     if preload_only:
         return
-    return slides[slide_name].instance()
+    return slides[slide_name].instantiate()
 
 func traverse_tree_for(obj_type: String, acc: Dictionary) -> void:
     # Start by traversing the root folder for this object type

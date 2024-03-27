@@ -48,7 +48,7 @@ func process_slide(slide_name: String, action: String, settings: Dictionary, con
 
 func play_slide(slide_name: String, settings: Dictionary, context: String, priority: int = 0) -> void:
     var slide = MPF.mc.get_slide(slide_name)
-    slide.priority = settings.get("priority", 0) + priority
+    slide.priority = settings['priority'] + priority if settings['priority'] else priority
     self._slide_stack.append(slide)
     self.add_child(slide)
     self._update_stack()

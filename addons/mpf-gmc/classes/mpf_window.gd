@@ -5,6 +5,8 @@ var displays: Dictionary = {}
 var default_display: MPFDisplay
 
 func _ready() -> void:
+
+    MPF.mc.register_window(self)
     # In case no default is explicitly defined, track the first one
     var first_display: MPFDisplay
     for display in self.get_children():
@@ -21,7 +23,6 @@ func _ready() -> void:
 
 func _enter_tree():
     print("Window entering tree")
-    #MPF.mc.register_window(self)
 
 func play_slides(payload: Dictionary) -> void:
     MPF.log.info("Playing slide with payload %s", payload)
@@ -34,7 +35,8 @@ func play_slides(payload: Dictionary) -> void:
 
         var context = payload.context
         var priority = payload.priority
-        var display: MPFDisplay = get_display(settings['target'])
+        var target = settings.get('target')
+        var display: MPFDisplay = get_display(target) if target else get_display()
         display.process_slide(slide_name, action, settings, context, priority)
 
 

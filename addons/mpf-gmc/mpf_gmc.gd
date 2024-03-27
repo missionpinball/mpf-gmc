@@ -7,7 +7,7 @@ var log
 var mc
 var player
 
-func _ready() -> void:
+func _enter_tree():
     # Log is top-most
     log = preload("scripts/log.gd").new()
     # Game should be loaded first
@@ -18,7 +18,6 @@ func _ready() -> void:
     mc = preload("scripts/mc.gd").new()
     print("GMC is ready")
 
-func _enter_tree():
     print("GMC entering tree")
     # Process is only called on children in the tree, so add the children
     # that need to call process
