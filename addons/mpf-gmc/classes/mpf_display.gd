@@ -45,12 +45,19 @@ func process_slide(slide_name: String, action: String, settings: Dictionary, con
             # Don't play a slide that's already there
             if not slide:
                 self.play_slide(slide_name, settings, context, priority)
+        "remove":
+            if slide:
+                self.remove_slide(slide)
 
 func play_slide(slide_name: String, settings: Dictionary, context: String, priority: int = 0) -> void:
     var slide = MPF.mc.get_slide(slide_name)
     slide.priority = settings['priority'] + priority if settings['priority'] else priority
     self._slide_stack.append(slide)
     self.add_child(slide)
+    self._update_stack()
+
+func remove_slide(slide) -> void:
+    self._slide_stack.erase(slide)
     self._update_stack()
 
 func _update_stack() -> void:
