@@ -1,10 +1,9 @@
 # Base singleton for managing all MC-related references,
 # including windows, displays, slides, and widgets
-
+@tool
 extends Node
 
 var window: Node
-var displays := {}
 var slides := {}
 var widgets := {}
 
@@ -15,19 +14,23 @@ func _init() -> void:
 
     MPF.log.info("Generated slide lookups: %s", slides)
 
-func play_slides(payload: Dictionary) -> void:
-    MPF.log.info("Playing slide with payload %s", payload)
-    for slide_name in payload.settings.keys():
-        if slide_name in slides:
-            ## TODO: add a slide stack
-            pass
-
 func register_window(inst: Node) -> void:
     window = inst
-    # Identify the children of the window of type MPFDisplay
-    for c in inst.get_children():
-        # TODO: create a type for display
-        displays[c.name] = c
+
+func play(payload: Dictionary) -> void:
+    var command = payload.name
+    match command:
+        "slides_play":
+            self.window.play_slides(payload)
+
+func get_slide(slide_name: String, preload_only: bool = false) -> MPFSlide:
+    assert(slide_name in slides, "Unknown slide name '%s'" % slide_name)
+    # If this is the first access, load the scene
+    if slides[slide_name] is String:
+        slides[slide_name] = load(slides[slide_name])
+    if preload_only:
+        return
+    return slides[slide_name].instance()
 
 func traverse_tree_for(obj_type: String, acc: Dictionary) -> void:
     # Start by traversing the root folder for this object type
@@ -61,7 +64,7 @@ func recurse_dir(path, acc, ext="tscn") -> void:
             else:
                 print("Found file: " + file_name)
             if file_name.ends_with(".%s" % ext):
-                acc[file_name.split(".")[0]] = file_name
+                acc[file_name.split(".")[0]] = "%s/%s" % [path, file_name]
             file_name = dir.get_next()
     else:
         print("An error occurred when trying to access the path '%s'." % dir)

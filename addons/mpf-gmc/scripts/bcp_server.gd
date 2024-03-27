@@ -322,15 +322,15 @@ func _thread_poll(_userdata=null) -> void:
           "signal":
             call_deferred("emit_signal", message.name, message)
           "slides_play":
-            call_deferred("deferred_mc", "play_slides", message)
+            call_deferred("deferred_mc", "play", message)
           "sounds_clear":
             pass
           "sounds_play":
-            call_deferred("deferred_mc", "play_sounds", message)
+            call_deferred("deferred_mc", "play", message)
           "timer":
             call_deferred("emit_signal", "mpf_timer", message)
           "widgets_play":
-            call_deferred("deferred_mc", "play_widgets", message)
+            call_deferred("deferred_mc", "play", message)
           _:
             MPF.log.warn("No action defined for BCP message %s" % message_raw)
     # Free the mutex in case the main thread is trying to shut down
