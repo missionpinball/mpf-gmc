@@ -50,45 +50,44 @@ func _ready() -> void:
 func _exit_tree():
   self.stop(true)
 
-func _input(ev: InputEvent) -> void:
-  if not ev.is_class("InputEventKey"):
-    return
-  elif Input.is_action_pressed("ui_cancel"):
-    # Cannot use quit() method because it won't cleanly shut down threads
-    # Instead, send a notification to the main thread to shut down
-    get_tree().notification(NOTIFICATION_WM_CLOSE_REQUEST)
-    return
+# func _input(ev: InputEvent) -> void:
+#   if not ev.is_class("InputEventKey"):
+#     return
+#   elif Input.is_action_pressed("ui_cancel"):
+#     # Cannot use quit() method because it won't cleanly shut down threads
+#     # Instead, send a notification to the main thread to shut down
+#     get_tree().notification(NOTIFICATION_WM_CLOSE_REQUEST)
+#     return
 
-  for action in InputMap.get_actions():
-    if ev.is_action(action):
-      get_tree().get_root().set_input_as_handled()
-      var ev_payload: PackedStringArray = action.split("?")
-      if ev_payload.size() > 1:
-        # Godot InputMap does not support the = and : characters,
-        # which the BCP protocol requires. InputMap values must be
-        # bound using % and $ as the respective substitutions.
-        ev_payload[1] = ev_payload[1].replace("%","=").replace("$",":")
+#   for action in InputMap.get_actions():
+#     if ev.is_action(action):
+#       var ev_payload: PackedStringArray = action.split("?")
+#       if ev_payload.size() > 1:
+#         # Godot InputMap does not support the = and : characters,
+#         # which the BCP protocol requires. InputMap values must be
+#         # bound using % and $ as the respective substitutions.
+#         ev_payload[1] = ev_payload[1].replace("%","=").replace("$",":")
 
-      match ev_payload[0]:
-        "event":
-          if ev.is_action_pressed(action):
-            _send("trigger?name=%s" % ev_payload[1])
-        "switch":
-          var message: String
-          # If the switch has no state, set one based on the key press state
-          if not "state" in ev_payload[1]:
-            if ev.is_action_pressed(action):
-              message = "switch?name=%s&state=1" % ev_payload[1]
-            elif ev.is_action_released(action):
-              message = "switch?name=%s&state=0" % ev_payload[1]
-            else:
-              return
-          elif ev.is_action_pressed(action):
-              message = "switch?name=%s" % ev_payload[1]
-          if message:
-            _send(message)
-      self.on_input(ev_payload)
-      return
+#       match ev_payload[0]:
+#         "event":
+#           if ev.is_action_pressed(action):
+#             _send("trigger?name=%s" % ev_payload[1])
+#         "switch":
+#           var message: String
+#           # If the switch has no state, set one based on the key press state
+#           if not "state" in ev_payload[1]:
+#             if ev.is_action_pressed(action):
+#               message = "switch?name=%s&state=1" % ev_payload[1]
+#             elif ev.is_action_released(action):
+#               message = "switch?name=%s&state=0" % ev_payload[1]
+#             else:
+#               return
+#           elif ev.is_action_pressed(action):
+#               message = "switch?name=%s" % ev_payload[1]
+#           if message:
+#             _send(message)
+#       self.on_input(ev_payload)
+#       return
 
 
 func _process(_delta: float) -> void:
@@ -147,6 +146,12 @@ func listen() -> void:
 ## Post an event to MPF
 func send_event(event_name: String) -> void:
   _send("trigger?name=%s" % event_name)
+
+func send_switch(switch_name: String, state: int = -1) -> void:
+  var state_msg = "" if state == -1 else ("&state=%s" % state)
+  var message = "switch?name=%s%s" % [switch_name, state_msg]
+  _send(message)
+
 
 ## Send a specialized Service Mode command to MPF
 func send_service(subcommand: String, values: PackedStringArray = []) -> void:
