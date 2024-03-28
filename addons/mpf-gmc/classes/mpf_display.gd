@@ -32,6 +32,7 @@ func _ready() -> void:
     if not self.initial_slide:
         return
     self.add_child(self.initial_slide.instantiate())
+    MPF.server.connect("clear", self._on_clear)
 
 
 func process_slide(slide_name: String, action: String, settings: Dictionary, context: String, priority: int = 0) -> void:
@@ -74,3 +75,11 @@ func _update_stack() -> void:
             s.queue_free()
         else:
             self.move_child(s, idx)
+
+func _on_clear(mode_name) -> void:
+    self._slide_stack = self._slide_stack.filter(
+        func(slide): return slide.context != mode_name
+    )
+    # TODO: For the remaining slides, call clear to remove any
+    # widgets added by the cleared mode
+    self._update_stack()

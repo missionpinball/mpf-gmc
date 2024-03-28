@@ -12,6 +12,7 @@ signal mpf_timer(payload)
 signal options(payload)
 signal player_var(value, prev_value, change, player_num)
 signal service(payload)
+signal clear(mode_name)
 
 # A list of events that trigger their own automatic signals
 var auto_signals = []
@@ -49,46 +50,6 @@ func _ready() -> void:
 
 func _exit_tree():
   self.stop(true)
-
-# func _input(ev: InputEvent) -> void:
-#   if not ev.is_class("InputEventKey"):
-#     return
-#   elif Input.is_action_pressed("ui_cancel"):
-#     # Cannot use quit() method because it won't cleanly shut down threads
-#     # Instead, send a notification to the main thread to shut down
-#     get_tree().notification(NOTIFICATION_WM_CLOSE_REQUEST)
-#     return
-
-#   for action in InputMap.get_actions():
-#     if ev.is_action(action):
-#       var ev_payload: PackedStringArray = action.split("?")
-#       if ev_payload.size() > 1:
-#         # Godot InputMap does not support the = and : characters,
-#         # which the BCP protocol requires. InputMap values must be
-#         # bound using % and $ as the respective substitutions.
-#         ev_payload[1] = ev_payload[1].replace("%","=").replace("$",":")
-
-#       match ev_payload[0]:
-#         "event":
-#           if ev.is_action_pressed(action):
-#             _send("trigger?name=%s" % ev_payload[1])
-#         "switch":
-#           var message: String
-#           # If the switch has no state, set one based on the key press state
-#           if not "state" in ev_payload[1]:
-#             if ev.is_action_pressed(action):
-#               message = "switch?name=%s&state=1" % ev_payload[1]
-#             elif ev.is_action_released(action):
-#               message = "switch?name=%s&state=0" % ev_payload[1]
-#             else:
-#               return
-#           elif ev.is_action_pressed(action):
-#               message = "switch?name=%s" % ev_payload[1]
-#           if message:
-#             _send(message)
-#       self.on_input(ev_payload)
-#       return
-
 
 func _process(_delta: float) -> void:
   if not _client and _server.is_connection_available() == true:
@@ -270,6 +231,8 @@ func _thread_poll(_userdata=null) -> void:
             call_deferred("on_ball_end")
           "ball_start":
             call_deferred("on_ball_start", message.ball, message.player_num)
+          "clear":
+            call_deferred("emit_signal", "clear", message.key)
           "goodbye":
             _send("goodbye")
             call_deferred("stop")
@@ -310,6 +273,7 @@ func _thread_poll(_userdata=null) -> void:
             _send("monitor_start?category=player_vars")
             _send("monitor_start?category=machine_vars")
             # Standard events
+            _send("register_trigger?event=clear")
             _send("register_trigger?event=bonus")
             _send("register_trigger?event=high_score_enter_initials")
             _send("register_trigger?event=high_score_award_display")
