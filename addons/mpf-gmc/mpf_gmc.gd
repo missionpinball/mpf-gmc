@@ -31,18 +31,13 @@ func _enter_tree():
             print("Making some keymaps!")
             for key in config.get_section_keys("keyboard"):
                 keyboard[key.to_upper()] = config.get_value("keyboard", key)
-            config.set_value("keyboard", "f", ["event", "another"])
-            config.save("res://gmc-out.cfg")
-    print(keyboard)
 
-
-func _input(event: InputEvent) -> void:
+func _unhandled_input(event: InputEvent) -> void:
     if not event.is_class("InputEventKey"):
         return
     # Don't support holding down a key
     if event.is_echo():
         return
-    print("INPUT EVENT: %s" % event)
     var keycode = OS.get_keycode_string(event.get_key_label_with_modifiers()).to_upper()
     print(keycode)
     if keycode == "ESCAPE":
@@ -73,7 +68,7 @@ func _input(event: InputEvent) -> void:
                 MPF.server.send_switch(cfg[1], state)
             _:
                 return
-    get_tree().get_root().set_input_as_handled()
+        get_tree().get_root().set_input_as_handled()
 
 
     # add_custom_type("MPFWindow", "Node2D", preload("classes/mpf_window.gd"), null)

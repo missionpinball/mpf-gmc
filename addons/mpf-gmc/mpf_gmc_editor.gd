@@ -7,6 +7,7 @@ func _enter_tree():
     add_custom_type("MPFWindow", "Node2D", preload("classes/mpf_window.gd"), null)
     add_custom_type("MPFDisplay", "Node2D", preload("classes/mpf_display.gd"), null)
     add_custom_type("MPFSlide", "Node2D", preload("classes/mpf_slide.gd"), null)
+    add_custom_type("MPFVariable", "Label", preload("classes/mpf_variable.gd"), null)
     # add_custom_type("MPFDisplay", "Node2D", preload("classes/mpf_display.gd"), null)
 
 func _exit_tree():
@@ -15,3 +16,4 @@ func _exit_tree():
     remove_custom_type("MPFDisplay")
     remove_custom_type("MPFWindow")
     remove_custom_type("MPFSlide")
+    remove_custom_type("MPFVariable")
