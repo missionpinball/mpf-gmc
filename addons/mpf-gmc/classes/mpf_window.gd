@@ -37,7 +37,7 @@ func play_slides(payload: Dictionary) -> void:
         var priority = payload.priority
         var target = settings.get('target')
         var display: MPFDisplay = get_display(target) if target else get_display()
-        display.process_slide(slide_name, action, settings, context, priority)
+        display.process_slide(slide_name, action, settings, context, priority, payload)
 
 
 func get_display(display_name: String = "") -> MPFDisplay:

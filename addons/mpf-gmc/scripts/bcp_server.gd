@@ -231,8 +231,6 @@ func _thread_poll(_userdata=null) -> void:
             call_deferred("on_ball_end")
           "ball_start":
             call_deferred("on_ball_start", message.ball, message.player_num)
-          "clear":
-            call_deferred("emit_signal", "clear", message.key)
           "goodbye":
             _send("goodbye")
             call_deferred("stop")
@@ -273,7 +271,6 @@ func _thread_poll(_userdata=null) -> void:
             _send("monitor_start?category=player_vars")
             _send("monitor_start?category=machine_vars")
             # Standard events
-            _send("register_trigger?event=clear")
             _send("register_trigger?event=bonus")
             _send("register_trigger?event=high_score_enter_initials")
             _send("register_trigger?event=high_score_award_display")
@@ -290,6 +287,9 @@ func _thread_poll(_userdata=null) -> void:
             call_deferred("emit_signal", message.name, message)
           "slides_play":
             call_deferred("deferred_mc", "play", message)
+          "slides_clear":
+            # TBD: Need to distinguish slides/widgets/sounds?
+            call_deferred("emit_signal", "clear", message.context)
           "sounds_clear":
             pass
           "sounds_play":
