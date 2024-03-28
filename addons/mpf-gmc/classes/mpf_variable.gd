@@ -10,7 +10,7 @@ var format_template: String = "%s"
 
 func _ready() -> void:
     if min_digits > 0:
-      format_template = ("%"+str(min_digits)+"d")
+      format_template = ("%0"+str(min_digits)+"d")
     if variable_type == "Machine":
         self._set_text(MPF.game.machine_vars[self.variable_name])
         # TODO: Dynamically update machine vars?

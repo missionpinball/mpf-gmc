@@ -19,7 +19,6 @@ func _enter_tree():
     mc = preload("scripts/mc.gd").new()
     print("GMC is ready")
 
-    print("GMC entering tree")
     # Process is only called on children in the tree, so add the children
     # that need to call process
     self.add_child(server)
@@ -39,11 +38,12 @@ func _unhandled_input(event: InputEvent) -> void:
     if event.is_echo():
         return
     var keycode = OS.get_keycode_string(event.get_key_label_with_modifiers()).to_upper()
-    print(keycode)
+    #print(keycode)
     if keycode == "ESCAPE":
         # Cannot use quit() method because it won't cleanly shut down threads
         # Instead, send a notification to the main thread to shut down
-        get_tree().notification(NOTIFICATION_WM_CLOSE_REQUEST)
+        #get_tree().notification(NOTIFICATION_WM_CLOSE_REQUEST)
+        get_tree().quit()
         return
 
     if keycode in keyboard:
@@ -69,9 +69,3 @@ func _unhandled_input(event: InputEvent) -> void:
             _:
                 return
         get_tree().get_root().set_input_as_handled()
-
-
-    # add_custom_type("MPFWindow", "Node2D", preload("classes/mpf_window.gd"), null)
-    # add_custom_type("MPFDisplay", "Node2D", preload("classes/mpf_display.gd"), null)
-    # add_custom_type("MPFSlide", "Node2D", preload("classes/mpf_slide.gd"), null)
-    # add_custom_type("MPFDisplay", "Node2D", preload("classes/mpf_display.gd"), null)
