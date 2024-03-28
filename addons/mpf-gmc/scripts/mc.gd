@@ -40,7 +40,6 @@ func traverse_tree_for(obj_type: String, acc: Dictionary) -> void:
     var file_name = dir.get_next()
     while (file_name != ""):
         if file_name == obj_type and dir.current_is_dir():
-            print("Found directory: " + file_name + " in mode " + dir)
             self.recurse_dir("%s/%s" % [dir, file_name], acc)
         file_name = dir.get_next()
     # Then look for defaults included with GMC
@@ -52,18 +51,13 @@ func traverse_tree_for(obj_type: String, acc: Dictionary) -> void:
             acc[d] = defaults[d]
 
 func recurse_dir(path, acc, ext="tscn") -> void:
-    print("Recursing dir at path %s" % path)
     var dir = DirAccess.open(path)
     if dir:
         dir.list_dir_begin()
         var file_name = dir.get_next()
         while (file_name != ""):
-            if dir.current_is_dir():
-                print("Found directory: " + file_name)
-            else:
-                print("Found file: " + file_name)
             if file_name.ends_with(".%s" % ext):
                 acc[file_name.split(".")[0]] = "%s/%s" % [path, file_name]
             file_name = dir.get_next()
-    else:
-        print("An error occurred when trying to access the path '%s'." % dir)
+    #else:
+    #    print("An error occurred when trying to access the path '%s'." % dir)

@@ -8,7 +8,6 @@ func _enter_tree():
     add_custom_type("MPFDisplay", "Node2D", preload("classes/mpf_display.gd"), null)
     add_custom_type("MPFSlide", "Node2D", preload("classes/mpf_slide.gd"), null)
     add_custom_type("MPFVariable", "Label", preload("classes/mpf_variable.gd"), null)
-    # add_custom_type("MPFDisplay", "Node2D", preload("classes/mpf_display.gd"), null)
 
 func _exit_tree():
     # Clean-up of the plugin goes here.

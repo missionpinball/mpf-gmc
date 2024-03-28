@@ -22,7 +22,7 @@ func _ready() -> void:
         default_display = first_display
 
 func _enter_tree():
-    print("Window entering tree")
+    pass
 
 func play_slides(payload: Dictionary) -> void:
     MPF.log.info("Playing slide with payload %s", payload)
