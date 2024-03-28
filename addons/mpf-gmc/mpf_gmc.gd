@@ -56,6 +56,8 @@ func _unhandled_input(event: InputEvent) -> void:
                 var state
                 if cfg.size() < 3:
                     action = "active" if event.is_pressed() else "inactive"
+                elif not event.is_pressed():
+                    return
                 else:
                     action = cfg[2]
                 match action:

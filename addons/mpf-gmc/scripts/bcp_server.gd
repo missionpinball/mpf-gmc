@@ -148,8 +148,7 @@ func send_event(event_name: String) -> void:
   _send("trigger?name=%s" % event_name)
 
 func send_switch(switch_name: String, state: int = -1) -> void:
-  var state_msg = "" if state == -1 else ("&state=%s" % state)
-  var message = "switch?name=%s%s" % [switch_name, state_msg]
+  var message = "switch?name=%s&state=%s" % [switch_name, state]
   _send(message)
 
 
