@@ -30,6 +30,11 @@ func process_slide(slide_name: String, action: String, settings: Dictionary, con
         "update":
             if slide:
                 slide.update(settings, kwargs)
+        "method":
+            if slide and slide.has_method(settings.method):
+                var callable = Callable(slide, settings.method)
+                callable.call(settings, kwargs)
+
 
 func play_slide(slide_name: String, settings: Dictionary, context: String, priority: int = 0, kwargs: Dictionary = {}) -> void:
     var slide = MPF.mc.get_slide(slide_name)
