@@ -37,11 +37,16 @@ func traverse_tree_for(obj_type: String, acc: Dictionary) -> void:
     # Then traverse the mode folders for subfolders of this object type
     var dir = DirAccess.open("res://modes")
     dir.list_dir_begin()
-    var file_name = dir.get_next()
-    while (file_name != ""):
-        if file_name == obj_type and dir.current_is_dir():
-            self.recurse_dir("%s/%s" % [dir, file_name], acc)
-        file_name = dir.get_next()
+    var mode = dir.get_next()
+    while (mode != ""):
+        var mdir = DirAccess.open("res://modes/%s" % mode)
+        mdir.list_dir_begin()
+        var file_name = mdir.get_next()
+        while (file_name != ""):
+            if file_name == obj_type and mdir.current_is_dir():
+                self.recurse_dir("res://modes/%s/%s" % [mode, obj_type], acc)
+            file_name = mdir.get_next()
+        mode = dir.get_next()
     # Then look for defaults included with GMC
     var defaults = {}
     self.recurse_dir("res://addons/mpf-gmc/%s" % obj_type, defaults)
@@ -56,7 +61,9 @@ func recurse_dir(path, acc, ext="tscn") -> void:
         dir.list_dir_begin()
         var file_name = dir.get_next()
         while (file_name != ""):
-            if file_name.ends_with(".%s" % ext):
+            if dir.current_is_dir():
+                self.recurse_dir("%s/%s" % [path, file_name], acc)
+            elif file_name.ends_with(".%s" % ext):
                 acc[file_name.split(".")[0]] = "%s/%s" % [path, file_name]
             file_name = dir.get_next()
     #else:
