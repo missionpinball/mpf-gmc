@@ -6,6 +6,7 @@ class_name MPFDisplay extends Node2D
 @export var initial_slide: PackedScene
 var _slide_stack = []
 var _timers = []
+var _current_slide: MPFSlide
 
 func _ready() -> void:
     if not self.initial_slide:
@@ -59,6 +60,8 @@ func remove_slide(slide) -> void:
     self._update_stack()
 
 func _update_stack() -> void:
+    if not self._slide_stack:
+        return
     # Sort the stack by priority
     self._slide_stack.sort_custom(
         func(a: Node, b: Node): return a.priority < b.priority
@@ -71,6 +74,14 @@ func _update_stack() -> void:
             s.queue_free()
         else:
             self.move_child(s, idx)
+    var new_slide = self._slide_stack[-1]
+    if new_slide != self._current_slide:
+        if self._current_slide:
+            MPF.server.send_event("slide_%s_inactive" % self._current_slide.key)
+            if self._current_slide not in self._slide_stack:
+                MPF.server.send_event("slide_%s_removed" % self._current_slide.key)
+        MPF.server.send_event("slide_%s_active" % new_slide.key)
+        self._current_slide = new_slide
 
 func _on_clear(mode_name) -> void:
     self._slide_stack = self._slide_stack.filter(
