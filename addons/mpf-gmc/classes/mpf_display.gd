@@ -45,10 +45,13 @@ func process_slide(slide_name: String, action: String, settings: Dictionary, con
         timer.timeout.connect(self._on_expire.bind(slide, timer))
         self.add_child(timer)
 
+func process_widget(widget_name: String, action: String, settings: Dictionary, context: String, priority: int = 0, kwargs: Dictionary = {}) -> void:
+    var slide = self.get_slide(settings.get('slide'))
+    slide.process_widget(widget_name, action, settings, context, priority, kwargs)
 
 func play_slide(slide_name: String, settings: Dictionary, context: String, priority: int = 0, kwargs: Dictionary = {}) -> MPFSlide:
     var slide = MPF.mc.get_slide(slide_name)
-    assert(slide is MPFSlide, "Slide scenes must use the MPFSlide script on the root node.")
+    assert(slide is MPFSlide, "Slide scenes must use (or extend) the MPFSlide script on the root node.")
     slide.initialize(slide_name, settings, context, priority, kwargs)
     self._slide_stack.append(slide)
     self.add_child(slide)
@@ -58,6 +61,13 @@ func play_slide(slide_name: String, settings: Dictionary, context: String, prior
 func remove_slide(slide) -> void:
     self._slide_stack.erase(slide)
     self._update_stack()
+
+func get_slide(slide_name: String) -> MPFSlide:
+    if not slide_name:
+        return self._current_slide
+    for s in self._slide_stack:
+        if s.key == slide_name:
+            return s
 
 func _update_stack() -> void:
     if not self._slide_stack:
@@ -92,5 +102,6 @@ func _on_clear(mode_name) -> void:
     self._update_stack()
 
 func _on_expire(slide: MPFSlide, timer: Timer) -> void:
-    self.remove_child(timer)
     self.remove_slide(slide)
+    self.remove_child(timer)
+    timer.queue_free()

@@ -21,15 +21,24 @@ func play(payload: Dictionary) -> void:
     match command:
         "slides_play":
             self.window.play_slides(payload)
+        "widgets_play":
+            self.window.play_widgets(payload)
 
 func get_slide(slide_name: String, preload_only: bool = false) -> MPFSlide:
     assert(slide_name in slides, "Unknown slide name '%s'" % slide_name)
+    return self._get_scene(slide_name, self.slides, preload_only) as MPFSlide
+
+func get_widget(widget_name: String, preload_only: bool = false) -> MPFWidget:
+    assert(widget_name in widgets, "Unknown widget name '%s'" % widget_name)
+    return self._get_scene(widget_name, self.widgets, preload_only) as MPFWidget
+
+func _get_scene(name: String, collection: Array, preload_only: bool = false):
     # If this is the first access, load the scene
-    if slides[slide_name] is String:
-        slides[slide_name] = load(slides[slide_name])
+    if collection[name] is String:
+        collection[name] = load(collection[name])
     if preload_only:
         return
-    return slides[slide_name].instantiate()
+    return collection[name].instantiate()
 
 func traverse_tree_for(obj_type: String, acc: Dictionary) -> void:
     # Start by traversing the root folder for this object type

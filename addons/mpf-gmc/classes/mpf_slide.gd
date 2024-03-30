@@ -1,22 +1,22 @@
 @tool
 class_name MPFSlide
-extends Node2D
+extends MPFSceneBase
 
-var priority: int = 0
-var context: String
-var key: String
+var _widgets: Node2D
 
-func initialize(key: String, settings: Dictionary, context: String, priority: int = 0, kwargs: Dictionary = {}) -> void:
-    # The "name" is the name of the root node, which could be
-    # anything or case-sensitive. Set an explicit key instead.
-    self.key = key
-    self.priority = settings['priority'] + priority if settings['priority'] else priority
-    self.context = context
+func process_widget(widget_name: String, action: String, settings: Dictionary, context: String, priority: int = 0, kwargs: Dictionary = {}) -> void:
+    if not self._widgets:
+        self._widgets = Node2D.new()
+        self.append_child(self._widgets)
+    self.process_action(widget_name, action, settings, context, priority, kwargs)
 
-    self.update(settings, kwargs)
+func action_play(widget_name: String, settings: Dictionary, context: String, priority: int = 0, kwargs: Dictionary = {}) -> MPFWidget:
+    var widget = MPF.mc.get_widget(widget_name)
+    assert(widget is MPFWidget, "Widget scenes must use (or extend) the MPFWidget script on the root node.")
+    widget.initialize(widget_name, settings, context, priority, kwargs)
+    self._widgets.add_child(widget)
+    return widget
 
-func update(settings: Dictionary, kwargs: Dictionary = {}) -> void:
-    # TODO: Recurse through all sub-children
-    for c in self.get_children():
-        if c is MPFVariable:
-            c.update(settings, kwargs)
+func action_remove(widget: MPFWidget) -> void:
+    self._widgets.remove_child(widget)
+    widget.queue_free()
