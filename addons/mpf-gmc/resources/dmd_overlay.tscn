@@ -1,0 +1,19 @@
+[gd_scene load_steps=4 format=3 uid="uid://3f4rqdk8gr7s"]
+
+[ext_resource type="Shader" path="res://addons/mpf-gmc/resources/dmd.gdshader" id="1_necd5"]
+[ext_resource type="Script" path="res://addons/mpf-gmc/resources/dmd_overlay.gd" id="2_lg0y5"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_sos3s"]
+shader = ExtResource("1_necd5")
+shader_parameter/dot_columns = 10.0
+shader_parameter/color = Color(0, 0, 0, 0)
+shader_parameter/display_width = 1280.0
+shader_parameter/display_height = 720.0
+shader_parameter/hardness = 2.0
+
+[node name="DMD_Overlay" type="ColorRect"]
+material = SubResource("ShaderMaterial_sos3s")
+offset_right = 3147.0
+offset_bottom = 1205.0
+color = Color(0, 0, 0, 1)
+script = ExtResource("2_lg0y5")
