@@ -30,7 +30,6 @@ func _enter_tree():
     var err = config.load("res://gmc.cfg")
     if err == OK:
         if config.has_section("keyboard"):
-            print("Making some keymaps!")
             for key in config.get_section_keys("keyboard"):
                 keyboard[key.to_upper()] = config.get_value("keyboard", key)
 

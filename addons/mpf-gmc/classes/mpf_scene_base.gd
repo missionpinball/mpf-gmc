@@ -5,6 +5,7 @@ extends Node2D
 var priority: int = 0
 var context: String
 var key: String
+var _variables: Array[Node]
 
 func initialize(key: String, settings: Dictionary, context: String, priority: int = 0, kwargs: Dictionary = {}) -> void:
     # The "name" is the name of the root node, which could be
@@ -13,13 +14,12 @@ func initialize(key: String, settings: Dictionary, context: String, priority: in
     self.priority = settings['priority'] + priority if settings['priority'] else priority
     self.context = context
 
+    self._variables = MPF.util.find_variables(self)
     self.update(settings, kwargs)
 
 func update(settings: Dictionary, kwargs: Dictionary = {}) -> void:
-    # TODO: Recurse through all sub-children
-    for c in self.get_children():
-        if c is MPFVariable:
-            c.update(settings, kwargs)
+    for c in self._variables:
+        c.update(settings, kwargs)
 
 func process_action(child_name: String, children: Array, action: String, settings: Dictionary, context: String, priority: int = 0, kwargs: Dictionary = {}) -> void:
     var child: MPFSceneBase

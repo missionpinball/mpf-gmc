@@ -13,10 +13,9 @@ func initialize(key: String, settings: Dictionary, context: String, priority: in
     self.priority = settings['priority'] + priority if settings['priority'] else priority
     self.context = context
 
+    self._variables = MPF.util.find_variables(self)
     self.update(settings, kwargs)
 
 func update(settings: Dictionary, kwargs: Dictionary = {}) -> void:
-    # TODO: Recurse through all sub-children
-    for c in self.get_children():
-        if c is MPFVariable:
-            c.update(settings, kwargs)
+    for c in self._variables:
+        c.update(settings, kwargs)
