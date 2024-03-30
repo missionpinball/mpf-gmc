@@ -32,7 +32,7 @@ func get_widget(widget_name: String, preload_only: bool = false) -> MPFWidget:
     assert(widget_name in widgets, "Unknown widget name '%s'" % widget_name)
     return self._get_scene(widget_name, self.widgets, preload_only) as MPFWidget
 
-func _get_scene(name: String, collection: Array, preload_only: bool = false):
+func _get_scene(name: String, collection: Dictionary, preload_only: bool = false):
     # If this is the first access, load the scene
     if collection[name] is String:
         collection[name] = load(collection[name])

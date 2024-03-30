@@ -21,7 +21,7 @@ func update(settings: Dictionary, kwargs: Dictionary = {}) -> void:
         if c is MPFVariable:
             c.update(settings, kwargs)
 
-func process_action(child_name: String, children: Array[MPFSceneBase], action: String, settings: Dictionary, context: String, priority: int = 0, kwargs: Dictionary = {}) -> void:
+func process_action(child_name: String, children: Array[Node], action: String, settings: Dictionary, context: String, priority: int = 0, kwargs: Dictionary = {}) -> void:
     var child: MPFSceneBase
     for c in children:
         if c.key == child_name:
@@ -47,9 +47,8 @@ func process_action(child_name: String, children: Array[MPFSceneBase], action: S
 func action_play(child_name: String, settings: Dictionary, context: String, priority: int = 0, kwargs: Dictionary = {}):
     assert(false, "Method 'action_play' must be overridden in child classes of MPFSceneBase")
 
-func action_remove(widget: MPFSceneBase) -> void:
+func action_remove(widget: Node) -> void:
     assert(false, "Method 'action_remove' must be overridden in child classes of MPFSceneBase")
-
 
 func _create_expire(child: MPFSceneBase, expiration_secs: float) -> void:
     var timer = Timer.new()
@@ -59,7 +58,7 @@ func _create_expire(child: MPFSceneBase, expiration_secs: float) -> void:
     timer.timeout.connect(self._on_expire.bind(child, timer))
     self.add_child(timer)
 
-func _on_expire(child: MPFSceneBase, timer: Timer, callback: Callable) -> void:
+func _on_expire(child: MPFSceneBase, timer: Timer) -> void:
     self.remove_child(timer)
     timer.queue_free()
     self.action_remove(child)

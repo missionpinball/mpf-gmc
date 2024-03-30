@@ -41,6 +41,7 @@ func update(settings: Dictionary, kwargs: Dictionary = {}) -> void:
 func update_text(value):
     if not value:
         self.text = ""
+        return
     if value is int or value is float:
         if comma_separate and value >= 1000:
             value = MPF.game.comma_sep(value)

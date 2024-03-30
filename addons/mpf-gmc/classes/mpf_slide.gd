@@ -7,8 +7,8 @@ var _widgets: Node2D
 func process_widget(widget_name: String, action: String, settings: Dictionary, context: String, priority: int = 0, kwargs: Dictionary = {}) -> void:
     if not self._widgets:
         self._widgets = Node2D.new()
-        self.append_child(self._widgets)
-    self.process_action(widget_name, action, settings, context, priority, kwargs)
+        self.add_child(self._widgets)
+    self.process_action(widget_name, self._widgets.get_children(), action, settings, context, priority, kwargs)
 
 func action_play(widget_name: String, settings: Dictionary, context: String, priority: int = 0, kwargs: Dictionary = {}) -> MPFWidget:
     var widget = MPF.mc.get_widget(widget_name)
@@ -17,6 +17,6 @@ func action_play(widget_name: String, settings: Dictionary, context: String, pri
     self._widgets.add_child(widget)
     return widget
 
-func action_remove(widget: MPFWidget) -> void:
+func action_remove(widget: Node) -> void:
     self._widgets.remove_child(widget)
     widget.queue_free()
