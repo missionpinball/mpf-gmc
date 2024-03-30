@@ -27,7 +27,8 @@ func process_slide(slide_name: String, action: String, settings: Dictionary, con
 func process_widget(widget_name: String, action: String, settings: Dictionary, context: String, priority: int = 0, kwargs: Dictionary = {}) -> void:
     var slide = self.get_slide(settings.get('slide'))
     # The requested slide may not exist
-    if not slide: return
+    if not slide:
+        return
     slide.process_widget(widget_name, action, settings, context, priority, kwargs)
 
 func action_play(slide_name: String, settings: Dictionary, context: String, priority: int = 0, kwargs: Dictionary = {}) -> MPFSlide:

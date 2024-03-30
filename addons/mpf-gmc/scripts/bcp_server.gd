@@ -15,9 +15,11 @@ signal service(payload)
 signal clear(mode_name)
 
 # A list of events that trigger their own automatic signals
-var auto_signals = []
+var auto_signals := []
 # A list of event names to register in MPF
-var registered_events = []
+var registered_events := []
+# A map of event handlers added by MPFVariables
+var registered_handlers := {}
 # A logger instance and possible private instance
 var logger
 var _logger
@@ -112,7 +114,6 @@ func send_switch(switch_name: String, state: int = -1) -> void:
   var message = "switch?name=%s&state=%s" % [switch_name, state]
   _send(message)
 
-
 ## Send a specialized Service Mode command to MPF
 func send_service(subcommand: String, values: PackedStringArray = []) -> void:
   var suffix: String = "&values=%s" % ",".join(values) if values else ""
@@ -121,6 +122,22 @@ func send_service(subcommand: String, values: PackedStringArray = []) -> void:
 ## Set a machine variable in MPF
 func set_machine_var(name: String, value) -> void:
   self._send("set_machine_var?name=%s&value=%s" % [name, self.wrap_value_type(value)])
+
+## Register an event handler for an MPFVariable
+func add_event_handler(event: String, handler: Callable) -> void:
+  # Add a listener for this event if we don't already have one
+  if event not in registered_handlers:
+    self._send("register_trigger?event=%s" % event)
+    registered_handlers[event] = []
+  if handler not in registered_handlers[event]:
+    registered_handlers[event].append(handler)
+
+func remove_event_handler(event: String, handler: Callable) -> void:
+  # TODO: Any fallback logic or error catching if it's not here?
+  registered_handlers[event].erase(handler)
+  # If there are no more handlers, unsubscribe from this event
+  if not registered_handlers[event] and event not in self.registered_events and event not in self.auto_signals:
+    self._send("remove_trigger?event=%s" % event)
 
 ## Disconnect the BCP server
 func stop(is_exiting: bool = false) -> void:
@@ -299,6 +316,13 @@ func _thread_poll(_userdata=null) -> void:
           "widgets_play":
             call_deferred("deferred_mc", "play", message)
           _:
-            MPF.log.warn("No action defined for BCP message %s" % message_raw)
+            if message.get("name") not in self.registered_handlers:
+              MPF.log.warn("No action defined for BCP message %s" % message_raw)
+
+        # If any handlers are registered for this event, post them
+        if message.get("name") in self.registered_handlers:
+          for h in self.registered_handlers[message.name]:
+            h.call_deferred(message)
+
     # Free the mutex in case the main thread is trying to shut down
     _mutex.unlock()

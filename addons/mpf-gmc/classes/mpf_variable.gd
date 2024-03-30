@@ -7,6 +7,7 @@ class_name MPFVariable extends Label
 @export var min_digits: int = -1
 @export var template: String = ""
 @export var initialize_empty: bool = true
+@export var update_event: String = ""
 
 var var_template: String = "%s"
 
@@ -28,11 +29,20 @@ func _ready() -> void:
         elif MPF.game.players.size() >= player_num:
             self.update_text(MPF.game.players[player_num - 1].get(self.variable_name))
 
+    if self.update_event:
+        MPF.server.add_event_handler(self.update_event, self.update)
+
+func _exit_tree() -> void:
+    if self.update_event:
+        MPF.server.remove_event_handler(self.update_event, self.update)
+
 func update(settings: Dictionary, kwargs: Dictionary = {}) -> void:
     if variable_type != "Event Arg":
         return
+    if variable_name in settings:
+        self.update_text(settings[variable_name])
     # The value may be passed via the tokens: config
-    if variable_name in settings.get("tokens", {}):
+    elif variable_name in settings.get("tokens", {}):
         self.update_text(settings.tokens[variable_name])
     # Or the value may be part of the triggering event
     elif variable_name in kwargs:
