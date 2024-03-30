@@ -6,10 +6,13 @@ var game
 var log
 var mc
 var player
+var util
 var keyboard: = {}
 
 func _enter_tree():
-    # Log is top-most
+    # Static utility functions first
+    util = preload("scripts/utilities.gd").new()
+    # Log is needed for the rest
     log = preload("scripts/log.gd").new()
     # Game should be loaded first
     game = preload("scripts/mpf_game.gd").new()

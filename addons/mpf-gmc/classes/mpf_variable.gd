@@ -54,7 +54,7 @@ func update_text(value):
         return
     if value is int or value is float:
         if comma_separate and value >= 1000:
-            value = MPF.game.comma_sep(value)
+            value = MPF.util.comma_sep(value)
         else:
             value = var_template % value
     if template:

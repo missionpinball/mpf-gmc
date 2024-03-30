@@ -138,7 +138,7 @@ func update_settings(result: Dictionary) -> void:
     s.priority = option[2]
     s.variable = option[3]
     # Convert the setting value to the appropriate data type
-    var cvrt = Callable(self, "to_float") if s.variable in self.settings_with_floats else Callable(self, "to_int")
+    var cvrt = Callable(MPF.util, "to_float") if s.variable in self.settings_with_floats else Callable(MPF.util, "to_int")
     s.default = cvrt.call(option[4])
     # Watch for true/false passed as strings, and convert to int 1 or 0
     if typeof(s.default) == TYPE_STRING and s.default == "True":
@@ -168,29 +168,3 @@ func update_settings(result: Dictionary) -> void:
         s.options[key] = s.options[key].replace("%", "%%")
     # Store all settings as root-level keys, regardless of settingType
     settings[option[0]] = s
-
-## Receive an integer value and return a comma-separated string
-static func comma_sep(n: int) -> String:
-  var result := ""
-  var i: int = int(abs(n))
-
-  while i > 999:
-    result = ",%03d%s" % [i % 1000, result]
-    i /= 1000
-
-  return "%s%s%s" % ["-" if n < 0 else "", i, result]
-
-
-## Receive a string template and an integer, return the string
-## formatted with an "s" if the number is anything other than 1
-static func pluralize(template: String, val: int) -> String:
-  return template % ("" if val == 1 else "s")
-
-static func to_int(x) -> int:
-  return int(x)
-
-static func to_float(x) -> float:
-  return float(x)
-
-static func no_op(x):
-  return x
