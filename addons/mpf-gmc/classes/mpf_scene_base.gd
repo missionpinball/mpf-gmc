@@ -6,6 +6,7 @@ var priority: int = 0
 var context: String
 var key: String
 var _variables: Array[Node]
+var _expirations: Dictionary = {}
 
 func initialize(key: String, settings: Dictionary, context: String, priority: int = 0, kwargs: Dictionary = {}) -> void:
     # The "name" is the name of the root node, which could be
@@ -51,14 +52,21 @@ func action_remove(widget: Node) -> void:
     assert(false, "Method 'action_remove' must be overridden in child classes of MPFSceneBase")
 
 func _create_expire(child: MPFSceneBase, expiration_secs: float) -> void:
+    # If there is already a timer for this child to expire, reset it
+    if self._expirations.has(child.key):
+        self._expirations[child.key].start(expiration_secs)
+        return
+
     var timer = Timer.new()
     timer.wait_time = expiration_secs
     timer.one_shot = true
     timer.autostart = true
     timer.timeout.connect(self._on_expire.bind(child, timer))
     self.add_child(timer)
+    self._expirations[child.key] = timer
 
 func _on_expire(child: MPFSceneBase, timer: Timer) -> void:
+    self._expirations.erase(child.key)
     self.remove_child(timer)
     timer.queue_free()
     self.action_remove(child)
