@@ -39,7 +39,7 @@ func update(settings: Dictionary, kwargs: Dictionary = {}) -> void:
         self.update_text(kwargs[variable_name])
 
 func update_text(value):
-    if not value:
+    if value == null:
         self.text = ""
         return
     if value is int or value is float:

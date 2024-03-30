@@ -21,7 +21,7 @@ func update(settings: Dictionary, kwargs: Dictionary = {}) -> void:
         if c is MPFVariable:
             c.update(settings, kwargs)
 
-func process_action(child_name: String, children: Array[Node], action: String, settings: Dictionary, context: String, priority: int = 0, kwargs: Dictionary = {}) -> void:
+func process_action(child_name: String, children: Array, action: String, settings: Dictionary, context: String, priority: int = 0, kwargs: Dictionary = {}) -> void:
     var child: MPFSceneBase
     for c in children:
         if c.key == child_name:
