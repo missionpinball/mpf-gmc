@@ -8,10 +8,10 @@ var key: String
 var _variables: Array[Node]
 var _expirations: Dictionary = {}
 
-func initialize(key: String, settings: Dictionary, context: String, priority: int = 0, kwargs: Dictionary = {}) -> void:
-    # The "name" is the name of the root node, which could be
-    # anything or case-sensitive. Set an explicit key instead.
-    self.key = key
+func initialize(name: String, settings: Dictionary, context: String, priority: int = 0, kwargs: Dictionary = {}) -> void:
+    # The node name attribute is the name of the root node, which could be
+    # anything or case-sensitive. Set an explicit key instead, using the name.
+    self.key = settings["key"] if settings.get("key") else name
     self.priority = settings['priority'] + priority if settings['priority'] else priority
     self.context = context
 
@@ -24,8 +24,9 @@ func update(settings: Dictionary, kwargs: Dictionary = {}) -> void:
 
 func process_action(child_name: String, children: Array, action: String, settings: Dictionary, context: String, priority: int = 0, kwargs: Dictionary = {}) -> void:
     var child: MPFSceneBase
+    var key = settings['key'] if settings.get('key') else child_name
     for c in children:
-        if c.key == child_name:
+        if c.key == key:
             child = c
             break
     match action:
