@@ -37,9 +37,9 @@ func _play_scene(scene_type: String, payload: Dictionary) -> void:
         var action: String = settings['action']
         if action == "preload":
             if scene_type == "slide":
-                MPF.mc.get_slide(name, true)
+                MPF.mc.get_slide_instance(name, true)
             elif scene_type == "widget":
-                MPF.mc.get_widget(name, true)
+                MPF.mc.get_widget_instance(name, true)
             return
 
         var context = payload.context

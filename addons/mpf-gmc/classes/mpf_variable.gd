@@ -11,6 +11,10 @@ class_name MPFVariable extends Label
 
 var var_template: String = "%s"
 
+func _init() -> void:
+    if initialize_empty:
+        self.text = ""
+
 func _ready() -> void:
     if min_digits > 0:
       var_template = ("%0"+str(min_digits)+"d")
@@ -18,8 +22,7 @@ func _ready() -> void:
         self.update_text(MPF.game.machine_vars.get(self.variable_name))
         # TODO: Dynamically update machine vars?
     elif variable_type == "Event Arg":
-        if initialize_empty:
-            self.text = ""
+        pass
     else:
         var player_num = int(variable_type.right(1))
         var is_current_player = variable_type == "Current Player" or player_num == MPF.game.player.get('number')
