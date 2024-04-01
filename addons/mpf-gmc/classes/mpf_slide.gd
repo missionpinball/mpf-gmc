@@ -20,3 +20,10 @@ func action_play(widget_name: String, settings: Dictionary, context: String, pri
 func action_remove(widget: Node) -> void:
     self._widgets.remove_child(widget)
     widget.queue_free()
+
+func clear(context_name):
+    if not self._widgets:
+        return
+    for w in self._widgets.get_children():
+        if w.context == context_name:
+            self.action_remove(w)

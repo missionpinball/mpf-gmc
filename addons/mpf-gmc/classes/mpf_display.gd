@@ -75,10 +75,12 @@ func _update_stack() -> void:
         MPF.server.send_event("slide_%s_active" % new_slide.key)
         self._current_slide = new_slide
 
-func _on_clear(mode_name) -> void:
+func _on_clear(context_name) -> void:
+    # Filter all slides with the given context
     self._slide_stack = self._slide_stack.filter(
-        func(slide): return slide.context != mode_name
+        func(slide): return slide.context != context_name
     )
-    # TODO: For the remaining slides, call clear to remove any
-    # widgets added by the cleared mode
     self._update_stack()
+    # For the remaining slides, clear out any widgets from that context
+    for s in self._slide_stack:
+        s.clear(context_name)
