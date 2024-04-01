@@ -12,6 +12,7 @@ func _init() -> void:
     self.traverse_tree_for("widgets", widgets)
 
     MPF.log.info("Generated slide lookups: %s", slides)
+    MPF.log.info("Generated widget lookups: %s", widgets)
 
 func register_window(inst: Node) -> void:
     window = inst
