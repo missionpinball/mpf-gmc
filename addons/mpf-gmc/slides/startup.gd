@@ -34,10 +34,6 @@ func _init() -> void:
   if "--fs" in args or "--prod" in args:
     Input.set_mouse_mode(Input.MOUSE_MODE_HIDDEN)
     DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_FULLSCREEN)
-  if "--no-intros" in args:
-    MPF.game.debug.hide_intros = true
-    # Do not pass this arg to MPF
-    args.remove_at(args.find("--no-intros"))
 
 
 func _ready() -> void:
