@@ -3,6 +3,7 @@
 @tool
 extends Node
 
+var sound: Node
 var window: Node
 var slides := {}
 var widgets := {}
@@ -14,6 +15,14 @@ func _init() -> void:
     MPF.log.info("Generated slide lookups: %s", slides)
     MPF.log.info("Generated widget lookups: %s", widgets)
 
+func _enter_tree():
+    print("MC entering the tree")
+    sound = preload("sound_player.gd").new()
+
+    # Process is only called on children in the tree, so add the children
+    # that need to call process
+    self.add_child(sound)
+
 func register_window(inst: Node) -> void:
     window = inst
 
@@ -24,6 +33,8 @@ func play(payload: Dictionary) -> void:
             self.window.play_slides(payload)
         "widgets_play":
             self.window.play_widgets(payload)
+        "sounds_play":
+            self.sound.play_sounds(payload)
 
 func get_slide_instance(slide_name: String, preload_only: bool = false) -> MPFSlide:
     assert(slide_name in slides, "Unknown slide name '%s'" % slide_name)

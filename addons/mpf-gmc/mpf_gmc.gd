@@ -1,11 +1,11 @@
 @tool
 extends Node
 
-var server
 var game
 var log
 var mc
 var player
+var server
 var util
 var keyboard: = {}
 
@@ -20,18 +20,22 @@ func _enter_tree():
     server = preload("scripts/bcp_server.gd").new()
     # MC can come last?
     mc = preload("scripts/mc.gd").new()
-    print("GMC is ready")
+    print("GMC is entering tree")
 
     # Process is only called on children in the tree, so add the children
-    # that need to call process
+    # that need to call process or that have enter_tree methods
     self.add_child(server)
+    self.add_child(mc)
 
+func _ready():
+    print("GMC is ready")
     var config = ConfigFile.new()
     var err = config.load("res://gmc.cfg")
     if err == OK:
         if config.has_section("keyboard"):
             for key in config.get_section_keys("keyboard"):
                 keyboard[key.to_upper()] = config.get_value("keyboard", key)
+        self.mc.sound.initialize(config)
 
 func _unhandled_input(event: InputEvent) -> void:
     if not event.is_class("InputEventKey"):
@@ -45,7 +49,7 @@ func _unhandled_input(event: InputEvent) -> void:
         # Cannot use quit() method because it won't cleanly shut down threads
         # Instead, send a notification to the main thread to shut down
         #get_tree().notification(NOTIFICATION_WM_CLOSE_REQUEST)
-        get_tree().quit()
+        # get_tree().quit()
         return
 
     if keycode in keyboard:
