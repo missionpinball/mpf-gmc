@@ -54,7 +54,7 @@ func initialize(config: ConfigFile) -> void:
     for i in range(0, AudioServer.bus_count):
         var bus_name = AudioServer.get_bus_name(i)
         print("Found bus %s" % bus_name)
-        self.busses[bus_name] = { "tracks": [] }
+        self.busses[bus_name] = { "channels": [] }
     if config.has_section("sound_system"):
         for key in config.get_section_keys("sound_system"):
             var settings = config.get_value("sound_system", key)
@@ -65,12 +65,12 @@ func initialize(config: ConfigFile) -> void:
                 assert(settings.get("type"), "Sound system bus '%s' missing required field 'type'." % target_bus)
                 var bus_type = settings["type"]
                 self.busses[target_bus]["type"] = bus_type
-                var tracks_to_make = 2 if bus_type == "solo" else settings.get("simultaneous_sounds", 1)
-                for i in range(0, tracks_to_make):
-                    var track = AudioStreamPlayer.new()
-                    track.name = "%s_%s" % [target_bus, i+1]
-                    self.busses[target_bus].tracks.append(track)
-                    self.add_child(track)
+                var channels_to_make = 2 if bus_type == "solo" else settings.get("simultaneous_sounds", 1)
+                for i in range(0, channels_to_make):
+                    var channel = AudioStreamPlayer.new()
+                    channel.name = "%s_%s" % [target_bus, i+1]
+                    self.busses[target_bus].channels.append(channel)
+                    self.add_child(channel)
         print("Finished configuring sound system: %s" % self.busses)
 
 func _ready() -> void:
@@ -133,7 +133,7 @@ func play(filename: String, track: String, settings: Dictionary = {}) -> void:
 
     # Look for some music so we can replace or queue
     if track == "music" :
-        self.MusicLoopMixPlayer.stop_all(1.0)
+        #self.MusicLoopMixPlayer.stop_all(1.0)
         for c in self._get_channels("music"):
             if c.playing and c != available_channel:
                 self._stop(c, settings)
@@ -141,7 +141,7 @@ func play(filename: String, track: String, settings: Dictionary = {}) -> void:
     # If the available channel we got back is already playing, it's playing this track
     # and we don't need to do anything further.
     if available_channel and available_channel.playing:
-        self.logger.debug("Recevied available channel that's already playing, no-op.")
+        MPF.log.debug("Recevied available channel that's already playing, no-op.")
         return
 
     if not available_channel:
@@ -156,18 +156,18 @@ func play(filename: String, track: String, settings: Dictionary = {}) -> void:
     if not available_channel.stream:
         available_channel.stream = self._load_stream(filepath)
     if not available_channel.stream:
-        self.logger.error("Failed to load stream for filepath '%s' on channel %s", [filepath, available_channel])
+        MPF.log.error("Failed to load stream for filepath '%s' on channel %s", [filepath, available_channel])
         return
     self._play(available_channel, settings)
 
 func _play(channel: AudioStreamPlayer, settings: Dictionary) -> void:
     if not channel.stream:
-        self.logger.error("Attempting to play on channel %s with no stream. %s ", [channel, settings])
+        MPF.log.error("Attempting to play on channel %s with no stream. %s ", [channel, settings])
         return
 
-    self.logger.debug("playing %s (%s) on %s with settings %s", [channel.stream.resource_path, channel.stream, channel, settings])
-    var start_at: float = settings.get("start_at", 0.0)
-    var fade_in: float = settings.get("fade_in", 0.0)
+    MPF.log.debug("playing %s (%s) on %s with settings %s", [channel.stream.resource_path, channel.stream, channel, settings])
+    var start_at: float = settings["start_at"] if settings.get("start_at") else 0.0
+    var fade_in: float = settings["fade_in"] if settings.get("fade_in") else 0.0
     # Music is OGG, which doesn't support loop begin/end
     if settings.get("track") == "music" and channel.stream is AudioStreamOggVorbis:
         # By default, loop the music, but allow an override
@@ -191,7 +191,7 @@ func _play(channel: AudioStreamPlayer, settings: Dictionary) -> void:
         fade_in = 0.5
     if not fade_in:
         # Ensure full volume in case it was tweened out previously
-        channel.volume_db = settings.get("volume", 0.0)
+        channel.volume_db = settings["volume"] if settings.get("volume") else 0.0
         channel.play(start_at)
         return
     # Set the channel volume and begin playing
@@ -236,7 +236,7 @@ func _stop(channel: AudioStreamPlayer, settings: Dictionary, action: String = "s
     channel.set_meta("tween", tween)
 
 func stop_all(fade_out: float = 1.0) -> void:
-    self.logger.debug("STOP ALL called with fadeout of %s" , fade_out)
+    MPF.log.debug("STOP ALL called with fadeout of %s" , fade_out)
     duck_settings = null
     # Clear any queued tracks as well, lest they be triggered after the stop
     for track in ["music", "voice", "callout"]:
@@ -289,7 +289,7 @@ func _on_fade_complete(channel, _nodePath, tween, action) -> void:
     tween.queue_free()
     # If this is a stop action, stop the channel as well
     if action == "stop" or action == "clear":
-        self.logger.debug("Fade out complete on channel %s" % channel)
+        MPF.log.debug("Fade out complete on channel %s" % channel)
         channel.stop()
         channel.volume_db = 0.0
     # If this is a stop_all action, stop all the channels
@@ -305,25 +305,20 @@ func _on_fade_complete(channel, _nodePath, tween, action) -> void:
                 c.set_meta("is_stopping", false)
         set_process(false)
     elif action == "play":
-        self.logger.debug("Fade in to %0.2f complete on channel %s", [channel.volume_db, channel])
+        MPF.log.debug("Fade in to %0.2f complete on channel %s", [channel.volume_db, channel])
     if action == "clear":
         channel.stream = null
 
 func _get_channels(track: String):
-    match track:
-        "sfx":
-          return SFX_TRACKS
-        "music":
-          return MUSIC_TRACKS
-        "voice":
-          return VOICE_TRACKS
-        "callout":
-          return CALLOUT_TRACKS
-    MPF.log.error("Invalid track %s requested", track)
+    if track not in self.busses:
+        MPF.log.error("Invalid track %s requested", track)
+    return self.busses[track].channels
 
 func _find_available_channel(track: String, filepath: String, settings: Dictionary) -> AudioStreamPlayer:
     var available_channel
+    print("Looking for channel for %s in channels" % track)
     for channel in self._get_channels(track):
+        print(" - trying channel %s" % channel)
         if channel.stream and channel.stream.resource_path == filepath:
             # If this file is *already* playing, keep playing
             if channel.playing:
@@ -338,18 +333,18 @@ func _find_available_channel(track: String, filepath: String, settings: Dictiona
                     # If there is an explicit start time, jump there unless told otherwise
                     if settings.get("start_at") != null and not settings.get("keep_position", false):
                         channel.seek(settings["start_at"])
-            self.logger.debug("Channel %s already has resource %s, playing from memory", [channel, filepath])
+            MPF.log.debug("Channel %s already has resource %s, playing from memory", [channel, filepath])
             available_channel = channel
         elif not available_channel:
             if not channel.stream:
-                self.logger.debug("Channel %s has no stream, making it the available channel" % channel)
+                MPF.log.debug("Channel %s has no stream, making it the available channel" % channel)
                 available_channel = channel
             elif not channel.playing:
                 # Don't take a channel that's queued
                 if track == "music" and self.queued_music and channel == self.queued_music[0]["channel"]:
-                    self.logger.debug("Channel %s is queued up with music, not making it available", channel)
+                    MPF.log.debug("Channel %s is queued up with music, not making it available", channel)
                 else:
-                    self.logger.debug("Channel %s has a stream %s but it's not playing, making it available" % [channel, channel.stream])
+                    MPF.log.debug("Channel %s has a stream %s but it's not playing, making it available" % [channel, channel.stream])
                     available_channel = channel
                     available_channel.stream = null
     return available_channel
@@ -416,7 +411,7 @@ func _duck_attack() -> void:
                                                                 Tween.TRANS_LINEAR,
                                                                 Tween.EASE_IN)
     musicDuck.start()
-    self.logger.debug("Ducking voice clip down with settings: %s", duck_settings)
+    MPF.log.debug("Ducking voice clip down with settings: %s", duck_settings)
     duckReleaseTimer.start(duck_settings.release_timestamp)
 
 
@@ -425,7 +420,7 @@ func _duck_release():
         return
   # If the music is ducked, unduck it
     if AudioServer.get_bus_volume_db(1) < self.unduck_level:
-        self.logger.debug("Unducking voice clip back to %0.2f db over %0.2f seconds", [self.unduck_level, duck_release])
+        MPF.log.debug("Unducking voice clip back to %0.2f db over %0.2f seconds", [self.unduck_level, duck_release])
         musicDuck.interpolate_method(self, "_duck_music", AudioServer.get_bus_volume_db(1), self.unduck_level, duck_release, Tween.TRANS_LINEAR, Tween.EASE_OUT)
         musicDuck.start()
 
