@@ -306,6 +306,8 @@ func _thread_poll(_userdata=null) -> void:
             call_deferred("deferred_mc", "play", message)
           "slides_clear":
             # TBD: Need to distinguish slides/widgets/sounds?
+            # Don't think so, all config_players have the same callback
+            # so all three will post at the same time.
             call_deferred("emit_signal", "clear", message.context)
           "sounds_clear":
             pass

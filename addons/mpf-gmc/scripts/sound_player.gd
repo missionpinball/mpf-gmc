@@ -9,8 +9,6 @@ var musicDuck: Tween
 
 var busses = {}
 
-var _music_interrupt_channel: AudioStreamPlayer
-var _music_interrupt_time: float
 var _music_loop_channel: AudioStreamPlayer
 
 # Counter for the current loop number of the music (zero-indexed)
@@ -69,6 +67,7 @@ func _ready() -> void:
     duckReleaseTimer.one_shot = true
     duckReleaseTimer.timeout.connect(self._duck_release)
     MPF.game.volume.connect(self._on_volume)
+    MPF.server.connect("clear", self._on_clear_context)
     set_process(false)
 
 func play_sounds(s: Dictionary) -> void:
@@ -79,6 +78,7 @@ func play_sounds(s: Dictionary) -> void:
         var track: String = settings.get("track", "sfx")
         var file: String = settings.get("file", asset)
         var action: String = settings.get("action", "play")
+        settings['context'] = settings.get("custom_context", s.context)
 
         if action == "stop" or action == "loop_stop":
             self.stop(file, track, settings)
@@ -144,6 +144,7 @@ func _play(channel: AudioStreamPlayer, settings: Dictionary) -> void:
         return
 
     MPF.log.debug("playing %s (%s) on %s with settings %s", [channel.stream.resource_path, channel.stream, channel, settings])
+    channel.set_meta("context", settings.context)
     var start_at: float = settings["start_at"] if settings.get("start_at") else 0.0
     var fade_in: float = settings["fade_in"] if settings.get("fade_in") else 0.0
     # Music is OGG, which doesn't support loop begin/end
@@ -176,8 +177,8 @@ func _play(channel: AudioStreamPlayer, settings: Dictionary) -> void:
     if not channel.playing:
         channel.volume_db = -80.0
         channel.play(start_at)
-    var tween = Tween.new()
-    tween.interpolate_property(channel, "volume_db", null, 0.0, fade_in, Tween.TRANS_QUINT, Tween.EASE_OUT)
+    var tween = self.create_tween()
+    tween.tween_property(channel, "volume_db", 0.0, fade_in).set_trans(Tween.TRANS_QUINT).set_ease(Tween.EASE_OUT)
     tween.tween_completed.connect(self._on_fade_complete.bind(tween, "play"))
     $Tweens.add_child(tween)
     tween.start()
@@ -206,8 +207,9 @@ func _stop(channel: AudioStreamPlayer, settings: Dictionary, action: String = "s
         channel.stop()
         channel.volume_db = 0.0
         return
-    var tween = Tween.new()
-    tween.interpolate_property(channel, "volume_db", null, -80.0, settings["fade_out"], Tween.TRANS_QUINT, Tween.EASE_IN)
+    var tween = self.create_tween()
+    tween.tween_property(channel, "volume_db", -80.0, settings["fade_out"]) \
+        .set_trans(Tween.TRANS_QUINT).set_ease(Tween.EASE_IN)
     tween.tween_completed.connect(self._on_fade_complete.bind(tween, action))
     $Tweens.add_child(tween)
     tween.start()
@@ -219,11 +221,12 @@ func stop_all(fade_out: float = 1.0) -> void:
     # Clear any queued tracks as well, lest they be triggered after the stop
     for track in self.busses.keys():
         self.clear_queue(track)
-    var tween = Tween.new() if fade_out > 0 else null
+    var tween = self.create_tween() if fade_out > 0 else null
     for channel in $Channels.get_children():
         if channel.playing and not channel.get_meta("is_stopping", false):
             if tween:
-                tween.interpolate_property(channel, "volume_db", null, -80.0, fade_out, Tween.TRANS_QUINT, Tween.EASE_IN)
+                tween.tween_property(channel, "volume_db", -80.0, fade_out) \
+                    .set_trans(Tween.TRANS_QUINT).set_ease(Tween.EASE_IN)
                 channel.set_meta("is_stopping", true)
             else:
                 channel.stop()
@@ -393,3 +396,11 @@ func _duck_release():
 
 func _load_stream(filepath: String) -> AudioStream:
     return ResourceLoader.load(filepath, "AudioStreamOGGVorbis" if filepath.get_extension() == "ogg" else "AudioStreamSample") as AudioStream
+
+func _on_clear_context(context_name: String) -> void:
+    # Loop through all the channels and stop any that are playing this context
+    for bus in self.busses.values():
+        for channel in bus.channels:
+            if channel.has_meta("context") and channel.get_meta("context") == context_name and channel.playing:
+                # TODO: Respect fade_out settings for context-stopped sounds
+                channel.stop()
