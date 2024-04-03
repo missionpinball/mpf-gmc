@@ -5,13 +5,10 @@ extends Node
 
 @onready var duckAttackTimer = Timer.new()
 @onready var duckReleaseTimer = Timer.new()
-@onready var musicDuck = Tween.new()
+var musicDuck: Tween
 
 var busses = {}
 
-var queued_voice: Array = []
-var queued_callout: Array = []
-var queued_music: Array = []
 var _music_interrupt_channel: AudioStreamPlayer
 var _music_interrupt_time: float
 var _music_loop_channel: AudioStreamPlayer
@@ -40,7 +37,7 @@ func initialize(config: ConfigFile) -> void:
     for i in range(0, AudioServer.bus_count):
         var bus_name = AudioServer.get_bus_name(i)
         print("Found bus %s" % bus_name)
-        self.busses[bus_name] = { "channels": [] }
+        self.busses[bus_name] = { "name": bus_name, "channels": [] }
     if config.has_section("sound_system"):
         for key in config.get_section_keys("sound_system"):
             var settings = config.get_value("sound_system", key)
@@ -57,13 +54,16 @@ func initialize(config: ConfigFile) -> void:
                     channel.name = "%s_%s" % [target_bus, i+1]
                     self.busses[target_bus].channels.append(channel)
                     self.add_child(channel)
+                # Sequential busses get a queue to store pending sounds
+                if bus_type == "sequential":
+                    self.busses[target_bus]["queue"] = []
         print("Finished configuring sound system: %s" % self.busses)
 
 func _ready() -> void:
     for bus in self.busses.values():
         if bus.type == "sequential":
             for track in bus.tracks:
-                track.finished.connect(self._on_queue_track_finished)
+                track.finished.connect(self._on_queue_track_finished.bind(bus.name))
     duckAttackTimer.one_shot = true
     duckAttackTimer.timeout.connect(self._duck_attack)
     duckReleaseTimer.one_shot = true
@@ -100,11 +100,11 @@ func play(filename: String, track: String, settings: Dictionary = {}) -> void:
     if settings.get("clear_queue", false):
         self.clear_queue(settings["track"])
 
-    # Callouts supercede voice tracks. If there is a callout, stop voices
-    if track == "callout" and _voice_1.playing and settings.get("block_voice", true):
-        self._stop(_voice_1, { "fade_out": 0.5 })
-        # Clear out any other queued voices
-        queued_voice = []
+    # # Callouts supercede voice tracks. If there is a callout, stop voices
+    # if track == "callout" and _voice_1.playing and settings.get("block_voice", true):
+    #     self._stop(_voice_1, { "fade_out": 0.5 })
+    #     # Clear out any other queued voices
+    #     queued_voice = []
 
     # Check our channels to see if (1) one is empty or (2) one already has this
     else:
@@ -123,8 +123,8 @@ func play(filename: String, track: String, settings: Dictionary = {}) -> void:
         return
 
     if not available_channel:
-        # Queue the filename if it's a voice or callout track
-        var target_queue = queued_callout if track == "callout" else queued_voice if track == "voice" else null
+        # Queue the filename if this track type has a queue
+        var target_queue = self.busses[track].get("queue")
         if target_queue:
             # By default, max queue time is one minute (tracked in milliseconds)
             var max_queue_time: int = settings.get("max_queue_time", 60000)
@@ -240,17 +240,10 @@ func stop_all(fade_out: float = 1.0) -> void:
         set_process(false)
 
 func clear_queue(track: String) -> void:
-    var queue_to_clear
-    match track:
-        "music":
-            queue_to_clear = self.queued_music
-        "voice":
-            queue_to_clear = self.queued_voice
-        "callout":
-            queue_to_clear = self.queued_callout
-        _:
-            MPF.log.error("Unknown track '%s' to clear queue.", track)
-            return
+    var queue_to_clear = self.busses[track].get("queue")
+    if not queue_to_clear:
+        MPF.log.error("Track '%s' does not have a queue to clear.", track)
+        return
     for q in queue_to_clear:
         # Clear any streams from these channels so they can be available again
         if q.get("channel", false):
@@ -332,22 +325,16 @@ func _generate_queue_item(filename: String, max_queue_time: int, settings: Dicti
         "settings": settings
     }
 
-func _on_queue_track_finished() -> void:
+func _on_queue_track_finished(bus_name: String) -> void:
     # The two queues hold dictionary objects like this:
     #{ "filename": filename, "expiration": some_time, "settings": settings }
     var now := Time.get_ticks_msec()
-    var q: Dictionary
-    # First check for a callout that's queued
-    while queued_callout:
-        q = queued_callout.pop_front()
-        if q.expiration > now:
-            self.play(q.filename, "callout", q.settings)
-            return
-    # Now check for voice
-    while queued_voice:
-        q = queued_voice.pop_front()
-        if q.expiration > now:
-            self.play(q.filename, "voice", q.settings)
+    var queue = self.busses[bus_name].queue
+    # Find the first item in the queue that's not expired
+    while queue:
+        var q_item: Dictionary = queue.pop_front()
+        if q_item.expiration > now:
+            self.play(q_item.filename, bus_name, q_item.settings)
             return
 
 func _on_volume(track: String, value: float, _change: float):
@@ -379,14 +366,13 @@ func _duck_attack() -> void:
         return
     # We only have one duck at a time, so store the return values globally
     duck_release = duck_settings.get("release", default_duck.release)
-    musicDuck.interpolate_method(self, "_duck_music",
-                                                                # Always use the current level in case we're interrupting
-                                                                AudioServer.get_bus_volume_db(1),
-                                                                self.unduck_level - duck_settings.get("attenuation", default_duck.attenuation),
-                                                                duck_settings.get("attack", default_duck.attack),
-                                                                Tween.TRANS_LINEAR,
-                                                                Tween.EASE_IN)
-    musicDuck.start()
+    musicDuck = self.create_tween()
+    musicDuck.tween_method(self._duck_music,
+        # Always use the current level in case we're interrupting
+        AudioServer.get_bus_volume_db(1),
+        self.unduck_level - duck_settings.get("attenuation", default_duck.attenuation),
+        duck_settings.get("attack", default_duck.attack),
+    ).set_trans(Tween.TRANS_LINEAR).set_ease(Tween.EASE_IN)
     MPF.log.debug("Ducking voice clip down with settings: %s", duck_settings)
     duckReleaseTimer.start(duck_settings.release_timestamp)
 
@@ -397,8 +383,13 @@ func _duck_release():
   # If the music is ducked, unduck it
     if AudioServer.get_bus_volume_db(1) < self.unduck_level:
         MPF.log.debug("Unducking voice clip back to %0.2f db over %0.2f seconds", [self.unduck_level, duck_release])
-        musicDuck.interpolate_method(self, "_duck_music", AudioServer.get_bus_volume_db(1), self.unduck_level, duck_release, Tween.TRANS_LINEAR, Tween.EASE_OUT)
-        musicDuck.start()
+        musicDuck.kill()
+        musicDuck = self.create_tween()
+        musicDuck.tween_method(self._duck_music,
+            AudioServer.get_bus_volume_db(1),
+            self.unduck_level,
+            duck_release
+        ).set_trans(Tween.TRANS_LINEAR).set_ease(Tween.EASE_OUT)
 
 func _load_stream(filepath: String) -> AudioStream:
     return ResourceLoader.load(filepath, "AudioStreamOGGVorbis" if filepath.get_extension() == "ogg" else "AudioStreamSample") as AudioStream
