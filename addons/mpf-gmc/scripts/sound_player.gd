@@ -3,20 +3,6 @@
 @tool
 extends Node
 
-@onready var _callout_1: AudioStreamPlayer = $Channels/Callout1
-@onready var _voice_1: AudioStreamPlayer = $Channels/Voice1
-@onready var _music_1: AudioStreamPlayer = $Channels/Music1
-@onready var _music_2: AudioStreamPlayer = $Channels/Music2
-@onready var _sfx_1: AudioStreamPlayer = $Channels/SFX1
-@onready var _sfx_2: AudioStreamPlayer = $Channels/SFX2
-@onready var _sfx_3: AudioStreamPlayer = $Channels/SFX3
-@onready var MusicLoopMixPlayer = $MusicLoopMixPlayer
-
-@onready var SFX_TRACKS: = [_sfx_1, _sfx_2, _sfx_3]
-@onready var MUSIC_TRACKS: = [_music_1, _music_2]
-@onready var VOICE_TRACKS: = [_voice_1]
-@onready var CALLOUT_TRACKS: = [_callout_1]
-
 @onready var duckAttackTimer = Timer.new()
 @onready var duckReleaseTimer = Timer.new()
 @onready var musicDuck = Tween.new()
@@ -94,13 +80,6 @@ func play_sounds(s: Dictionary) -> void:
         var file: String = settings.get("file", asset)
         var action: String = settings.get("action", "play")
 
-        # Special case: synced sfx track
-        if track == "sfx_sync":
-            track = "sfx"
-            # Super secret value -1.0 means sync with music
-            # TODO: Remove this if unused, or update with MusicLoopMixPlayer
-            settings["start_at"] = -1.0 if _music_loop_channel else 0.0
-
         if action == "stop" or action == "loop_stop":
             self.stop(file, track, settings)
             return
@@ -133,7 +112,6 @@ func play(filename: String, track: String, settings: Dictionary = {}) -> void:
 
     # Look for some music so we can replace or queue
     if track == "music" :
-        #self.MusicLoopMixPlayer.stop_all(1.0)
         for c in self._get_channels("music"):
             if c.playing and c != available_channel:
                 self._stop(c, settings)
@@ -239,10 +217,8 @@ func stop_all(fade_out: float = 1.0) -> void:
     MPF.log.debug("STOP ALL called with fadeout of %s" , fade_out)
     duck_settings = null
     # Clear any queued tracks as well, lest they be triggered after the stop
-    for track in ["music", "voice", "callout"]:
+    for track in self.busses.keys():
         self.clear_queue(track)
-    # Kill the music mix
-    self.MusicLoopMixPlayer.stop_all()
     var tween = Tween.new() if fade_out > 0 else null
     for channel in $Channels.get_children():
         if channel.playing and not channel.get_meta("is_stopping", false):
