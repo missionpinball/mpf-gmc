@@ -75,7 +75,7 @@ func play_sounds(s: Dictionary) -> void:
     print("PLAYIDNG SOUNDS from dictionary %s" % s)
     for asset in s.settings.keys():
         var settings = s.settings[asset]
-        var track: String = settings.get("track", "sfx")
+        var track: String = settings["track"] if settings.get("track") else "sfx"
         var file: String = settings.get("file", asset)
         var action: String = settings.get("action", "play")
         settings['context'] = settings.get("custom_context", s.context)
