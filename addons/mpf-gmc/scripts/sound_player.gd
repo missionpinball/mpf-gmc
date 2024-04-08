@@ -105,12 +105,6 @@ func play(filename: String, track: String, settings: Dictionary = {}) -> void:
     if settings.get("clear_queue", false):
         self.clear_queue(settings["track"])
 
-    # # Callouts supercede voice tracks. If there is a callout, stop voices
-    # if track == "callout" and _voice_1.playing and settings.get("block_voice", true):
-    #     self._stop(_voice_1, { "fade_out": 0.5 })
-    #     # Clear out any other queued voices
-    #     queued_voice = []
-
     # Check our channels to see if (1) one is empty or (2) one already has this
     else:
         available_channel = self._find_available_channel(track, filepath, settings)
@@ -152,6 +146,8 @@ func _play(channel: AudioStreamPlayer, settings: Dictionary) -> void:
     channel.set_meta("context", settings.context)
     var start_at: float = settings["start_at"] if settings.get("start_at") else 0.0
     var fade_in: float = settings["fade_in"] if settings.get("fade_in") else 0.0
+    if settings.get("fade_out"):
+        channel.set_meta("fade_out", settings.fade_out)
     # Music is OGG, which doesn't support loop begin/end
     if settings.get("track") == "music" and channel.stream is AudioStreamOggVorbis:
         # By default, loop the music, but allow an override
@@ -199,7 +195,7 @@ func stop(filename: String, track: String, settings: Dictionary) -> void:
     # If no channel is found with this file, that's okay.
 
 
-func _stop(channel: AudioStreamPlayer, settings: Dictionary, action: String = "stop") -> void:
+func _stop(channel: AudioStreamPlayer, settings: Dictionary = {}, action: String = "stop") -> void:
     if settings.get("action") == "loop_stop":
         # The position is reset when the loop mode changes, so store it first
         var pos: float = channel.get_playback_position()
@@ -207,16 +203,17 @@ func _stop(channel: AudioStreamPlayer, settings: Dictionary, action: String = "s
         # Play the track to the end of the file
         channel.play(pos)
         return
-    if not settings.get("fade_out"):
-        channel.stop()
-        channel.volume_db = 0.0
+    var fade_out = settings.get("fade_out")
+    if not fade_out and channel.has_meta("fade_out"):
+        fade_out = channel.get_meta("fade_out")
+    if not fade_out:
+        self._clear_channel(channel)
         return
     var tween = self.create_tween()
-    tween.tween_property(channel, "volume_db", -80.0, settings["fade_out"]) \
+    tween.tween_property(channel, "volume_db", -80.0, fade_out) \
         .set_trans(Tween.TRANS_QUINT).set_ease(Tween.EASE_IN)
     tween.finished.connect(self._on_fade_complete.bind(channel, tween, action))
     self.tweens.append(tween)
-    tween.start()
     channel.set_meta("tween", tween)
 
 func stop_all(fade_out: float = 1.0) -> void:
@@ -233,8 +230,7 @@ func stop_all(fade_out: float = 1.0) -> void:
                     .set_trans(Tween.TRANS_QUINT).set_ease(Tween.EASE_IN)
                 channel.set_meta("is_stopping", true)
             else:
-                channel.stop()
-                channel.volume_db = 0.0
+                self._clear_channel(channel)
     if tween:
         tween.finished.connect(self._on_fade_complete.bind(null, tween, "stop_all"))
         self.tweens.append(tween)
@@ -267,15 +263,12 @@ func _on_fade_complete(channel, tween, action) -> void:
         var non_stop_resources := ["res://assets/sfx/stinger.wav", "res://assets/sfx/sof-bonus.ogg"]
         for c in $Channels.get_children():
             if c.stream and not c.stream.resource_path in non_stop_resources:
-                c.stop()
-                c.volume_db = 0.0
-                c.set_meta("is_stopping", false)
+                self._clear_channel(channel)
         set_process(false)
     # If this is a stop action, stop the channel as well
     elif action == "stop" or action == "clear":
         MPF.log.debug("Fade out complete on channel %s" % channel)
-        channel.stop()
-        channel.volume_db = 0.0
+        self._clear_channel(channel)
     elif action == "play":
         MPF.log.debug("Fade in to %0.2f complete on channel %s", [channel.volume_db, channel])
     if action == "clear":
@@ -285,6 +278,13 @@ func _get_channels(track: String):
     if track not in self.busses:
         MPF.log.error("Invalid track %s requested", track)
     return self.busses[track].channels
+
+func _clear_channel(channel):
+    channel.stop()
+    channel.volume_db = 0.0
+    channel.remove_meta("tween")
+    channel.remove_meta("context")
+    channel.remove_meta("fade_out")
 
 func _find_available_channel(track: String, filepath: String, settings: Dictionary) -> AudioStreamPlayer:
     var available_channel
@@ -402,5 +402,4 @@ func _on_clear_context(context_name: String) -> void:
     for bus in self.busses.values():
         for channel in bus.channels:
             if channel.has_meta("context") and channel.get_meta("context") == context_name and channel.playing:
-                # TODO: Respect fade_out settings for context-stopped sounds
-                channel.stop()
+                self._stop(channel)
