@@ -47,7 +47,10 @@ func _ready() -> void:
   MPF.game.version = version
   $version.text = version
   MPF.log.info("Loading GMC: %s", $version.text)
-  #$spinner.visible = false
+  $error_main.visible = false
+  $error_sub.visible = false
+  $status_main.visible = false
+  $status_sub.visible = false
 
   # NOTE: All args must start with DOUBLE DASH for Godot to pass them through
   var args: PackedStringArray = OS.get_cmdline_args()
@@ -108,12 +111,20 @@ func _checksum(is_build_file: bool = false) -> String:
 func set_error(main: String = "", sub: String = "") -> void:
   $error_main.text = main
   $error_sub.text = sub
+  $error_main.visible = false
+  $error_sub.visible = false
   error = true
   #$spinner.visible = false
   $status_main.visible = false
+  $status_sub.visible = false
 
-func set_status(value: String = "") -> void:
+func set_status(value: String = "", sub_value: String = "") -> void:
+  $status_main.visible = false
+  $status_sub.visible = sub_value != ""
   $status_main.text = value
+  $status_sub.text = sub_value
+  $error_main.visible = false
+  $error_sub.visible = false
 
 func get_status() -> String:
   return $status_main.text
