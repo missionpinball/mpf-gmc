@@ -8,6 +8,7 @@ extends Node
 var musicDuck: Tween
 
 var busses = {}
+var tweens = []
 
 var _music_loop_channel: AudioStreamPlayer
 
@@ -34,15 +35,12 @@ const default_duck = {
 func initialize(config: ConfigFile) -> void:
     for i in range(0, AudioServer.bus_count):
         var bus_name = AudioServer.get_bus_name(i)
-        print("Found bus %s" % bus_name)
         self.busses[bus_name] = { "name": bus_name, "channels": [] }
     if config.has_section("sound_system"):
         for key in config.get_section_keys("sound_system"):
             var settings = config.get_value("sound_system", key)
-            print("Sound system config '%s' has setting: %s" % [key, settings])
             var target_bus = settings['track'] if settings.get('bus') else key
             if target_bus in self.busses:
-                print("Going to set up a config for '%s'!!" % target_bus)
                 assert(settings.get("type"), "Sound system bus '%s' missing required field 'type'." % target_bus)
                 var bus_type = settings["type"]
                 self.busses[target_bus]["type"] = bus_type
@@ -72,9 +70,16 @@ func _ready() -> void:
 
 func play_sounds(s: Dictionary) -> void:
     assert(typeof(s) == TYPE_DICTIONARY, "Sound player called with non-dict value: %s" % s)
-    print("PLAYIDNG SOUNDS from dictionary %s" % s)
+    print("PLAYING SOUNDS from dictionary %s" % s)
     for asset in s.settings.keys():
         var settings = s.settings[asset]
+        if MPF.mc.sounds.has(asset):
+            var addl_settings = MPF.mc.get_sound_instance(asset)
+            settings["file"] = addl_settings.file.resource_path
+            for prop in ["fade_in", "fade_out"]:
+                if settings.get(prop) == null and addl_settings.get(prop):
+                    settings[prop] = addl_settings[prop]
+            print("Override values now have: %s" % settings)
         var track: String = settings["track"] if settings.get("track") else "sfx"
         var file: String = settings.get("file", asset)
         var action: String = settings.get("action", "play")
@@ -92,7 +97,7 @@ func play(filename: String, track: String, settings: Dictionary = {}) -> void:
     if filename.left(4) == "res:":
         filepath = filename
     else:
-        filepath = "res://assets/%s/%s" % ["voice" if track == "callout" else track, filename]
+        filepath = "res://assets/%s/%s" % [track, filename]
     var available_channel: AudioStreamPlayer
     settings["track"] = track
 
@@ -179,9 +184,8 @@ func _play(channel: AudioStreamPlayer, settings: Dictionary) -> void:
         channel.play(start_at)
     var tween = self.create_tween()
     tween.tween_property(channel, "volume_db", 0.0, fade_in).set_trans(Tween.TRANS_QUINT).set_ease(Tween.EASE_OUT)
-    tween.tween_completed.connect(self._on_fade_complete.bind(tween, "play"))
-    $Tweens.add_child(tween)
-    tween.start()
+    tween.finished.connect(self._on_fade_complete.bind(channel, tween, "play"))
+    self.tweens.append(tween)
     channel.set_meta("tween", tween)
 
 func stop(filename: String, track: String, settings: Dictionary) -> void:
@@ -210,8 +214,8 @@ func _stop(channel: AudioStreamPlayer, settings: Dictionary, action: String = "s
     var tween = self.create_tween()
     tween.tween_property(channel, "volume_db", -80.0, settings["fade_out"]) \
         .set_trans(Tween.TRANS_QUINT).set_ease(Tween.EASE_IN)
-    tween.tween_completed.connect(self._on_fade_complete.bind(tween, action))
-    $Tweens.add_child(tween)
+    tween.finished.connect(self._on_fade_complete.bind(channel, tween, action))
+    self.tweens.append(tween)
     tween.start()
     channel.set_meta("tween", tween)
 
@@ -232,14 +236,13 @@ func stop_all(fade_out: float = 1.0) -> void:
                 channel.stop()
                 channel.volume_db = 0.0
     if tween:
-        tween.tween_completed.connect(self._on_fade_complete.bind(tween, "stop_all"))
-        $Tweens.add_child(tween)
+        tween.finished.connect(self._on_fade_complete.bind(null, tween, "stop_all"))
+        self.tweens.append(tween)
         tween.start()
     else:
-        for t in $Tweens.get_children():
-            $Tweens.remove_child(t)
-            t.remove_all()
-            t.queue_free()
+        for t in self.tweens:
+            t.stop()
+        self.tweens = []
         set_process(false)
 
 func clear_queue(track: String) -> void:
@@ -254,18 +257,10 @@ func clear_queue(track: String) -> void:
     # Remove all items from the queue
     queue_to_clear.clear()
 
-func _on_fade_complete(channel, _nodePath, tween, action) -> void:
-    $Tweens.remove_child(tween)
-    # Presumably the signal will disconnect when the tween is removed
-    tween.remove_all()
-    tween.queue_free()
-    # If this is a stop action, stop the channel as well
-    if action == "stop" or action == "clear":
-        MPF.log.debug("Fade out complete on channel %s" % channel)
-        channel.stop()
-        channel.volume_db = 0.0
+func _on_fade_complete(channel, tween, action) -> void:
+    self.tweens.erase(tween)
     # If this is a stop_all action, stop all the channels
-    elif action == "stop_all":
+    if action == "stop_all":
         # TODO: Add a timestamp to stop_all callback and automatically prevent
         # stoppage of tracks started after the stop_all call. In the meantime,
         # hard-code tracks that should not be stopped via stop_all.
@@ -276,6 +271,11 @@ func _on_fade_complete(channel, _nodePath, tween, action) -> void:
                 c.volume_db = 0.0
                 c.set_meta("is_stopping", false)
         set_process(false)
+    # If this is a stop action, stop the channel as well
+    elif action == "stop" or action == "clear":
+        MPF.log.debug("Fade out complete on channel %s" % channel)
+        channel.stop()
+        channel.volume_db = 0.0
     elif action == "play":
         MPF.log.debug("Fade in to %0.2f complete on channel %s", [channel.volume_db, channel])
     if action == "clear":
@@ -299,7 +299,7 @@ func _find_available_channel(track: String, filepath: String, settings: Dictiona
                     # Stop the tween
                     var tween = channel.get_meta("tween")
                     tween.stop_all()
-                    self._on_fade_complete(channel, null, tween,  "cancel")
+                    self._on_fade_complete(channel, tween,  "cancel")
                 # If the channel does not have a tween, let it continue playing
                 else:
                     # If there is an explicit start time, jump there unless told otherwise

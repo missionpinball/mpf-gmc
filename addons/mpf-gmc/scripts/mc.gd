@@ -7,13 +7,16 @@ var sound: Node
 var window: Node
 var slides := {}
 var widgets := {}
+var sounds := {}
 
 func _init() -> void:
     self.traverse_tree_for("slides", slides)
     self.traverse_tree_for("widgets", widgets)
+    self.traverse_tree_for("sounds", sounds, "tres")
 
     MPF.log.info("Generated slide lookups: %s", slides)
     MPF.log.info("Generated widget lookups: %s", widgets)
+    MPF.log.info("Generated sound lookups: %s", sounds)
 
 func _enter_tree():
     print("MC entering the tree")
@@ -44,17 +47,23 @@ func get_widget_instance(widget_name: String, preload_only: bool = false) -> MPF
     assert(widget_name in widgets, "Unknown widget name '%s'" % widget_name)
     return self._get_scene(widget_name, self.widgets, preload_only) as MPFWidget
 
+func get_sound_instance(sound_name: String, preload_only: bool = false) -> MPFSoundAsset:
+    assert(sound_name in sounds, "Unknown sound name '%s'" % sound_name)
+    return self._get_scene(sound_name, self.sounds, preload_only)
+
 func _get_scene(name: String, collection: Dictionary, preload_only: bool = false):
     # If this is the first access, load the scene
     if collection[name] is String:
         collection[name] = load(collection[name])
     if preload_only:
         return
+    if collection == self.sounds:
+        return collection[name]
     return collection[name].instantiate()
 
-func traverse_tree_for(obj_type: String, acc: Dictionary) -> void:
+func traverse_tree_for(obj_type: String, acc: Dictionary, ext="tscn") -> void:
     # Start by traversing the root folder for this object type
-    self.recurse_dir("res://%s" % obj_type, acc)
+    self.recurse_dir("res://%s" % obj_type, acc, ext)
     # Then traverse the mode folders for subfolders of this object type
     var dir = DirAccess.open("res://modes")
     dir.list_dir_begin()

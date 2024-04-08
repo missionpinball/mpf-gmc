@@ -10,6 +10,7 @@ func _enter_tree():
     add_custom_type("MPFDisplay", "MPFSceneBase", preload("classes/mpf_display.gd"), null)
     add_custom_type("MPFSlide", "MPFSceneBase", preload("classes/mpf_slide.gd"), null)
     add_custom_type("MPFVariable", "Label", preload("classes/mpf_variable.gd"), null)
+    add_custom_type("MPFSoundAsset", "Resource", preload("classes/mpf_sound.gd"), null)
 
 func _exit_tree():
     # Clean-up of the plugin goes here.
@@ -20,3 +21,4 @@ func _exit_tree():
     remove_custom_type("MPFWindow")
     remove_custom_type("MPFSlide")
     remove_custom_type("MPFVariable")
+    remove_custom_type("MPFSoundAsset")
