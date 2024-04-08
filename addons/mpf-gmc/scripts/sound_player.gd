@@ -219,18 +219,18 @@ func _stop(channel: AudioStreamPlayer, settings: Dictionary = {}, action: String
 func stop_all(fade_out: float = 1.0) -> void:
     MPF.log.debug("STOP ALL called with fadeout of %s" , fade_out)
     duck_settings = null
-    # Clear any queued tracks as well, lest they be triggered after the stop
-    for track in self.busses.keys():
-        self.clear_queue(track)
     var tween = self.create_tween() if fade_out > 0 else null
-    for channel in $Channels.get_children():
-        if channel.playing and not channel.get_meta("is_stopping", false):
-            if tween:
-                tween.tween_property(channel, "volume_db", -80.0, fade_out) \
-                    .set_trans(Tween.TRANS_QUINT).set_ease(Tween.EASE_IN)
-                channel.set_meta("is_stopping", true)
-            else:
-                self._clear_channel(channel)
+    for track in self.busses.keys():
+        # Clear any queued tracks as well, lest they be triggered after the stop
+        self.clear_queue(track)
+        for channel in self.busses[track].channels:
+            if channel.playing and not channel.get_meta("is_stopping", false):
+                if tween:
+                    tween.tween_property(channel, "volume_db", -80.0, fade_out) \
+                        .set_trans(Tween.TRANS_QUINT).set_ease(Tween.EASE_IN)
+                    channel.set_meta("is_stopping", true)
+                else:
+                    self._clear_channel(channel)
     if tween:
         tween.finished.connect(self._on_fade_complete.bind(null, tween, "stop_all"))
         self.tweens.append(tween)
@@ -255,17 +255,14 @@ func clear_queue(track: String) -> void:
 
 func _on_fade_complete(channel, tween, action) -> void:
     self.tweens.erase(tween)
-    # If this is a stop_all action, stop all the channels
+    # If this is a stop_all action, finish all the channels that are stopping
     if action == "stop_all":
-        # TODO: Add a timestamp to stop_all callback and automatically prevent
-        # stoppage of tracks started after the stop_all call. In the meantime,
-        # hard-code tracks that should not be stopped via stop_all.
-        var non_stop_resources := ["res://assets/sfx/stinger.wav", "res://assets/sfx/sof-bonus.ogg"]
-        for c in $Channels.get_children():
-            if c.stream and not c.stream.resource_path in non_stop_resources:
-                self._clear_channel(channel)
+        for track in self.busses.values():
+            for c in track.channels:
+                if c.stream and c.get_meta("is_stopping", false):
+                    self._clear_channel(channel)
         set_process(false)
-    # If this is a stop action, stop the channel as well
+    # If this is a stop action, stop the channel
     elif action == "stop" or action == "clear":
         MPF.log.debug("Fade out complete on channel %s" % channel)
         self._clear_channel(channel)
@@ -285,6 +282,7 @@ func _clear_channel(channel):
     channel.remove_meta("tween")
     channel.remove_meta("context")
     channel.remove_meta("fade_out")
+    channel.remove_meta("is_stopping")
 
 func _find_available_channel(track: String, filepath: String, settings: Dictionary) -> AudioStreamPlayer:
     var available_channel
