@@ -78,14 +78,18 @@ func play_sounds(s: Dictionary) -> void:
     for asset in s.settings.keys():
         var settings = s.settings[asset]
 
+        assert(MPF.mc.sounds.has(asset), "Unknown sound file or resource '%s'" % asset)
+
+        var config = MPF.mc.get_sound_instance(asset)
+        # If the result is a stream, there's no custom asset resource
+        if config is AudioStream:
+            settings["file"] = config.resource_path
         # If this sound is defined with a custom asset resource, populate those values
-        if MPF.mc.sounds.has(asset):
-            var addl_settings = MPF.mc.get_sound_instance(asset)
-            settings["file"] = addl_settings.file.resource_path
+        else:
+            settings["file"] = config.file.resource_path
             for prop in ["fade_in", "fade_out", "track"]:
-                if settings.get(prop) == null and addl_settings.get(prop):
-                    settings[prop] = addl_settings[prop]
-            print("Override values now have: %s" % settings)
+                if settings.get(prop) == null and config.get(prop):
+                    settings[prop] = config[prop]
 
         var track: String = settings["track"] if settings.get("track") else self.default_track
         var file: String = settings.get("file", asset)

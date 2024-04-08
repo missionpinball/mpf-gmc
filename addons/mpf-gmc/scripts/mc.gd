@@ -12,7 +12,8 @@ var sounds := {}
 func _init() -> void:
     self.traverse_tree_for("slides", slides)
     self.traverse_tree_for("widgets", widgets)
-    self.traverse_tree_for("sounds", sounds, "tres")
+    for ext in ["tres", "wav", "ogg"]:
+        self.traverse_tree_for("sounds", sounds, ext)
 
     MPF.log.info("Generated slide lookups: %s", slides)
     MPF.log.info("Generated widget lookups: %s", widgets)
@@ -47,7 +48,7 @@ func get_widget_instance(widget_name: String, preload_only: bool = false) -> MPF
     assert(widget_name in widgets, "Unknown widget name '%s'" % widget_name)
     return self._get_scene(widget_name, self.widgets, preload_only) as MPFWidget
 
-func get_sound_instance(sound_name: String, preload_only: bool = false) -> MPFSoundAsset:
+func get_sound_instance(sound_name: String, preload_only: bool = false):
     assert(sound_name in sounds, "Unknown sound name '%s'" % sound_name)
     return self._get_scene(sound_name, self.sounds, preload_only)
 
@@ -74,12 +75,12 @@ func traverse_tree_for(obj_type: String, acc: Dictionary, ext="tscn") -> void:
         var file_name = mdir.get_next()
         while (file_name != ""):
             if file_name == obj_type and mdir.current_is_dir():
-                self.recurse_dir("res://modes/%s/%s" % [mode, obj_type], acc)
+                self.recurse_dir("res://modes/%s/%s" % [mode, obj_type], acc, ext)
             file_name = mdir.get_next()
         mode = dir.get_next()
     # Then look for defaults included with GMC
     var defaults = {}
-    self.recurse_dir("res://addons/mpf-gmc/%s" % obj_type, defaults)
+    self.recurse_dir("res://addons/mpf-gmc/%s" % obj_type, defaults, ext)
     # And map over to fill in defaults for any missing scenes
     for d in defaults:
         if d not in acc:
@@ -92,7 +93,7 @@ func recurse_dir(path, acc, ext="tscn") -> void:
         var file_name = dir.get_next()
         while (file_name != ""):
             if dir.current_is_dir():
-                self.recurse_dir("%s/%s" % [path, file_name], acc)
+                self.recurse_dir("%s/%s" % [path, file_name], acc, ext)
             elif file_name.ends_with(".%s" % ext):
                 acc[file_name.split(".")[0]] = "%s/%s" % [path, file_name]
             file_name = dir.get_next()

@@ -4,7 +4,6 @@
 # Released under the MIT License
 
 
-class_name BCPServer
 extends Node
 
 signal bonus(payload)
@@ -252,7 +251,7 @@ func _thread_poll(_userdata=null) -> void:
             _send("goodbye")
             call_deferred("stop")
             # Resume polling for new client connections
-            set_process(true)
+            call_deferred("set_process", true)
           "hello":
             _send("hello")
             call_deferred("on_connect")
