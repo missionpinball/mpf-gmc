@@ -9,6 +9,7 @@ var musicDuck: Tween
 
 var busses = {}
 var tweens = []
+var default_track: String
 
 var _music_loop_channel: AudioStreamPlayer
 
@@ -40,19 +41,22 @@ func initialize(config: ConfigFile) -> void:
         for key in config.get_section_keys("sound_system"):
             var settings = config.get_value("sound_system", key)
             var target_bus = settings['track'] if settings.get('bus') else key
-            if target_bus in self.busses:
-                assert(settings.get("type"), "Sound system bus '%s' missing required field 'type'." % target_bus)
-                var bus_type = settings["type"]
-                self.busses[target_bus]["type"] = bus_type
-                var channels_to_make = 2 if bus_type == "solo" else settings.get("simultaneous_sounds", 1)
-                for i in range(0, channels_to_make):
-                    var channel = AudioStreamPlayer.new()
-                    channel.name = "%s_%s" % [target_bus, i+1]
-                    self.busses[target_bus].channels.append(channel)
-                    self.add_child(channel)
-                # Sequential busses get a queue to store pending sounds
-                if bus_type == "sequential":
-                    self.busses[target_bus]["queue"] = []
+            assert(target_bus in self.busses, "Sound system track '%s' does not have an audio bus configured.")
+            assert(settings.get("type"), "Sound system bus '%s' missing required field 'type'." % target_bus)
+            var bus_type = settings["type"]
+            self.busses[target_bus]["type"] = bus_type
+            var channels_to_make = 2 if bus_type == "solo" else settings.get("simultaneous_sounds", 1)
+            for i in range(0, channels_to_make):
+                var channel = AudioStreamPlayer.new()
+                channel.name = "%s_%s" % [target_bus, i+1]
+                self.busses[target_bus].channels.append(channel)
+                self.add_child(channel)
+            # Sequential busses get a queue to store pending sounds
+            if bus_type == "sequential":
+                self.busses[target_bus]["queue"] = []
+            # A bus can be marked default
+            if settings.get("default", false):
+                self.default_track = target_bus
         print("Finished configuring sound system: %s" % self.busses)
 
 func _ready() -> void:
@@ -73,14 +77,17 @@ func play_sounds(s: Dictionary) -> void:
     print("PLAYING SOUNDS from dictionary %s" % s)
     for asset in s.settings.keys():
         var settings = s.settings[asset]
+
+        # If this sound is defined with a custom asset resource, populate those values
         if MPF.mc.sounds.has(asset):
             var addl_settings = MPF.mc.get_sound_instance(asset)
             settings["file"] = addl_settings.file.resource_path
-            for prop in ["fade_in", "fade_out"]:
+            for prop in ["fade_in", "fade_out", "track"]:
                 if settings.get(prop) == null and addl_settings.get(prop):
                     settings[prop] = addl_settings[prop]
             print("Override values now have: %s" % settings)
-        var track: String = settings["track"] if settings.get("track") else "sfx"
+
+        var track: String = settings["track"] if settings.get("track") else self.default_track
         var file: String = settings.get("file", asset)
         var action: String = settings.get("action", "play")
         settings['context'] = settings.get("custom_context", s.context)
@@ -185,10 +192,14 @@ func _play(channel: AudioStreamPlayer, settings: Dictionary) -> void:
     channel.set_meta("tween", tween)
 
 func stop(filename: String, track: String, settings: Dictionary) -> void:
-    var filepath: String = "res://assets/%s/%s" % [track, filename]
+    var filepath: String
+    if filename.left(4) == "res:":
+        filepath = filename
+    else:
+        filepath = "res://assets/%s/%s" % [track, filename]
     # Find the channel playing this file
     for channel in self._get_channels(track):
-        if channel.stream and channel.stream.resource_path == filepath:
+        if channel.stream and channel.stream.resource_path == filepath and channel.playing and not channel.get_meta("is_stopping", false):
             self._stop(channel, settings)
             return
     # It's possible that the stop was called just for safety.
@@ -215,6 +226,7 @@ func _stop(channel: AudioStreamPlayer, settings: Dictionary = {}, action: String
     tween.finished.connect(self._on_fade_complete.bind(channel, tween, action))
     self.tweens.append(tween)
     channel.set_meta("tween", tween)
+    channel.set_meta("is_stopping", true)
 
 func stop_all(fade_out: float = 1.0) -> void:
     MPF.log.debug("STOP ALL called with fadeout of %s" , fade_out)
@@ -399,5 +411,5 @@ func _on_clear_context(context_name: String) -> void:
     # Loop through all the channels and stop any that are playing this context
     for bus in self.busses.values():
         for channel in bus.channels:
-            if channel.has_meta("context") and channel.get_meta("context") == context_name and channel.playing:
+            if channel.has_meta("context") and channel.get_meta("context") == context_name and channel.playing and not channel.get_meta("is_stopping", false):
                 self._stop(channel)
