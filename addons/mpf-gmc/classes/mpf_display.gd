@@ -37,8 +37,12 @@ func action_play(slide_name: String, settings: Dictionary, context: String, prio
     slide.initialize(slide_name, settings, context, priority, kwargs)
     self._slide_stack.append(slide)
     self._slides.add_child(slide)
-    self._update_stack()
+    if kwargs.get("update_stack", true):
+        self._update_stack()
     return slide
+
+func update_stack():
+    self._update_stack
 
 func action_remove(slide) -> void:
     self._slide_stack.erase(slide)
