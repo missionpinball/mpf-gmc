@@ -20,6 +20,7 @@ func _ready() -> void:
         displays[display.name] = display
     if not default_display:
         default_display = first_display
+    MPF.server.listen()
 
 func _enter_tree():
     pass
