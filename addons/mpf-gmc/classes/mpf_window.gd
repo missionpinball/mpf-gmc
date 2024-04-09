@@ -53,7 +53,8 @@ func _play_scene(scene_type: String, payload: Dictionary) -> void:
             display.process_slide(name, action, settings, context, priority, payload)
         elif scene_type == "widget":
             display.process_widget(name, action, settings, context, priority, payload)
-        dirty_displays.append(display)
+        if display not in dirty_displays:
+            dirty_displays.append(display)
     # Allow all the slides to be updated before re-rendering
     for display in dirty_displays:
         display.update_stack()

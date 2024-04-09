@@ -42,7 +42,7 @@ func action_play(slide_name: String, settings: Dictionary, context: String, prio
     return slide
 
 func update_stack():
-    self._update_stack
+    self._update_stack()
 
 func action_remove(slide) -> void:
     self._slide_stack.erase(slide)
@@ -56,8 +56,6 @@ func get_slide(slide_name):
             return s
 
 func _update_stack() -> void:
-    if not self._slide_stack:
-        return
     # Sort the stack by priority
     self._slide_stack.sort_custom(
         func(a: MPFSlide, b: MPFSlide): return a.priority < b.priority
@@ -70,6 +68,11 @@ func _update_stack() -> void:
             s.queue_free()
         else:
             self._slides.move_child(s, idx)
+
+    if not self._slide_stack:
+        self._current_slide = null
+        return
+
     var new_slide = self._slide_stack[-1]
     if new_slide != self._current_slide:
         if self._current_slide:
