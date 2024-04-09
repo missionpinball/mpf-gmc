@@ -20,7 +20,8 @@ func _ready() -> void:
         displays[display.name] = display
     if not default_display:
         default_display = first_display
-    MPF.server.listen()
+    if not Engine.is_editor_hint():
+        MPF.server.listen()
 
 func _enter_tree():
     pass
