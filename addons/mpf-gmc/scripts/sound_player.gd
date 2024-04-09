@@ -167,6 +167,16 @@ func _play(channel: AudioStreamPlayer, settings: Dictionary) -> void:
         # Map the sound start position relative to the music position
         start_at = fmod(_music_loop_channel.get_playback_position(), channel.stream.get_length())
 
+    # TODO: Support marker events
+    if settings.get("events_when_started"):
+        for e in settings["events_when_started"]:
+            MPF.server.send_event(e)
+    if settings.get("events_when_stopped"):
+        # Store a reference to the callable so it can be disconnected
+        var callable = self._trigger_events.bind("stopped", settings["events_when_stopped"], channel)
+        channel.set_meta("events_when_stopped", callable)
+        channel.finished.connect(callable)
+
   # If this is a voice or callout, duck the music
     if settings.get("ducking"):
         duck_settings = settings.ducking
@@ -287,6 +297,12 @@ func _on_fade_complete(channel, tween, action) -> void:
     if action == "clear":
         channel.stream = null
 
+func _trigger_events(state, events, channel) -> void:
+    for e in events:
+        MPF.server.send_event(e)
+    channel.finished.disconnect(channel.get_meta("events_when_%s" % state))
+    channel.remove_meta("events_when_%s" % state)
+
 func _get_channels(track: String):
     if track not in self.busses:
         MPF.log.error("Invalid track %s requested", track)
@@ -299,6 +315,9 @@ func _clear_channel(channel):
     channel.remove_meta("context")
     channel.remove_meta("fade_out")
     channel.remove_meta("is_stopping")
+    for e in ["started", "stopped"]:
+        if channel.has_meta("events_when_%s" % e):
+            channel.remove_meta("events_when_%s" % e)
 
 func _find_available_channel(track: String, filepath: String, settings: Dictionary) -> AudioStreamPlayer:
     var available_channel
