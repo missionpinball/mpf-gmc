@@ -35,7 +35,7 @@ var version: String
 
 
 signal player_update(variable_name, value)
-signal player_added
+signal player_added(total_players)
 signal credits
 signal volume(track, value, change)
 
@@ -50,7 +50,7 @@ func add_player(kwargs: Dictionary) -> void:
     "number": kwargs.player_num
   })
   num_players = players.size()
-  emit_signal("player_added")
+  emit_signal("player_added", num_players)
 
 # Called with a dynamic path value, must use load()
 func preload_scene(path: String, delay_secs: int = 0, persist: bool = false) -> void:

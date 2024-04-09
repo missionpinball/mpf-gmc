@@ -8,6 +8,8 @@ class_name MPFVariable extends Label
 @export var template: String = ""
 @export var initialize_empty: bool = true
 @export var update_event: String = ""
+@export var min_players: int
+@export var max_players: int
 
 var var_template: String = "%s"
 
@@ -23,14 +25,14 @@ func _ready() -> void:
         # TODO: Dynamically update machine vars?
     elif variable_type == "Event Arg":
         pass
+    elif min_players or max_players or variable_type.begins_with("Player"):
+        MPF.game.connect("player_added", self._on_player_added)
+        # Set the initial state as well
+        self._on_player_added(MPF.game.num_players)
     else:
-        var player_num = int(variable_type.right(1))
-        var is_current_player = variable_type == "Current Player" or player_num == MPF.game.player.get('number')
+        var is_current_player = self._calculate_player_value()
         if is_current_player:
             MPF.game.connect("player_update", self._on_player_update)
-            self.update_text(MPF.game.player.get(self.variable_name))
-        elif MPF.game.players.size() >= player_num:
-            self.update_text(MPF.game.players[player_num - 1].get(self.variable_name))
 
     if self.update_event:
         MPF.server.add_event_handler(self.update_event, self.update)
@@ -68,3 +70,23 @@ func update_text(value):
 func _on_player_update(var_name, value):
     if var_name == variable_name:
         self.update_text(value)
+
+func _on_player_added(total_players):
+    if min_players != 0 and min_players > total_players:
+        self.hide()
+    elif max_players != 0 and total_players > max_players:
+        self.hide()
+    else:
+        # TODO: There is a gap here where a min/max var that applies to the current
+        # player won't connect to an update signal if the range is met during play.
+        self._calculate_player_value()
+        self.show()
+
+func _calculate_player_value():
+    var player_num = int(variable_type.right(1))
+    var is_current_player = variable_type == "Current Player" or player_num == MPF.game.player.get('number')
+    if is_current_player:
+        self.update_text(MPF.game.player.get(self.variable_name))
+        return true
+    elif MPF.game.players.size() >= player_num:
+        self.update_text(MPF.game.players[player_num - 1].get(self.variable_name))
