@@ -69,7 +69,6 @@ func _ready() -> void:
     duckReleaseTimer.timeout.connect(self._duck_release)
     MPF.game.volume.connect(self._on_volume)
     MPF.server.connect("clear", self._on_clear_context)
-    set_process(false)
 
 func play_sounds(s: Dictionary) -> void:
     assert(typeof(s) == TYPE_DICTIONARY, "Sound player called with non-dict value: %s" % s)
@@ -118,9 +117,9 @@ func play(filename: String, track: String, settings: Dictionary = {}) -> void:
     else:
         available_channel = self._find_available_channel(track, filepath, settings)
 
-    # Look for some music so we can replace or queue
-    if track == "music" :
-        for c in self._get_channels("music"):
+    # If this is a solo track, stop any other playback
+    if self.busses[track].type == "solo":
+        for c in self._get_channels(track):
             if c.playing and c != available_channel:
                 self._stop(c, settings)
 
@@ -152,15 +151,23 @@ func _play(channel: AudioStreamPlayer, settings: Dictionary) -> void:
         return
 
     MPF.log.debug("playing %s (%s) on %s with settings %s", [channel.stream.resource_path, channel.stream, channel, settings])
-    channel.set_meta("context", settings.context)
+    channel.stream.set_meta("context", settings.context)
     var start_at: float = settings["start_at"] if settings.get("start_at") else 0.0
     var fade_in: float = settings["fade_in"] if settings.get("fade_in") else 0.0
     if settings.get("fade_out"):
-        channel.set_meta("fade_out", settings.fade_out)
-    # Music is OGG, which doesn't support loop begin/end
-    if settings.get("track") == "music" and channel.stream is AudioStreamOggVorbis:
-        # By default, loop the music, but allow an override
-        channel.stream.loop = settings.get("loop", true)
+        channel.stream.set_meta("fade_out", settings.fade_out)
+
+    if settings.get("loops"):
+        # OGG and MPF use the 'loop' property, while WAV uses 'loop_mode
+        if channel.stream is AudioStreamWAV:
+            channel.stream.loop_mode = 1 if settings["loops"] != 0 else 0
+        else:
+            channel.stream.loop = settings["loops"] != 0
+        # Attach metadata to track the loops
+        if settings["loops"] > 0:
+            print("Setting up loops (%s) for stream %s" % [settings['loops'], channel.stream])
+            channel.stream.set_meta("loops_remaining", settings["loops"])
+            channel.finished.connect(self._on_loop.bind(channel))
     elif start_at == -1.0:
         # Map the sound start position relative to the music position
         start_at = fmod(_music_loop_channel.get_playback_position(), channel.stream.get_length())
@@ -172,7 +179,7 @@ func _play(channel: AudioStreamPlayer, settings: Dictionary) -> void:
     if settings.get("events_when_stopped"):
         # Store a reference to the callable so it can be disconnected
         var callable = self._trigger_events.bind("stopped", settings["events_when_stopped"], channel)
-        channel.set_meta("events_when_stopped", callable)
+        channel.stream.set_meta("events_when_stopped", callable)
         channel.finished.connect(callable)
 
   # If this is a voice or callout, duck the music
@@ -227,8 +234,8 @@ func _stop(channel: AudioStreamPlayer, settings: Dictionary = {}, action: String
         channel.play(pos)
         return
     var fade_out = settings.get("fade_out")
-    if not fade_out and channel.has_meta("fade_out"):
-        fade_out = channel.get_meta("fade_out")
+    if not fade_out and channel.stream.has_meta("fade_out"):
+        fade_out = channel.stream.get_meta("fade_out")
     if not fade_out:
         self._clear_channel(channel)
         return
@@ -263,7 +270,6 @@ func stop_all(fade_out: float = 1.0) -> void:
         for t in self.tweens:
             t.stop()
         self.tweens = []
-        set_process(false)
 
 func clear_queue(track: String) -> void:
     var queue_to_clear = self.busses[track].get("queue")
@@ -285,7 +291,6 @@ func _on_fade_complete(channel, tween, action) -> void:
             for c in track.channels:
                 if c.stream and c.get_meta("is_stopping", false):
                     self._clear_channel(channel)
-        set_process(false)
     # If this is a stop action, stop the channel
     elif action == "stop" or action == "clear":
         MPF.log.debug("Fade out complete on channel %s" % channel)
@@ -295,11 +300,25 @@ func _on_fade_complete(channel, tween, action) -> void:
     if action == "clear":
         channel.stream = null
 
+func _on_loop(channel) -> void:
+    var loops_remaining = channel.stream.get_meta("loops_remaining") - 1
+    print("Channel %s stream %s has %s loops remaining" % [channel, channel.stream, loops_remaining])
+    if loops_remaining == 0:
+        channel.stream.remove_meta("loops_remaining")
+        channel.finished.disconnect(self._on_loop)
+        if channel.stream is AudioStreamWAV:
+            channel.stream.loop_mode = 0
+        else:
+            channel.loop = false
+    else:
+        channel.stream.set_meta("loops_remaining", loops_remaining)
+
+
 func _trigger_events(state, events, channel) -> void:
     for e in events:
         MPF.server.send_event(e)
-    channel.finished.disconnect(channel.get_meta("events_when_%s" % state))
-    channel.remove_meta("events_when_%s" % state)
+    channel.finished.disconnect(channel.stream.get_meta("events_when_%s" % state))
+    channel.stream.remove_meta("events_when_%s" % state)
 
 func _get_channels(track: String):
     if track not in self.busses:
@@ -310,12 +329,7 @@ func _clear_channel(channel):
     channel.stop()
     channel.volume_db = 0.0
     channel.remove_meta("tween")
-    channel.remove_meta("context")
-    channel.remove_meta("fade_out")
     channel.remove_meta("is_stopping")
-    for e in ["started", "stopped"]:
-        if channel.has_meta("events_when_%s" % e):
-            channel.remove_meta("events_when_%s" % e)
 
 func _find_available_channel(track: String, filepath: String, settings: Dictionary) -> AudioStreamPlayer:
     var available_channel
@@ -430,5 +444,7 @@ func _on_clear_context(context_name: String) -> void:
     # Loop through all the channels and stop any that are playing this context
     for bus in self.busses.values():
         for channel in bus.channels:
-            if channel.has_meta("context") and channel.get_meta("context") == context_name and channel.playing and not channel.get_meta("is_stopping", false):
+            if channel.stream and channel.stream.has_meta("context") and \
+            channel.stream.get_meta("context") == context_name and \
+            channel.playing and not channel.get_meta("is_stopping", false):
                 self._stop(channel)

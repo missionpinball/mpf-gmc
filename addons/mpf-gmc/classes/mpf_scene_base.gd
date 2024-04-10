@@ -72,7 +72,7 @@ func _create_expire(child: MPFSceneBase, expiration_secs: float) -> void:
     self.add_child(timer)
     self._expirations[child.key] = timer
 
-func _on_expire(child: MPFSceneBase, timer: Timer) -> void:
+func _on_expire(child, timer: Timer) -> void:
     self._expirations.erase(child.key)
     self.remove_child(timer)
     timer.queue_free()
