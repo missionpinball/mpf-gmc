@@ -57,7 +57,6 @@ func initialize(config: ConfigFile) -> void:
             # A bus can be marked default
             if settings.get("default", false):
                 self.default_track = target_bus
-        print("Finished configuring sound system: %s" % self.busses)
 
 func _ready() -> void:
     for bus in self.busses.values():
@@ -74,7 +73,6 @@ func _ready() -> void:
 
 func play_sounds(s: Dictionary) -> void:
     assert(typeof(s) == TYPE_DICTIONARY, "Sound player called with non-dict value: %s" % s)
-    print("PLAYING SOUNDS from dictionary %s" % s)
     for asset in s.settings.keys():
         var settings = s.settings[asset]
 
@@ -321,9 +319,7 @@ func _clear_channel(channel):
 
 func _find_available_channel(track: String, filepath: String, settings: Dictionary) -> AudioStreamPlayer:
     var available_channel
-    print("Looking for channel for %s in channels" % track)
     for channel in self._get_channels(track):
-        print(" - trying channel %s" % channel)
         if channel.stream and channel.stream.resource_path == filepath:
             # If this file is *already* playing, keep playing
             if channel.playing:
