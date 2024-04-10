@@ -33,6 +33,9 @@ func process_action(child_name: String, children: Array, action: String, setting
         "play":
             if not child:
                 child = self.action_play(child_name, settings, context, priority, kwargs)
+        "queue", "queue_first", "queue_immediate":
+            self.action_queue(action, child_name, settings, context, priority, kwargs)
+            child = null
         "remove":
             if child:
                 self.action_remove(child)
@@ -51,6 +54,9 @@ func action_play(child_name: String, settings: Dictionary, context: String, prio
 
 func action_remove(widget: Node) -> void:
     assert(false, "Method 'action_remove' must be overridden in child classes of MPFSceneBase")
+
+func action_queue(action: String, slide_name: String, settings: Dictionary, context: String, priority: int = 0, kwargs: Dictionary = {}):
+    assert(false, "Method 'action_queue' must be overridden in child classes of MPFSceneBase")
 
 func _create_expire(child: MPFSceneBase, expiration_secs: float) -> void:
     # If there is already a timer for this child to expire, reset it
