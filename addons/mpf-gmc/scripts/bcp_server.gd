@@ -9,6 +9,7 @@ extends Node
 signal bonus(payload)
 signal mpf_timer(payload)
 signal options(payload)
+signal item_highlighted(payload)
 signal player_var(value, prev_value, change, player_num)
 signal service(payload)
 signal clear(mode_name)
@@ -255,6 +256,8 @@ func _thread_poll(_userdata=null) -> void:
           "hello":
             _send("hello")
             call_deferred("on_connect")
+          "item_highlighted":
+            call_deferred("emit_signal", "item_highlighted", message)
           "list_coils":
             call_deferred("emit_signal", "service", message)
           "list_lights":
@@ -287,6 +290,7 @@ func _thread_poll(_userdata=null) -> void:
             _send("monitor_start?category=player_vars")
             _send("monitor_start?category=machine_vars")
             # Standard events
+            _send("register_trigger?event=item_highlighted")
             _send("register_trigger?event=bonus")
             _send("register_trigger?event=high_score_enter_initials")
             _send("register_trigger?event=high_score_award_display")
