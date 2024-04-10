@@ -129,20 +129,32 @@ func _manage_queue(action: String) -> void:
 func _process_queue():
     if not self._queue.size():
         return
+    var now = Time.get_ticks_msec()
     while self._queue.size():
         var s = self._queue[0]
-        if s["expiration"] and s["expiration"] < Time.get_ticks_msec():
+        if s["expiration"] and s["expiration"] < now:
             self._queue.pop_front()
         else:
             self.process_slide(s["slide_name"], "play", s["settings"], s["context"], s["priority"], s["kwargs"])
             return
 
 func _on_clear(context_name) -> void:
+    # Track the top-most (i.e. currently active) queue item
+    var top_queued = self._queue[0] if self._queue.size() else null
+    self._queue = self._queue.filter(
+        func(queue_entry): return queue_entry.context != context_name
+    )
     # Filter all slides with the given context
     self._slide_stack = self._slide_stack.filter(
         func(slide): return slide.context != context_name
     )
-    self._update_stack()
+    # If the queued item was removed, process the queue
+    if top_queued and top_queued.context == context_name:
+        self._process_queue()
+    # Otherwise, just refresh the stack
+    else:
+        self._update_stack()
+
     # For the remaining slides, clear out any widgets from that context
     for s in self._slide_stack:
         s.clear(context_name)
