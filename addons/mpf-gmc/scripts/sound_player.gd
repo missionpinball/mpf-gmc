@@ -22,6 +22,7 @@ var duck_attenuation := 8
 var duck_attack := 0.5
 var duck_release := 0.5
 var duck_settings
+# TODO: Make this dynamically find the music/duck target bus
 var unduck_level: int = AudioServer.get_bus_volume_db(1)
 
 # TODO: Remove default duck, or make customizable/optional

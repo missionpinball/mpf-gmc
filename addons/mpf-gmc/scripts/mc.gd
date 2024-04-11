@@ -65,8 +65,36 @@ func _get_scene(name: String, collection: Dictionary, preload_only: bool = false
 func traverse_tree_for(obj_type: String, acc: Dictionary, ext="tscn") -> void:
     # Start by traversing the root folder for this object type
     self.recurse_dir("res://%s" % obj_type, acc, ext)
-    # Then traverse the mode folders for subfolders of this object type
+    self.recurse_modes(obj_type, acc, ext)
+    # Then look for defaults included with GMC
+    var defaults = {}
+    self.recurse_dir("res://addons/mpf-gmc/%s" % obj_type, defaults, ext)
+    # And map over to fill in defaults for any missing scenes
+    for d in defaults:
+        if d not in acc:
+            acc[d] = defaults[d]
+
+func recurse_dir(path, acc, ext="tscn") -> void:
+    var dir = DirAccess.open(path)
+    # If this path does not exist, that's okay
+    if not dir:
+        return
+    if dir:
+        dir.list_dir_begin()
+        var file_name = dir.get_next()
+        while (file_name != ""):
+            if dir.current_is_dir():
+                self.recurse_dir("%s/%s" % [path, file_name], acc, ext)
+            elif file_name.ends_with(".%s" % ext):
+                acc[file_name.split(".")[0]] = "%s/%s" % [path, file_name]
+            file_name = dir.get_next()
+
+func recurse_modes(obj_type: String, acc: Dictionary, ext="tscn") -> void:
+    # Traverse the mode folders for subfolders of this object type
     var dir = DirAccess.open("res://modes")
+    # If this is a new project there may not be modes
+    if not dir:
+        return
     dir.list_dir_begin()
     var mode = dir.get_next()
     while (mode != ""):
@@ -78,24 +106,3 @@ func traverse_tree_for(obj_type: String, acc: Dictionary, ext="tscn") -> void:
                 self.recurse_dir("res://modes/%s/%s" % [mode, obj_type], acc, ext)
             file_name = mdir.get_next()
         mode = dir.get_next()
-    # Then look for defaults included with GMC
-    var defaults = {}
-    self.recurse_dir("res://addons/mpf-gmc/%s" % obj_type, defaults, ext)
-    # And map over to fill in defaults for any missing scenes
-    for d in defaults:
-        if d not in acc:
-            acc[d] = defaults[d]
-
-func recurse_dir(path, acc, ext="tscn") -> void:
-    var dir = DirAccess.open(path)
-    if dir:
-        dir.list_dir_begin()
-        var file_name = dir.get_next()
-        while (file_name != ""):
-            if dir.current_is_dir():
-                self.recurse_dir("%s/%s" % [path, file_name], acc, ext)
-            elif file_name.ends_with(".%s" % ext):
-                acc[file_name.split(".")[0]] = "%s/%s" % [path, file_name]
-            file_name = dir.get_next()
-    #else:
-    #    print("An error occurred when trying to access the path '%s'." % dir)
