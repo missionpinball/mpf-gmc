@@ -6,6 +6,7 @@ uniform float display_width = 1280.0;
 uniform float display_height = 720.0;
 uniform float hardness = 8.0;
 
+
 void fragment() {
 	//vec2 ratio = vec2(1.0, TEXTURE_PIXEL_SIZE.x / TEXTURE_PIXEL_SIZE.y); // make sure the dots are going to be 1:1
 	vec2 ratio = vec2(1.0, display_height/display_width);
