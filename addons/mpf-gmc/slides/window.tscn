@@ -1,13 +1,59 @@
-[gd_scene load_steps=4 format=3 uid="uid://ds4gduf8660uj"]
+[gd_scene load_steps=8 format=3 uid="uid://ds4gduf8660uj"]
 
 [ext_resource type="Script" path="res://addons/mpf-gmc/classes/mpf_window.gd" id="1_ixxnq"]
+[ext_resource type="Shader" path="res://addons/mpf-gmc/resources/dotmatrix.gdshader" id="2_cbmcr"]
 [ext_resource type="Script" path="res://addons/mpf-gmc/classes/mpf_display.gd" id="2_clr31"]
 [ext_resource type="PackedScene" uid="uid://belkug6sa4arr" path="res://addons/mpf-gmc/slides/startup.tscn" id="3_8nbga"]
+[ext_resource type="Shader" path="res://addons/mpf-gmc/resources/pixelate.gdshader" id="5_m6y8w"]
 
-[node name="MPFWindow" type="Node2D"]
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_vnlqf"]
+shader = ExtResource("2_cbmcr")
+shader_parameter/color = Color(0.101961, 0, 0, 1)
+shader_parameter/hardness = 5.0
+shader_parameter/spacing = 2.0
+shader_parameter/cols = 98.0
+shader_parameter/rows = 36.0
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_gmaen"]
+shader = ExtResource("5_m6y8w")
+shader_parameter/cols = 128
+shader_parameter/rows = 32
+
+[node name="MPFWindow" type="Control"]
+custom_minimum_size = Vector2(1920, 720)
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
 script = ExtResource("1_ixxnq")
 
-[node name="MPFDisplay" type="Node2D" parent="."]
+[node name="MPFDisplay" type="Control" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 script = ExtResource("2_clr31")
 is_default = true
 initial_slide = ExtResource("3_8nbga")
+
+[node name="DMD" type="ColorRect" parent="."]
+visible = false
+z_index = 4096
+material = SubResource("ShaderMaterial_vnlqf")
+layout_mode = 0
+offset_right = 1916.0
+offset_bottom = 762.0
+
+[node name="Pixellate" type="ColorRect" parent="."]
+visible = false
+top_level = true
+material = SubResource("ShaderMaterial_gmaen")
+layout_mode = 0
+offset_right = 1936.0
+offset_bottom = 740.0

@@ -1,6 +1,6 @@
 @tool
 class_name MPFSceneBase
-extends Node2D
+extends Control
 
 var priority: int = 0
 var context: String

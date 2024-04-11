@@ -8,13 +8,16 @@ extends MPFSceneBase
 # The slide stack is an array of slide nodes that are sorted by priority
 var _slide_stack: Array = []
 # The slides node is the parent container for the slide nodes rendered in the tree
-var _slides: Node2D
+var _slides: Control
 var _current_slide: MPFSlide
 # The queue of slides waiting to be played
 var _queue: Array = []
 
 func _ready() -> void:
-    self._slides = Node2D.new()
+    self._slides = Control.new()
+    self._slides.set_anchors_preset(PRESET_FULL_RECT)
+    self._slides.size_flags_horizontal = SIZE_EXPAND
+    self._slides.size_flags_vertical = SIZE_EXPAND
     self.add_child(self._slides)
     if not self.initial_slide:
         return

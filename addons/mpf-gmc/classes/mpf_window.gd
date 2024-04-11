@@ -1,5 +1,5 @@
 @tool
-class_name MPFWindow extends Node2D
+class_name MPFWindow extends Control
 
 var displays: Dictionary = {}
 var default_display: MPFDisplay

@@ -13,6 +13,7 @@ signal item_highlighted(payload)
 signal player_var(value, prev_value, change, player_num)
 signal service(payload)
 signal clear(mode_name)
+signal status(message, details, is_error)
 
 # A list of events that trigger their own automatic signals
 var auto_signals := []
