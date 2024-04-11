@@ -1,4 +1,6 @@
 
+// Shader to pixelate the screen texture
+
 shader_type canvas_item;
 
 uniform int cols = 128;
