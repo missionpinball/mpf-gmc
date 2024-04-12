@@ -9,7 +9,7 @@ var musicDuck: Tween
 
 var busses = {}
 var tweens = []
-var default_track: String
+var default_bus: String
 
 var _music_loop_channel: AudioStreamPlayer
 
@@ -41,8 +41,8 @@ func initialize(config: ConfigFile) -> void:
     if config.has_section("sound_system"):
         for key in config.get_section_keys("sound_system"):
             var settings = config.get_value("sound_system", key)
-            var target_bus = settings['track'] if settings.get('bus') else key
-            assert(target_bus in self.busses, "Sound system track '%s' does not have an audio bus configured.")
+            var target_bus = settings['bus'] if settings.get('bus') else key
+            assert(target_bus in self.busses, "Sound system does not have an audio bus '%s' configured.")
             assert(settings.get("type"), "Sound system bus '%s' missing required field 'type'." % target_bus)
             var bus_type = settings["type"]
             self.busses[target_bus]["type"] = bus_type
@@ -57,13 +57,13 @@ func initialize(config: ConfigFile) -> void:
                 self.busses[target_bus]["queue"] = []
             # A bus can be marked default
             if settings.get("default", false):
-                self.default_track = target_bus
+                self.default_bus = target_bus
 
 func _ready() -> void:
     for bus in self.busses.values():
         if bus.type == "sequential":
-            for track in bus.tracks:
-                track.finished.connect(self._on_queue_track_finished.bind(bus.name))
+            for channel in bus.channels:
+                channel.finished.connect(self._on_queue_channel_finished.bind(bus.name))
     duckAttackTimer.one_shot = true
     duckAttackTimer.timeout.connect(self._duck_attack)
     duckReleaseTimer.one_shot = true
@@ -85,54 +85,55 @@ func play_sounds(s: Dictionary) -> void:
         # If this sound is defined with a custom asset resource, populate those values
         else:
             settings["file"] = config.file.resource_path
-            for prop in ["fade_in", "fade_out", "track"]:
+            for prop in ["fade_in", "fade_out", "bus"]:
                 if settings.get(prop) == null and config.get(prop):
                     settings[prop] = config[prop]
 
-        var track: String = settings["track"] if settings.get("track") else self.default_track
+        var bus: String = settings["bus"] if settings.get("bus") else self.default_bus
         var file: String = settings.get("file", asset)
         var action: String = settings.get("action", "play")
         settings['context'] = settings.get("custom_context", s.context)
 
         if action == "stop" or action == "loop_stop":
-            self.stop(file, track, settings)
+            self.stop(file, bus, settings)
             return
-        self.play(file, track, settings)
+        self.play(file, bus, settings)
 
-func play(filename: String, track: String, settings: Dictionary = {}) -> void:
-    MPF.log.info("play called for %s on %s with settings %s" % [filename, track, settings])
+func play(filename: String, bus: String, settings: Dictionary = {}) -> void:
+    MPF.log.info("play called for %s on bus %s with settings %s" % [filename, bus, settings])
     # Accept an absolute filepath too
     var filepath: String
     if filename.left(4) == "res:":
         filepath = filename
     else:
-        filepath = "res://assets/%s/%s" % [track, filename]
+        # TODO: Clean this up now that sounds are indexed by MC
+        filepath = "res://assets/%s/%s" % [bus, filename]
     var available_channel: AudioStreamPlayer
-    settings["track"] = track
+    settings["bus"] = bus
 
     # Clear out the queue if necessary, to free up channels
     if settings.get("clear_queue", false):
-        self.clear_queue(settings["track"])
+        self.clear_queue(bus)
 
     # Check our channels to see if (1) one is empty or (2) one already has this
     else:
-        available_channel = self._find_available_channel(track, filepath, settings)
+        available_channel = self._find_available_channel(bus, filepath, settings)
 
-    # If this is a solo track, stop any other playback
-    if self.busses[track].type == "solo":
-        for c in self._get_channels(track):
+    # If this is a solo bus, stop any other playback
+    if self.busses[bus].type == "solo":
+        for c in self._get_channels(bus):
             if c.playing and c != available_channel:
                 self._stop(c, settings)
 
-    # If the available channel we got back is already playing, it's playing this track
+    # If the available channel we got back is already playing, it's playing this file
     # and we don't need to do anything further.
     if available_channel and available_channel.playing:
         MPF.log.debug("Recevied available channel that's already playing, no-op.")
         return
 
     if not available_channel:
-        # Queue the filename if this track type has a queue
-        var target_queue = self.busses[track].get("queue")
+        # Queue the filename if this bus type has a queue
+        var target_queue = self.busses[bus].get("queue")
         if target_queue:
             # By default, max queue time is one minute (tracked in milliseconds)
             var max_queue_time: int = settings.get("max_queue_time", 60000)
@@ -211,14 +212,15 @@ func _play(channel: AudioStreamPlayer, settings: Dictionary) -> void:
     self.tweens.append(tween)
     channel.set_meta("tween", tween)
 
-func stop(filename: String, track: String, settings: Dictionary) -> void:
+func stop(filename: String, bus: String, settings: Dictionary) -> void:
     var filepath: String
+    # TODO: Track the stop by key, not filename
     if filename.left(4) == "res:":
         filepath = filename
     else:
-        filepath = "res://assets/%s/%s" % [track, filename]
+        filepath = "res://assets/%s/%s" % [bus, filename]
     # Find the channel playing this file
-    for channel in self._get_channels(track):
+    for channel in self._get_channels(bus):
         if channel.stream and channel.stream.resource_path == filepath and channel.playing and not channel.get_meta("is_stopping", false):
             self._stop(channel, settings)
             return
@@ -231,7 +233,7 @@ func _stop(channel: AudioStreamPlayer, settings: Dictionary = {}, action: String
         # The position is reset when the loop mode changes, so store it first
         var pos: float = channel.get_playback_position()
         channel.stream.loop_mode = 0
-        # Play the track to the end of the file
+        # Play the sound to the end of the file
         channel.play(pos)
         return
     var fade_out = settings.get("fade_out")
@@ -252,10 +254,10 @@ func stop_all(fade_out: float = 1.0) -> void:
     MPF.log.debug("STOP ALL called with fadeout of %s" , fade_out)
     duck_settings = null
     var tween = self.create_tween() if fade_out > 0 else null
-    for track in self.busses.keys():
-        # Clear any queued tracks as well, lest they be triggered after the stop
-        self.clear_queue(track)
-        for channel in self.busses[track].channels:
+    for bus_name in self.busses.keys():
+        # Clear any queued buses as well, lest they be triggered after the stop
+        self.clear_queue(bus_name)
+        for channel in self.busses[bus_name].channels:
             if channel.playing and not channel.get_meta("is_stopping", false):
                 if tween:
                     tween.tween_property(channel, "volume_db", -80.0, fade_out) \
@@ -272,10 +274,10 @@ func stop_all(fade_out: float = 1.0) -> void:
             t.stop()
         self.tweens = []
 
-func clear_queue(track: String) -> void:
-    var queue_to_clear = self.busses[track].get("queue")
+func clear_queue(bus: String) -> void:
+    var queue_to_clear = self.busses[bus].get("queue")
     if not queue_to_clear:
-        MPF.log.error("Track '%s' does not have a queue to clear.", track)
+        MPF.log.error("Bus '%s' does not have a queue to clear.", bus)
         return
     for q in queue_to_clear:
         # Clear any streams from these channels so they can be available again
@@ -288,8 +290,8 @@ func _on_fade_complete(channel, tween, action) -> void:
     self.tweens.erase(tween)
     # If this is a stop_all action, finish all the channels that are stopping
     if action == "stop_all":
-        for track in self.busses.values():
-            for c in track.channels:
+        for bus in self.busses.values():
+            for c in bus.channels:
                 if c.stream and c.get_meta("is_stopping", false):
                     self._clear_channel(channel)
     # If this is a stop action, stop the channel
@@ -321,10 +323,10 @@ func _trigger_events(state, events, channel) -> void:
     channel.finished.disconnect(channel.stream.get_meta("events_when_%s" % state))
     channel.stream.remove_meta("events_when_%s" % state)
 
-func _get_channels(track: String):
-    if track not in self.busses:
-        MPF.log.error("Invalid track %s requested", track)
-    return self.busses[track].channels
+func _get_channels(bus: String):
+    if bus not in self.busses:
+        MPF.log.error("Invalid bus %s requested", bus)
+    return self.busses[bus].channels
 
 func _clear_channel(channel):
     channel.stop()
@@ -332,9 +334,9 @@ func _clear_channel(channel):
     channel.remove_meta("tween")
     channel.remove_meta("is_stopping")
 
-func _find_available_channel(track: String, filepath: String, settings: Dictionary) -> AudioStreamPlayer:
+func _find_available_channel(bus: String, filepath: String, settings: Dictionary) -> AudioStreamPlayer:
     var available_channel
-    for channel in self._get_channels(track):
+    for channel in self._get_channels(bus):
         if channel.stream and channel.stream.resource_path == filepath:
             # If this file is *already* playing, keep playing
             if channel.playing:
@@ -357,7 +359,8 @@ func _find_available_channel(track: String, filepath: String, settings: Dictiona
                 available_channel = channel
             elif not channel.playing:
                 # Don't take a channel that's queued
-                if track == "music" and self.queued_music and channel == self.queued_music[0]["channel"]:
+                # TODO: Abstract this for solo-type tracks with queues
+                if bus == "music" and self.queued_music and channel == self.queued_music[0]["channel"]:
                     MPF.log.debug("Channel %s is queued up with music, not making it available", channel)
                 else:
                     MPF.log.debug("Channel %s has a stream %s but it's not playing, making it available" % [channel, channel.stream])
@@ -372,7 +375,7 @@ func _generate_queue_item(filename: String, max_queue_time: int, settings: Dicti
         "settings": settings
     }
 
-func _on_queue_track_finished(bus_name: String) -> void:
+func _on_queue_channel_finished(bus_name: String) -> void:
     # The two queues hold dictionary objects like this:
     #{ "filename": filename, "expiration": some_time, "settings": settings }
     var now := Time.get_ticks_msec()
@@ -384,22 +387,22 @@ func _on_queue_track_finished(bus_name: String) -> void:
             self.play(q_item.filename, bus_name, q_item.settings)
             return
 
-func _on_volume(track: String, value: float, _change: float):
-    var bus_name: String = track.trim_suffix("_volume")
+func _on_volume(bus: String, value: float, _change: float):
+    var bus_name: String = bus.trim_suffix("_volume")
     # The Master bus is fixed and capitalized
     if bus_name == "master":
         bus_name = "Master"
     AudioServer.set_bus_volume_db(AudioServer.get_bus_index(bus_name), linear_to_db(value))
 
-func get_current_sound(track: String) -> String:
-    var channels = self._get_channels(track)
+func get_current_sound(bus: String) -> String:
+    var channels = self._get_channels(bus)
     for channel in channels:
         if channel.playing:
             return channel.stream.resource_path.split("/")[-1]
     return ""
 
-func is_resource_playing(track: String, filepath: String) -> bool:
-    var channels = self._get_channels(track)
+func is_resource_playing(bus: String, filepath: String) -> bool:
+    var channels = self._get_channels(bus)
     for channel in channels:
         if channel.playing and channel.stream.resource_path == filepath:
             return true

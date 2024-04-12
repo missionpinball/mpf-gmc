@@ -37,7 +37,7 @@ var version: String
 signal player_update(variable_name, value)
 signal player_added(total_players)
 signal credits
-signal volume(track, value, change)
+signal volume(bus, value, change)
 
 
 func _init() -> void:
