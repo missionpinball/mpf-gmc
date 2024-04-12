@@ -42,7 +42,7 @@ func initialize(config: ConfigFile) -> void:
         for key in config.get_section_keys("sound_system"):
             var settings = config.get_value("sound_system", key)
             var target_bus = settings['bus'] if settings.get('bus') else key
-            assert(target_bus in self.busses, "Sound system does not have an audio bus '%s' configured.")
+            assert(target_bus in self.busses, "Sound system does not have an audio bus '%s' configured." % target_bus)
             assert(settings.get("type"), "Sound system bus '%s' missing required field 'type'." % target_bus)
             var bus_type = settings["type"]
             self.busses[target_bus]["type"] = bus_type
