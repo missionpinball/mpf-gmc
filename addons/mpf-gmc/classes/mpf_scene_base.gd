@@ -13,7 +13,7 @@ func initialize(name: String, settings: Dictionary, context: String, priority: i
     # anything or case-sensitive. Set an explicit key instead, using the name.
     self.key = settings["key"] if settings.get("key") else name
     self.priority = settings['priority'] + priority if settings['priority'] else priority
-    self.context = context
+    self.context = settings["custom_context"] if settings.get('custom_context') else context
 
     self._variables = MPF.util.find_variables(self)
     self.update(settings, kwargs)
