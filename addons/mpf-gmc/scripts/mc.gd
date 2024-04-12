@@ -12,7 +12,8 @@ var sounds := {}
 func _init() -> void:
     self.traverse_tree_for("slides", slides)
     self.traverse_tree_for("widgets", widgets)
-    for ext in ["tres", "wav", "ogg"]:
+    # Always do TRES files last so they'll supersede WAV/OGG files of the same name
+    for ext in ["wav", "ogg", "tres"]:
         self.traverse_tree_for("sounds", sounds, ext)
 
     MPF.log.info("Generated slide lookups: %s", slides)

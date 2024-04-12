@@ -85,7 +85,7 @@ func play_sounds(s: Dictionary) -> void:
         # If this sound is defined with a custom asset resource, populate those values
         else:
             settings["file"] = config.file.resource_path
-            for prop in ["fade_in", "fade_out", "bus"]:
+            for prop in [ "bus", "fade_in", "fade_out", "start_at"]:
                 if settings.get(prop) == null and config.get(prop):
                     settings[prop] = config[prop]
 
