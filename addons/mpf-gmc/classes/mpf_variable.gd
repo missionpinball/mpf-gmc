@@ -50,9 +50,10 @@ func update(settings: Dictionary, kwargs: Dictionary = {}) -> void:
         return
     # With format substitutions, we don't know what will be needed so do it all
     if self.format_string:
-        if not kwargs.is_empty():
+        if not kwargs.is_empty() or not settings["tokens"].is_empty():
             # Create a copy because other handlers may be referencing the dict
             settings = settings.duplicate()
+            settings.merge(settings["tokens"])
             settings.merge(kwargs)
         self.update_text(settings)
         return
