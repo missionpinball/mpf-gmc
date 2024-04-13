@@ -5,7 +5,8 @@ class_name MPFVariable extends Label
 @export var variable_name: String
 @export var comma_separate: bool
 @export var min_digits: int = -1
-@export var template: String = ""
+@export var template_string: String = ""
+@export var format_string: String = ""
 @export var initialize_empty: bool = true
 @export var update_event: String = ""
 @export var min_players: int
@@ -14,7 +15,10 @@ class_name MPFVariable extends Label
 var var_template: String = "%s"
 
 func _init() -> void:
-    if initialize_empty:
+    # For new slides, initialize() and update() are called before it enters the tree
+    # so there's no safe place in ready() or enter_tree() to initialize empty.
+    # But keep placeholder text in the editor so it can be visualized
+    if initialize_empty and not Engine.is_editor_hint():
         self.text = ""
 
 func _ready() -> void:
@@ -44,6 +48,15 @@ func _exit_tree() -> void:
 func update(settings: Dictionary, kwargs: Dictionary = {}) -> void:
     if variable_type != "Event Arg":
         return
+    # With format substitutions, we don't know what will be needed so do it all
+    if self.format_string:
+        if not kwargs.is_empty():
+            # Create a copy because other handlers may be referencing the dict
+            settings = settings.duplicate()
+            settings.merge(kwargs)
+        self.update_text(settings)
+        return
+    # If there is an explicit variable name, only update if it exists
     if variable_name in settings:
         self.update_text(settings[variable_name])
     # The value may be passed via the tokens: config
@@ -62,14 +75,20 @@ func update_text(value):
             value = MPF.util.comma_sep(value)
         else:
             value = var_template % value
-    if template:
-        self.text = template % value
+    if template_string:
+        self.text = template_string % value
+    elif format_string:
+        self.text = format_string.format(value)
     else:
         self.text = value
 
 func _on_player_update(var_name, value):
     if var_name == variable_name:
-        self.update_text(value)
+        # For formatting, we need a key/value pair
+        if self.format_string:
+            self.update_text({ "value": value })
+        else:
+            self.update_text(value)
 
 func _on_player_added(total_players):
     if min_players != 0 and min_players > total_players:
