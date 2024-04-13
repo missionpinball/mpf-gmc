@@ -8,7 +8,6 @@ func _ready() -> void:
     self.finished.connect(self._on_finished)
 
 func _on_finished() -> void:
-    print("Video is finished!!!")
     match end_behavior:
         "Remove Slide/Widget":
             self._remove_self()
@@ -35,7 +34,5 @@ func _remove_self():
             break
         grandparent = grandparent.get_parent()
     if not grandparent:
-        printerr("No grandparent display or slide??")
         return
-    print("Removing parent %s from grandparent %s" % [parent, grandparent])
     grandparent.action_remove(parent)

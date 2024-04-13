@@ -13,7 +13,6 @@ func _ready():
 func _on_item_highlighted(payload: Dictionary) -> void:
     if payload.carousel != self.carousel_name:
         return
-    print("Carousel %s sees item '%s' highlighted!" % [payload.carousel, payload.item])
     for c in self.get_children():
         if c.name == payload.item:
             c.show()

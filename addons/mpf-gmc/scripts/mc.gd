@@ -21,7 +21,6 @@ func _init() -> void:
     MPF.log.info("Generated sound lookups: %s", sounds)
 
 func _enter_tree():
-    print("MC entering the tree")
     sound = preload("sound_player.gd").new()
 
     # Process is only called on children in the tree, so add the children

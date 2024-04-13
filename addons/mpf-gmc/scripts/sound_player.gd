@@ -167,7 +167,6 @@ func _play(channel: AudioStreamPlayer, settings: Dictionary) -> void:
             channel.stream.loop = settings["loops"] != 0
         # Attach metadata to track the loops
         if settings["loops"] > 0:
-            print("Setting up loops (%s) for stream %s" % [settings['loops'], channel.stream])
             channel.stream.set_meta("loops_remaining", settings["loops"])
             channel.finished.connect(self._on_loop.bind(channel))
     elif start_at == -1.0:
@@ -305,7 +304,6 @@ func _on_fade_complete(channel, tween, action) -> void:
 
 func _on_loop(channel) -> void:
     var loops_remaining = channel.stream.get_meta("loops_remaining") - 1
-    print("Channel %s stream %s has %s loops remaining" % [channel, channel.stream, loops_remaining])
     if loops_remaining == 0:
         channel.stream.remove_meta("loops_remaining")
         channel.finished.disconnect(self._on_loop)

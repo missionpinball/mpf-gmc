@@ -20,7 +20,6 @@ func _enter_tree():
     server = preload("scripts/bcp_server.gd").new()
     # MC can come last?
     mc = preload("scripts/mc.gd").new()
-    print("GMC is entering tree")
 
     # Process is only called on children in the tree, so add the children
     # that need to call process or that have enter_tree methods
@@ -28,7 +27,6 @@ func _enter_tree():
     self.add_child(mc)
 
 func _ready():
-    print("GMC is ready")
     var config = ConfigFile.new()
     var err = config.load("res://gmc.cfg")
     if err == OK:
