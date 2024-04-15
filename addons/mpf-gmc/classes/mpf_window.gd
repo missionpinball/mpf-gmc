@@ -35,7 +35,9 @@ func play_widgets(payload: Dictionary) -> void:
 func _play_scene(scene_type: String, payload: Dictionary) -> void:
     MPF.log.info("Playing %s with payload %s", [scene_type, payload])
     var dirty_displays = []
-    payload["update_stack"] = false
+    # Strip the settings from the payload to avoid redundant nestings
+    var kwargs = payload.duplicate()
+    kwargs.erase("settings")
     for name in payload.settings.keys():
         var settings = payload.settings[name]
         var action: String = settings['action']
@@ -51,14 +53,13 @@ func _play_scene(scene_type: String, payload: Dictionary) -> void:
         var target = settings.get('target')
         var display: MPFDisplay = get_display(target) if target else get_display()
         if scene_type == "slide":
-            display.process_slide(name, action, settings, context, priority, payload)
+            display.process_slide(name, action, settings, context, priority, kwargs)
         elif scene_type == "widget":
-            display.process_widget(name, action, settings, context, priority, payload)
+            display.process_widget(name, action, settings, context, priority, kwargs)
         if display not in dirty_displays:
             dirty_displays.append(display)
-    # Allow all the slides to be updated before re-rendering
     for display in dirty_displays:
-        display.update_stack(payload)
+        display.update_stack(kwargs)
 
 func get_display(display_name: String = "") -> MPFDisplay:
     if not display_name:

@@ -44,8 +44,6 @@ func action_play(slide_name: String, settings: Dictionary, context: String, prio
         self._manage_queue(settings['queue'])
     self._slide_stack.append(slide)
     self._slides.add_child(slide)
-    if kwargs.get("update_stack", true):
-        self._update_stack(kwargs)
     return slide
 
 func action_queue(action: String, slide_name: String, settings: Dictionary, context: String, priority: int = 0, kwargs: Dictionary = {}):
@@ -103,10 +101,10 @@ func _update_stack(kwargs: Dictionary = {}) -> void:
             # If this is in the queue, remove it as well
             if self._queue and s.key == self._queue[0].key:
                 self._queue.pop_front()
-                var is_queue_changed = self._process_queue()
+                var new_queue = self._process_queue()
                 # Restart this update with the new slide from the queue
-                if is_queue_changed:
-                    return self._update_stack(kwargs)
+                if new_queue:
+                    return self._update_stack(new_queue["kwargs"])
         else:
             self._slides.move_child(s, idx)
 
@@ -139,7 +137,7 @@ func _process_queue():
             self._queue.pop_front()
         else:
             self.process_slide(s["slide_name"], "play", s["settings"], s["context"], s["priority"], s["kwargs"])
-            return
+            return s
 
 func _on_clear(context_name) -> void:
     # Track the top-most (i.e. currently active) queue item
