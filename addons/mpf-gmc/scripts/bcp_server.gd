@@ -111,6 +111,16 @@ func listen() -> void:
 func send_event(event_name: String) -> void:
   _send("trigger?name=%s" % event_name)
 
+func send_event_with_args(event_name: String, args: Dictionary) -> void:
+  if not args or args.is_empty():
+    return self.send_event(event_name)
+  args["name"] = event_name
+  var params = []
+  for x in args.keys():
+    if args[x] is String:
+      params.append("%s=%s" % [x, args[x]])
+  _send("trigger?%s" % ["&".join(params)])
+
 func send_switch(switch_name: String, state: int = -1) -> void:
   var message = "switch?name=%s&state=%s" % [switch_name, state]
   _send(message)

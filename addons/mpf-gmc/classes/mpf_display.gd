@@ -45,7 +45,7 @@ func action_play(slide_name: String, settings: Dictionary, context: String, prio
     self._slide_stack.append(slide)
     self._slides.add_child(slide)
     if kwargs.get("update_stack", true):
-        self._update_stack()
+        self._update_stack(kwargs)
     return slide
 
 func action_queue(action: String, slide_name: String, settings: Dictionary, context: String, priority: int = 0, kwargs: Dictionary = {}):
@@ -75,8 +75,8 @@ func action_queue(action: String, slide_name: String, settings: Dictionary, cont
     if self._queue.size() == 1 or action == "queue_immediate":
         return self._process_queue()
 
-func update_stack():
-    self._update_stack()
+func update_stack(kwargs):
+    self._update_stack(kwargs)
 
 func action_remove(slide) -> void:
     self._slide_stack.erase(slide)
@@ -89,7 +89,7 @@ func get_slide(slide_name):
         if s.key == slide_name:
             return s
 
-func _update_stack() -> void:
+func _update_stack(kwargs: Dictionary = {}) -> void:
     # Sort the stack by priority
     self._slide_stack.sort_custom(
         func(a: MPFSlide, b: MPFSlide): return a.priority < b.priority
@@ -106,7 +106,7 @@ func _update_stack() -> void:
                 var is_queue_changed = self._process_queue()
                 # Restart this update with the new slide from the queue
                 if is_queue_changed:
-                    return self._update_stack()
+                    return self._update_stack(kwargs)
         else:
             self._slides.move_child(s, idx)
 
@@ -120,7 +120,7 @@ func _update_stack() -> void:
             MPF.server.send_event("slide_%s_inactive" % self._current_slide.key)
             if self._current_slide not in self._slide_stack:
                 MPF.server.send_event("slide_%s_removed" % self._current_slide.key)
-        MPF.server.send_event("slide_%s_active" % new_slide.key)
+        MPF.server.send_event_with_args("slide_%s_active" % new_slide.key, kwargs)
         self._current_slide = new_slide
 
 func _manage_queue(action: String) -> void:

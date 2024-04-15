@@ -58,7 +58,7 @@ func _play_scene(scene_type: String, payload: Dictionary) -> void:
             dirty_displays.append(display)
     # Allow all the slides to be updated before re-rendering
     for display in dirty_displays:
-        display.update_stack()
+        display.update_stack(payload)
 
 func get_display(display_name: String = "") -> MPFDisplay:
     if not display_name:
