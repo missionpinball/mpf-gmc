@@ -2,7 +2,7 @@
 class_name MPFSoundAsset
 extends Resource
 
-@export var file: AudioStream
+@export var stream: AudioStream
 @export var bus: String
 @export var fade_in: float
 @export var fade_out: float

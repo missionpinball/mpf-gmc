@@ -83,11 +83,13 @@ func play_sounds(s: Dictionary) -> void:
         if config is AudioStream:
             settings["file"] = config.resource_path
         # If this sound is defined with a custom asset resource, populate those values
-        else:
-            settings["file"] = config.file.resource_path
+        elif config is MPFSoundAsset:
+            settings["file"] = config.stream.resource_path
             for prop in [ "bus", "fade_in", "fade_out", "start_at"]:
                 if settings.get(prop) == null and config.get(prop):
                     settings[prop] = config[prop]
+        else:
+            assert(false, "Cannot play sound of class %s" % config.get_class())
 
         var bus: String = settings["bus"] if settings.get("bus") else self.default_bus
         var file: String = settings.get("file", asset)
