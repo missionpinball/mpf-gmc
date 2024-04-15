@@ -116,9 +116,15 @@ func send_event_with_args(event_name: String, args: Dictionary) -> void:
     return self.send_event(event_name)
   args["name"] = event_name
   var params = []
-  for x in args.keys():
-    if args[x] is String:
-      params.append("%s=%s" % [x, args[x]])
+  for k in args.keys():
+    if args[k] is String:
+      var v = args[k]
+      # Can't send back context because it interferes with triggering players
+      if k == "context":
+        k = "original_context"
+      elif k == "calling_context":
+        k = "original_calling_context"
+      params.append("%s=%s" % [k,v])
   _send("trigger?%s" % ["&".join(params)])
 
 func send_switch(switch_name: String, state: int = -1) -> void:
