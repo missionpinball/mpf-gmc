@@ -52,6 +52,8 @@ func initialize(config: ConfigFile) -> void:
                 channel.name = "%s_%s" % [target_bus, i+1]
                 self.busses[target_bus].channels.append(channel)
                 self.add_child(channel)
+                if bus_type == "sequential":
+                    channel.finished.connect(self._on_queue_channel_finished.bind(target_bus))
             # Sequential busses get a queue to store pending sounds
             if bus_type == "sequential":
                 self.busses[target_bus]["queue"] = []
@@ -60,10 +62,6 @@ func initialize(config: ConfigFile) -> void:
                 self.default_bus = target_bus
 
 func _ready() -> void:
-    for bus in self.busses.values():
-        if bus.type == "sequential":
-            for channel in bus.channels:
-                channel.finished.connect(self._on_queue_channel_finished.bind(bus.name))
     duckAttackTimer.one_shot = true
     duckAttackTimer.timeout.connect(self._duck_attack)
     duckReleaseTimer.one_shot = true
@@ -135,10 +133,10 @@ func play(filename: String, bus: String, settings: Dictionary = {}) -> void:
 
     if not available_channel:
         # Queue the filename if this bus type has a queue
-        var target_queue = self.busses[bus].get("queue")
-        if target_queue:
-            # By default, max queue time is one minute (tracked in milliseconds)
-            var max_queue_time: int = settings.get("max_queue_time", 60000)
+        var target_queue = self.busses[bus].get("queue", null)
+        if target_queue != null:
+            # By default, max queue time is forever
+            var max_queue_time: float = settings.get("max_queue_time", -1.0)
             if max_queue_time != 0:
                 target_queue.append(self._generate_queue_item(filename, max_queue_time, settings))
         return
@@ -368,10 +366,12 @@ func _find_available_channel(bus: String, filepath: String, settings: Dictionary
                     available_channel.stream = null
     return available_channel
 
-func _generate_queue_item(filename: String, max_queue_time: int, settings: Dictionary) -> Dictionary:
+func _generate_queue_item(filename: String, max_queue_time: float, settings: Dictionary) -> Dictionary:
+    # Negative queue means infinite queue
+    var expiration = INF if max_queue_time < 0 else (Time.get_ticks_msec() + (1000 * max_queue_time))
     return {
         "filename": filename,
-        "expiration": Time.get_ticks_msec() + (1000 * max_queue_time),
+        "expiration": expiration,
         "settings": settings
     }
 

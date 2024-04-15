@@ -7,3 +7,4 @@ extends Resource
 @export var fade_in: float
 @export var fade_out: float
 @export var start_at: float
+@export var max_queue_time: float
