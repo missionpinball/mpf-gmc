@@ -83,7 +83,9 @@ func play_sounds(s: Dictionary) -> void:
         # If this sound is defined with a custom asset resource, populate those values
         elif config is MPFSoundAsset:
             settings["file"] = config.stream.resource_path
-            for prop in [ "bus", "fade_in", "fade_out", "start_at"]:
+            for prop in [ "bus", "fade_in", "fade_out", "start_at", "max_queue_time"]:
+                # Any values passed from the event have priority, only populate
+                # asset property values not defined from the event.
                 if settings.get(prop) == null and config.get(prop):
                     settings[prop] = config[prop]
         else:
