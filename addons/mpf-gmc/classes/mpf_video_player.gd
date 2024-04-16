@@ -1,7 +1,9 @@
 @tool
 class_name MPFVideoPlayer extends VideoStreamPlayer
 
-@export_enum("Nothing", "Remove Slide/Widget", "Post Event") var end_behavior: String = "Nothing"
+enum EndBehavior {NOTHING, REMOVE_SLIDE, POST_EVENT}
+
+@export var end_behavior: EndBehavior
 @export var events_when_stopped: String
 
 func _ready() -> void:
@@ -9,9 +11,9 @@ func _ready() -> void:
 
 func _on_finished() -> void:
     match end_behavior:
-        "Remove Slide/Widget":
+        EndBehavior.REMOVE_SLIDE:
             self._remove_self()
-        "Post Event":
+        EndBehavior.POST_EVENT:
             MPF.server.send_event("video_finished")
     if events_when_stopped:
         for e in events_when_stopped.split(","):

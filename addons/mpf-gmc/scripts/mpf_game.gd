@@ -30,6 +30,8 @@ var settings: Dictionary = {}
 # Some settings use floats as their keys. These settings are
 # not predictable, so explicitly provide the their names here.
 var settings_with_floats = []
+# Store persistent trackers
+var _trackers = {}
 # Store a string of the version
 var version: String
 
@@ -168,3 +170,11 @@ func update_settings(result: Dictionary) -> void:
         s.options[key] = s.options[key].replace("%", "%%")
     # Store all settings as root-level keys, regardless of settingType
     settings[option[0]] = s
+
+func get_tracker(node_path, player_number):
+  if not node_path in self._trackers:
+    # TODO: Make a class for Trackers
+    self._trackers[node_path] = {}
+  if not player_number in self._trackers[node_path]:
+    self._trackers[node_path][player_number] = { "last_index": -1, "used": []}
+  return self._trackers[node_path][player_number]
