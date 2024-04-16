@@ -2,12 +2,27 @@
 class_name MPFChildPool
 extends Node2D
 
-enum PlaybackMethod {RANDOM, RANDOM_NO_REPEAT, RANDOM_FORCE_ALL, SEQUENTIAL}
+## A Node for choosing one child to display when entering the scene tree.
+
+enum PlaybackMethod {
+    ## A child will be chosen at random. Repetition is allowed.
+    RANDOM,
+    ## A child will be chosen at random, but never the same twice in a row.
+    RANDOM_NO_REPEAT,
+    ## A child will be chosen at random, and all will be chosen before any repeats.
+    RANDOM_FORCE_ALL,
+    ## The first child will be chosen first, then the second, et cetera.
+    SEQUENTIAL
+}
 
 @export var playback_method: PlaybackMethod
+## If checked, randomness/sequences will be unique for each player.
 @export var track_per_player: bool
+## If checked, randomness/sequences will reset for each game.
 @export var reset_on_game_end: bool
+## The name of a method to call when selecting a child to display.
 @export var child_method: String
+## If checked, the child_method will be called when the scene is opened in the Editor.
 @export var call_child_method_in_editor: bool
 
 var _tracker: Dictionary
