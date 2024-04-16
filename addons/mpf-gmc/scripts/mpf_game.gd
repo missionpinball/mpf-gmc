@@ -35,7 +35,7 @@ var _trackers = {}
 # Store a string of the version
 var version: String
 
-
+signal game_started
 signal player_update(variable_name, value)
 signal player_added(total_players)
 signal credits
@@ -70,6 +70,12 @@ func stash_preloaded_scene(path: String, scene: PackedScene):
 func reset() -> void:
   players = []
   player = {}
+  for tracker in self._trackers.values():
+    if tracker["_reset_on_game_end"]:
+      tracker.clear()
+      # Restore the value
+      tracker["_reset_on_game_end"] = true
+  emit_signal("game_started")
 
 func retrieve_preloaded_scene(path: String) -> PackedScene:
   var scene: PackedScene
@@ -171,10 +177,10 @@ func update_settings(result: Dictionary) -> void:
     # Store all settings as root-level keys, regardless of settingType
     settings[option[0]] = s
 
-func get_tracker(node_path, player_number):
+func get_tracker(node_path, player_number, reset_on_game_end):
   if not node_path in self._trackers:
     # TODO: Make a class for Trackers
-    self._trackers[node_path] = {}
+    self._trackers[node_path] = {"_reset_on_game_end": reset_on_game_end}
   if not player_number in self._trackers[node_path]:
     self._trackers[node_path][player_number] = { "last_index": -1, "used": []}
   return self._trackers[node_path][player_number]

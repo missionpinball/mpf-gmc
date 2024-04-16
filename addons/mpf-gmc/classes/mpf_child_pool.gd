@@ -28,7 +28,7 @@ func _initialize():
     # Pure random does not require a tracker
     if self.playback_method != PlaybackMethod.RANDOM:
         self._player_num = MPF.game.player.number if self.track_per_player else 0
-        self._tracker = MPF.game.get_tracker(self.get_path(), self._player_num)
+        self._tracker = MPF.game.get_tracker(self.get_path(), self._player_num, reset_on_game_end)
 
     var child_count = self.get_child_count()
     if not child_count:
