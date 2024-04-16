@@ -2,7 +2,7 @@
 class_name MPFChildPool
 extends Node2D
 
-## A Node for choosing one child to display when entering the scene tree.
+## Chooses one child to display when entering the scene tree.
 
 enum PlaybackMethod {
     ## A child will be chosen at random. Repetition is allowed.
