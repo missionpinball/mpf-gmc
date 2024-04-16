@@ -1,15 +1,27 @@
 @tool
 class_name MPFVariable extends Label
 
+## Displays a player, machine, or event variable as text on screen.
+
 @export_enum("Current Player", "Machine", "Event Arg", "Player 1", "Player 2", "Player 3", "Player 4") var variable_type: String = "Current Player"
+
+## The name of the variable or event arg to show
 @export var variable_name: String
+## If checked, number values will be comma-separated into thousands
 @export var comma_separate: bool
+## If greater than zero, numbers will be left-padded with zeroes to this minimum number of digits.
 @export var min_digits: int = -1
+## A template string for substituting the variable value into. Use "%s" as the replacement value.
 @export var template_string: String = ""
+## A format string for formatting the variable value or event args into.
 @export var format_string: String = ""
+## If checked, this node will show no text until an update sets a value on it.
 @export var initialize_empty: bool = true
+## The name of an MPF event to subscribe to for getting new variable values.
 @export var update_event: String = ""
+## If set, this node will only render if the number of players is greater than or equal to this value.
 @export var min_players: int
+## If set, this nod will only render if the number of players is less than or equal to this value.
 @export var max_players: int
 
 var var_template: String = "%s"
@@ -57,15 +69,15 @@ func update(settings: Dictionary, kwargs: Dictionary = {}) -> void:
             settings.merge(kwargs)
         self.update_text(settings)
         return
-    # If there is an explicit variable name, only update if it exists
-    if variable_name in settings:
-        self.update_text(settings[variable_name])
-    # The value may be passed via the tokens: config
+    # If there is an explicit variable name, kwargs have highest priority
+    if variable_name in kwargs:
+        self.update_text(kwargs[variable_name])
+    # Tokens have second priority
     elif variable_name in settings.get("tokens", {}):
         self.update_text(settings.tokens[variable_name])
-    # Or the value may be part of the triggering event
-    elif variable_name in kwargs:
-        self.update_text(kwargs[variable_name])
+    # Base slide_player settings are last priority
+    elif variable_name in settings:
+        self.update_text(settings[variable_name])
 
 func update_text(value):
     if value == null:
