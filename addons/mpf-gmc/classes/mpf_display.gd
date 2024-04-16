@@ -2,9 +2,13 @@
 class_name MPFDisplay
 extends MPFSceneBase
 
+## A container for slides and widgets. Each display is tracked separately and maintains its own stack of slides.
 
+## If checked, slides played without a display target will be shown on this display.
 @export var is_default: bool = false
+## The scene to render on this display during startup
 @export var initial_slide: PackedScene
+
 # The slide stack is an array of slide nodes that are sorted by priority
 var _slide_stack: Array = []
 # The slides node is the parent container for the slide nodes rendered in the tree
