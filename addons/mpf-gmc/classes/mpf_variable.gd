@@ -3,8 +3,29 @@ class_name MPFVariable extends Label
 
 ## Displays a player, machine, or event variable as text on screen.
 
-@export_enum("Current Player", "Machine", "Event Arg", "Player 1", "Player 2", "Player 3", "Player 4") var variable_type: String = "Current Player"
+enum VariableType {
+    ## The current player whose turn it is
+    CURRENT_PLAYER,
+    ## An argument attached to an event
+    EVENT_ARG,
+    ## A machine variable
+    MACHINE_VAR,
+    ## A game settings value
+    SETTING,
+    ## Player 1
+    PLAYER_1,
+    ## Player 2
+    PLAYER_2,
+    ## Player 3
+    PLAYER_3,
+    ## Player 4
+    PLAYER_4
+}
 
+const numbered_players = [VariableType.PLAYER_1, VariableType.PLAYER_2, VariableType.PLAYER_3, VariableType.PLAYER_4]
+
+## The source of the variable value
+@export var variable_type: VariableType = VariableType.CURRENT_PLAYER
 ## The name of the variable or event arg to show
 @export var variable_name: String
 ## If checked, number values will be comma-separated into thousands
@@ -36,12 +57,12 @@ func _init() -> void:
 func _ready() -> void:
     if min_digits > 0:
       var_template = ("%0"+str(min_digits)+"d")
-    if variable_type == "Machine":
+    if variable_type == VariableType.MACHINE_VAR:
         self.update_text(MPF.game.machine_vars.get(self.variable_name))
         # TODO: Dynamically update machine vars?
-    elif variable_type == "Event Arg":
+    elif variable_type == VariableType.EVENT_ARG:
         pass
-    elif min_players or max_players or variable_type.begins_with("Player"):
+    elif min_players or max_players or variable_type in numbered_players:
         MPF.game.connect("player_added", self._on_player_added)
         # Set the initial state as well
         self._on_player_added(MPF.game.num_players)
@@ -58,7 +79,7 @@ func _exit_tree() -> void:
         MPF.server.remove_event_handler(self.update_event, self.update)
 
 func update(settings: Dictionary, kwargs: Dictionary = {}) -> void:
-    if variable_type != "Event Arg":
+    if variable_type != VariableType.EVENT_ARG:
         return
     # With format substitutions, we don't know what will be needed so do it all
     if self.format_string:
@@ -115,8 +136,8 @@ func _on_player_added(total_players):
         self.show()
 
 func _calculate_player_value():
-    var player_num = int(variable_type.right(1))
-    var is_current_player = variable_type == "Current Player" or player_num == MPF.game.player.get('number')
+    var player_num = numbered_players.find(variable_type) + 1
+    var is_current_player = variable_type == VariableType.CURRENT_PLAYER or player_num == MPF.game.player.get('number')
     if is_current_player:
         self.update_text(MPF.game.player.get(self.variable_name))
         return true
