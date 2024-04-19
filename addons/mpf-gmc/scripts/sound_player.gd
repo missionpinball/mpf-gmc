@@ -329,6 +329,9 @@ func _get_channels(bus: String):
     return self.busses[bus].channels
 
 func _clear_channel(channel):
+    if channel.has_meta("loops_remaining"):
+        channel.finished.disconnect(self._on_loop)
+        channel.remove_meta("loops_remaining")
     channel.stop()
     channel.volume_db = 0.0
     channel.remove_meta("tween")
@@ -358,14 +361,9 @@ func _find_available_channel(bus: String, filepath: String, settings: Dictionary
                 MPF.log.debug("Channel %s has no stream, making it the available channel" % channel)
                 available_channel = channel
             elif not channel.playing:
-                # Don't take a channel that's queued
-                # TODO: Abstract this for solo-type tracks with queues
-                if bus == "music" and self.queued_music and channel == self.queued_music[0]["channel"]:
-                    MPF.log.debug("Channel %s is queued up with music, not making it available", channel)
-                else:
-                    MPF.log.debug("Channel %s has a stream %s but it's not playing, making it available" % [channel, channel.stream])
-                    available_channel = channel
-                    available_channel.stream = null
+                MPF.log.debug("Channel %s has a stream %s but it's not playing, making it available" % [channel, channel.stream])
+                available_channel = channel
+                available_channel.stream = null
     return available_channel
 
 func _generate_queue_item(filename: String, max_queue_time: float, settings: Dictionary) -> Dictionary:
