@@ -62,7 +62,7 @@ func _show_or_hide():
         self.visible = false
     elif self.max_players and MPF.game.num_players > self.max_players:
         self.visible = false
-    else:
+    elif self.target:
         self.show_or_hide()
 
 func show_or_hide():
@@ -76,8 +76,7 @@ func evaluate(value):
 func _initialize():
     # Look up the operator
     self.operator = self._find_operator()
-    if self.variable_type != VariableType.EVENT_ARG:
-        self.target = self._find_target()
+    self.target = self._find_target()
     self._show_or_hide()
 
 func _find_target():
@@ -90,8 +89,7 @@ func _find_target():
         VariableType.SETTING:
             base = MPF.game.settings
         VariableType.EVENT_ARG:
-            # TODO: handle this
-            assert(false, "Event Arg not supported for conditionals yet.")
+            base = null
         VariableType.PLAYER_1:
             base = MPF.game.players[0]
         VariableType.PLAYER_2:
@@ -103,7 +101,7 @@ func _find_target():
         VariableType.PLAYER_4:
             if MPF.game.players.size() > 4:
                 base = MPF.game.players[4]
-    if "." in self.variable_name:
+    if "." in self.variable_name and base != null:
         var nested = self.variable_name.split(".")
         while nested.size() > 1:
             var next_nest = nested.pop_front()

@@ -92,7 +92,7 @@ func _find_random_child_force_all() -> Node:
         i = randi_range(0, r-1)
     # If this is the last unused one, clear the array
     if used.size() == r-1:
-        used.empty()
+        used.clear()
     # But add this one after clearing, to avoid back-to-back
     used.append(i)
     return self.get_child(i)
