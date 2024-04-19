@@ -5,9 +5,20 @@ static func find_variables(n: Node, acc: Array[Node] = []) -> Array[Node]:
     for c in n.get_children():
         if c.get_child_count():
             find_variables(c, acc)
-        if c is MPFVariable:
+        if c is MPFVariable or c is MPFConditional:
             acc.append(c)
     return acc
+
+
+static func find_parent_slide(n: Node):
+    var parent = n
+    while parent:
+        if parent is MPFSlide:
+            return parent
+        parent = parent.get_parent()
+    if not parent:
+        printerr("No parent slide or widget found?")
+        return
 
 ## Receive an integer value and return a comma-separated string
 static func comma_sep(n: int) -> String:
