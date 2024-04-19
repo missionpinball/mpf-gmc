@@ -5,7 +5,6 @@ extends Control
 var priority: int = 0
 var context: String
 var key: String
-var _variables: Array[Node]
 var _expirations: Dictionary = {}
 
 func initialize(name: String, settings: Dictionary, context: String, priority: int = 0, kwargs: Dictionary = {}) -> void:
@@ -14,13 +13,6 @@ func initialize(name: String, settings: Dictionary, context: String, priority: i
     self.key = settings["key"] if settings.get("key") else name
     self.priority = settings['priority'] + priority if settings['priority'] else priority
     self.context = settings["custom_context"] if settings.get('custom_context') else context
-
-    self._variables = MPF.util.find_variables(self)
-    self.update(settings, kwargs)
-
-func update(settings: Dictionary, kwargs: Dictionary = {}) -> void:
-    for c in self._variables:
-        c.update(settings, kwargs)
 
 func process_action(child_name: String, children: Array, action: String, settings: Dictionary, context: String, priority: int = 0, kwargs: Dictionary = {}) -> void:
     var child: MPFSceneBase
@@ -41,7 +33,7 @@ func process_action(child_name: String, children: Array, action: String, setting
                 self.action_remove(child)
         "update":
             if child:
-                child.update(settings, kwargs)
+                child.action_update(settings, kwargs)
         "method":
             if child and child.has_method(settings.method):
                 var callable = Callable(child, settings.method)
@@ -57,6 +49,9 @@ func action_remove(widget: Node) -> void:
 
 func action_queue(action: String, slide_name: String, settings: Dictionary, context: String, priority: int = 0, kwargs: Dictionary = {}):
     assert(false, "Method 'action_queue' must be overridden in child classes of MPFSceneBase")
+
+func action_update(settings: Dictionary, kwargs: Dictionary = {}):
+    pass
 
 func _create_expire(child: MPFSceneBase, expiration_secs: float) -> void:
     # If there is already a timer for this child to expire, reset it

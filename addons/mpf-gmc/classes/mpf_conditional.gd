@@ -36,6 +36,8 @@ var target
 func _ready() -> void:
     if not Engine.is_editor_hint():
         self._initialize()
+    var parent_slide = MPF.util.find_parent_slide(self)
+    parent_slide.register_updater(self)
 
 func show():
     if self.visible:
@@ -44,6 +46,15 @@ func show():
         self._initialize()
     else:
         self._show_or_hide()
+
+func update(settings: Dictionary, kwargs: Dictionary = {}):
+    if self.variable_type == VariableType.EVENT_ARG:
+        self.target = settings.duplicate()
+        if settings.get("tokens") and not settings["tokens"].is_empty():
+            self.target.merge(settings["tokens"])
+        if not kwargs.is_empty():
+            self.target.merge(kwargs)
+    self.show_or_hide()
 
 ## Override this method to pass in the correct value and set visibility
 func _show_or_hide():
@@ -65,7 +76,8 @@ func evaluate(value):
 func _initialize():
     # Look up the operator
     self.operator = self._find_operator()
-    self.target = self._find_target()
+    if self.variable_type != VariableType.EVENT_ARG:
+        self.target = self._find_target()
     self._show_or_hide()
 
 func _find_target():

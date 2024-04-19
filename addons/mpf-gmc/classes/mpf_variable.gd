@@ -38,13 +38,16 @@ func _init() -> void:
         self.text = ""
 
 func _ready() -> void:
+    print("variable is _ready")
     if min_digits > 0:
       var_template = ("%0"+str(min_digits)+"d")
     if variable_type == VariableType.MACHINE_VAR:
         self.update_text(MPF.game.machine_vars.get(self.variable_name))
         # TODO: Dynamically update machine vars?
     elif variable_type == VariableType.EVENT_ARG:
-        pass
+        print("registering variable")
+        var parent_slide = MPF.util.find_parent_slide(self)
+        parent_slide.register_updater(self)
     elif min_players or max_players or variable_type in numbered_players:
         MPF.game.connect("player_added", self._on_player_added)
         # Set the initial state as well
