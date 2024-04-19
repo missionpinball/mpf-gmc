@@ -3,26 +3,18 @@ class_name MPFSlide
 extends MPFSceneBase
 
 var _widgets: Node2D
-var _updaters: Array[Node2D] = []
+var _updaters: Array = []
 
 
 func initialize(name: String, settings: Dictionary, context: String, priority: int = 0, kwargs: Dictionary = {}) -> void:
     # The node name attribute is the name of the root node, which could be
     # anything or case-sensitive. Set an explicit key instead, using the name.
     super(name, settings, context, priority, kwargs)
-    print("Slide is being initialized")
     # Wait for the child variables to initialize themselves
     await self.ready
-    print("slide is ready, proceeding with init")
     self.action_update(settings, kwargs)
 
-func _ready() -> void:
-    print("slide is ready")
-
-func _enter_tree():
-    print("slide is entering tree")
-
-func register_updater(node: Node2D):
+func register_updater(node):
     if self._updaters.find(node) == -1:
         self._updaters.append(node)
 

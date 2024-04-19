@@ -86,7 +86,7 @@ func recurse_dir(path, acc, ext="tscn") -> void:
             if dir.current_is_dir():
                 self.recurse_dir("%s/%s" % [path, file_name], acc, ext)
             elif file_name.ends_with(".%s" % ext):
-                acc[file_name.split(".")[0]] = "%s/%s" % [path, file_name]
+                acc[file_name.rsplit(".", false, 1)[0]] = "%s/%s" % [path, file_name]
             file_name = dir.get_next()
 
 func recurse_modes(obj_type: String, acc: Dictionary, ext="tscn") -> void:
