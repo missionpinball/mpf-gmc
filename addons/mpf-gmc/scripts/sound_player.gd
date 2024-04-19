@@ -329,13 +329,14 @@ func _get_channels(bus: String):
     return self.busses[bus].channels
 
 func _clear_channel(channel):
-    if channel.has_meta("loops_remaining"):
+    if channel.stream.has_meta("loops_remaining"):
         channel.finished.disconnect(self._on_loop)
-        channel.remove_meta("loops_remaining")
+        channel.stream.remove_meta("loops_remaining")
     channel.stop()
     channel.volume_db = 0.0
     channel.remove_meta("tween")
     channel.remove_meta("is_stopping")
+    channel.stream = null
 
 func _find_available_channel(bus: String, filepath: String, settings: Dictionary) -> AudioStreamPlayer:
     var available_channel

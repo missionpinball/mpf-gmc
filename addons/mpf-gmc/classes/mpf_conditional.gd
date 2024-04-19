@@ -59,16 +59,7 @@ func show_or_hide():
 
 func evaluate(value):
     var t = self.target.get(self.true_variable_name)
-    var v
-    match typeof(t):
-        TYPE_FLOAT:
-            v = float(value)
-        TYPE_INT:
-            v = int(value)
-        TYPE_STRING:
-            v = str(value)
-        _:
-            v = value
+    var v = type_convert(value, typeof(t))
     return self.operator.call(t, v)
 
 func _initialize():
