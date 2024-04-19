@@ -3,25 +3,8 @@ class_name MPFVariable extends Label
 
 ## Displays a player, machine, or event variable as text on screen.
 
-enum VariableType {
-    ## The current player whose turn it is
-    CURRENT_PLAYER,
-    ## An argument attached to an event
-    EVENT_ARG,
-    ## A machine variable
-    MACHINE_VAR,
-    ## A game settings value
-    SETTING,
-    ## Player 1
-    PLAYER_1,
-    ## Player 2
-    PLAYER_2,
-    ## Player 3
-    PLAYER_3,
-    ## Player 4
-    PLAYER_4
-}
 
+const VariableType = preload("const.gd").VariableType
 const numbered_players = [VariableType.PLAYER_1, VariableType.PLAYER_2, VariableType.PLAYER_3, VariableType.PLAYER_4]
 
 ## The source of the variable value
