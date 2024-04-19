@@ -15,9 +15,14 @@ enum ConditionType {
 
 const VariableType = preload("const.gd").VariableType
 
+## The source of the variable value
 @export var variable_type: VariableType = VariableType.CURRENT_PLAYER
+## The name of the variable to compare to
 @export var variable_name: String
+## The comparison to make
 @export var condition_type: ConditionType = ConditionType.EQUALS
+## The value to compare to. Has no effect for MPFConditionalChildren
+@export var condition_value: String
 ## If set, this node will only render if the number of players is greater than or equal to this value.
 @export var min_players: int
 ## If set, this nod will only render if the number of players is less than or equal to this value.
@@ -29,7 +34,7 @@ var true_variable_name: String
 var target
 
 func _ready() -> void:
-    if self.visible:
+    if not Engine.is_editor_hint():
         self._initialize()
 
 func show():
@@ -38,11 +43,19 @@ func show():
     if not self.initialized:
         self._initialize()
     else:
-        self.show_or_hide()
+        self._show_or_hide()
 
 ## Override this method to pass in the correct value and set visibility
+func _show_or_hide():
+    if self.min_players and MPF.game.num_players < self.min_players:
+        self.visible = false
+    elif self.max_players and MPF.game.num_players > self.max_players:
+        self.visible = false
+    else:
+        self.show_or_hide()
+
 func show_or_hide():
-    assert(false, "MPFConditional subclasses must implement show_or_hide()")
+    self.visible = self.evaluate(self.condition_value)
 
 func evaluate(value):
     var t = self.target.get(self.true_variable_name)
@@ -62,7 +75,7 @@ func _initialize():
     # Look up the operator
     self.operator = self._find_operator()
     self.target = self._find_target()
-    self.show_or_hide()
+    self._show_or_hide()
 
 func _find_target():
     var base
