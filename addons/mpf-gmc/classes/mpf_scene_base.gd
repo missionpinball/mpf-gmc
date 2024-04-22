@@ -43,7 +43,8 @@ func process_action(child_name: String, children: Array, action: String, setting
 
 func _exit_tree() -> void:
     for timer in self._expirations.values():
-        timer.stop()
+        if is_instance_valid(timer):
+            timer.stop()
 
 func action_play(child_name: String, settings: Dictionary, context: String, priority: int = 0, kwargs: Dictionary = {}):
     assert(false, "Method 'action_play' must be overridden in child classes of MPFSceneBase")

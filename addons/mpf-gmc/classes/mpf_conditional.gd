@@ -70,6 +70,9 @@ func show_or_hide():
 
 func evaluate(value):
     var t = self.target.get(self.true_variable_name)
+    # If there is no target, evaluate false
+    if not t:
+        return false
     var v = type_convert(value, typeof(t))
     return self.operator.call(t, v)
 
