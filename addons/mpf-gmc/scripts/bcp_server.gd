@@ -25,7 +25,7 @@ var registered_handlers := {}
 var logger
 var _logger
 # The port we will listen on
-var port := 5052
+var port := 5050
 # The polling frequency to poll the server for data
 var poll_fps: int = 120
 # The process ID for a spawned MPF
