@@ -1,0 +1,31 @@
+[gd_scene load_steps=3 format=3 uid="uid://cado054cg40cv"]
+
+[ext_resource type="Script" path="res://addons/mpf-gmc/classes/mpf_slide.gd" id="1_524xj"]
+[ext_resource type="Script" path="res://addons/mpf-gmc/classes/mpf_variable.gd" id="2_6rn1m"]
+
+[node name="Bonus" type="Control"]
+layout_mode = 3
+anchors_preset = 0
+offset_right = 1920.0
+offset_bottom = 720.0
+script = ExtResource("1_524xj")
+
+[node name="ColorRect" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 1)
+
+[node name="MPFVariable" type="Label" parent="."]
+layout_mode = 0
+offset_left = 720.0
+offset_top = 211.0
+offset_right = 1218.0
+offset_bottom = 388.0
+script = ExtResource("2_6rn1m")
+variable_type = 1
+variable_name = "name"
+update_event = "bonus_award"

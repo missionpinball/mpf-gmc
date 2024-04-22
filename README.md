@@ -2,9 +2,14 @@
 
 ![Godot BCP Logo](https://github.com/missionpinball/godot-bcp-server/blob/main/icon.png?raw=true)
 
-The Godot MC is a plugin for connecting Godot to the Mission Pinball Framework (MPF) using the Backbox Control Protocol (BCP).
+The Godot MC (GMC) is a media controller for rendering screen and audio content in pinball games created using the [Mission Pinball Framework](https://www.missionpinball.org) (MPF).
 
-With this plugin, pinball creators using MPF can choose Godot as their display engine and drive all screen slides, videos, animations, and sounds via a Godot project.
+It is built on top of the [Godot BCP Server](https://github.com/missionpinball/godot-bcp-server) and will replace the old Kivy-based [MPF Media Controller](https://github.com/missionpinball/mpf-mc)
+
+With the Godot MC, pinball creators using MPF can choose Godot as their display engine and drive all screen slides, videos, animations, and sounds via a Godot project.
+
+> [!WARNING]
+> Godot MC is in early development. While all core functionality is available and games can be run, implementations and usage may change frequently. We hope you'll give it a try, but breaking changes may occur.
 
 ## Features
 * Direct socket connection between MPF and Godot for high-speed synchronization
@@ -14,15 +19,9 @@ With this plugin, pinball creators using MPF can choose Godot as their display e
 * Easily subscribe to MPF events and send events to MPF
 * Support for keyboard input bindings to aid in development
 
-## Installation
+# Installation & Documentation
 
-Create a new Godot project and find Godot MC in the Asset Library. Add this plugin to your project and save.
-
-_Note: Godot BCP Server uses custom class names for extending support to your project. It is recommended to exit and restart Godot after adding the plugin, to ensure that the class names are recognized and available._
-
-
-# Usage
-This is being written from scratch and will change a lot. More coming soon!
+Full installation guides and documentation are available at https://missionpinball.org/gmc/
 
 # Contributing
 
