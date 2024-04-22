@@ -41,6 +41,10 @@ func process_action(child_name: String, children: Array, action: String, setting
     if child and settings.expire:
         self._create_expire(child, settings.expire)
 
+func _exit_tree() -> void:
+    for timer in self._expirations.values():
+        timer.stop()
+
 func action_play(child_name: String, settings: Dictionary, context: String, priority: int = 0, kwargs: Dictionary = {}):
     assert(false, "Method 'action_play' must be overridden in child classes of MPFSceneBase")
 
@@ -68,7 +72,10 @@ func _create_expire(child: MPFSceneBase, expiration_secs: float) -> void:
     self._expirations[child.key] = timer
 
 func _on_expire(child, timer: Timer) -> void:
-    self._expirations.erase(child.key)
-    self.remove_child(timer)
-    timer.queue_free()
-    self.action_remove(child)
+    # This expiration may come after the child was removed for other reasons
+    if is_instance_valid(child):
+        self._expirations.erase(child.key)
+        self.action_remove(child)
+    if is_instance_valid(timer):
+        self.remove_child(timer)
+        timer.queue_free()

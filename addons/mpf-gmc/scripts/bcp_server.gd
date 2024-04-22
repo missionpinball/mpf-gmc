@@ -308,7 +308,7 @@ func _thread_poll(_userdata=null) -> void:
             _send("monitor_start?category=machine_vars")
             # Standard events
             _send("register_trigger?event=item_highlighted")
-            _send("register_trigger?event=bonus")
+            _send("register_trigger?event=bonus_entry")
             _send("register_trigger?event=high_score_enter_initials")
             _send("register_trigger?event=high_score_award_display")
             # Custom events
