@@ -1,4 +1,4 @@
-[gd_scene load_steps=10 format=3 uid="uid://ds4gduf8660uj"]
+[gd_scene load_steps=11 format=3 uid="uid://ds4gduf8660uj"]
 
 [ext_resource type="Script" path="res://addons/mpf-gmc/classes/mpf_window.gd" id="1_ixxnq"]
 [ext_resource type="Shader" path="res://addons/mpf-gmc/resources/virtual_dmd.gdshader" id="2_cbmcr"]
@@ -17,8 +17,8 @@ shader_parameter/rows = 36.0
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_gmaen"]
 shader = ExtResource("5_m6y8w")
-shader_parameter/columns = 128
-shader_parameter/rows = 32
+shader_parameter/columns = 128.0
+shader_parameter/rows = 32.0
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_4bkj2"]
 shader = ExtResource("5_0sixv")
@@ -27,6 +27,8 @@ shader_parameter/hardness = 5.0
 shader_parameter/spacing = 2.0
 shader_parameter/columns = 98.0
 shader_parameter/rows = 36.0
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_t6y31"]
 
 [node name="MPFWindow" type="Control"]
 custom_minimum_size = Vector2(1920, 720)
@@ -60,7 +62,6 @@ grow_horizontal = 2
 grow_vertical = 2
 
 [node name="virtual_dmd" type="ColorRect" parent="filters"]
-visible = false
 z_index = 4096
 material = SubResource("ShaderMaterial_vnlqf")
 layout_mode = 1
@@ -86,6 +87,18 @@ visible = false
 top_level = true
 z_index = 4096
 material = SubResource("ShaderMaterial_4bkj2")
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="custom" type="ColorRect" parent="filters"]
+visible = false
+top_level = true
+z_index = 4096
+material = SubResource("ShaderMaterial_t6y31")
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0

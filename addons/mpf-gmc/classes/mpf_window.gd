@@ -83,6 +83,12 @@ func _check_config() -> void:
                     c.show()
                 else:
                     c.hide()
+            # If the filter is a resource, look it up
+            if not filter and filter_name.begins_with("res://"):
+                filter = self.get_node("filters").get_node("custom")
+                filter.material.shader = load(filter_name)
+                filter.show()
+
             assert(filter != null, "Unknown filter '%s'" % filter_name)
             for prop in ["rows", "columns", "hardness", "color", "spacing"]:
                 if MPF.config.has_section_key("filter", prop):
