@@ -1,6 +1,6 @@
 [gd_scene load_steps=4 format=3 uid="uid://3f4rqdk8gr7s"]
 
-[ext_resource type="Shader" path="res://addons/mpf-gmc/resources/dmd.gdshader" id="1_necd5"]
+[ext_resource type="Shader" path="res://addons/mpf-gmc/resources/dmd_dots.gdshader" id="1_necd5"]
 [ext_resource type="Script" path="res://addons/mpf-gmc/resources/dmd_overlay.gd" id="2_lg0y5"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_sos3s"]

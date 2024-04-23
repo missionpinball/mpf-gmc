@@ -8,6 +8,7 @@ var player
 var server
 var util
 var keyboard: = {}
+var config
 
 func _enter_tree():
     # Static utility functions first
@@ -27,13 +28,14 @@ func _enter_tree():
     self.add_child(mc)
 
 func _ready():
-    var config = ConfigFile.new()
-    var err = config.load("res://gmc.cfg")
+    var cfg = ConfigFile.new()
+    var err = cfg.load("res://gmc.cfg")
     if err == OK:
-        if config.has_section("keyboard"):
-            for key in config.get_section_keys("keyboard"):
-                keyboard[key.to_upper()] = config.get_value("keyboard", key)
-        self.mc.sound.initialize(config)
+        self.config = cfg
+        if cfg.has_section("keyboard"):
+            for key in cfg.get_section_keys("keyboard"):
+                keyboard[key.to_upper()] = cfg.get_value("keyboard", key)
+        self.mc.sound.initialize(cfg)
 
 func _unhandled_input(event: InputEvent) -> void:
     if not event.is_class("InputEventKey"):

@@ -7,6 +7,7 @@ var default_display: MPFDisplay
 func _ready() -> void:
 
     MPF.mc.register_window(self)
+    self._check_config()
     # In case no default is explicitly defined, track the first one
     var first_display: MPFDisplay
     for display in self.get_children():
@@ -66,3 +67,26 @@ func get_display(display_name: String = "") -> MPFDisplay:
         return default_display
     assert(display_name in displays, "Unknown display name '%s'" % display_name)
     return displays[display_name]
+
+func _check_config() -> void:
+    if MPF.config and MPF.config.has_section("filter"):
+        # Don't show the filter in the editor
+        if Engine.is_editor_hint():
+            return
+        # Check for a filter
+        if MPF.config.has_section_key("filter", "filter"):
+            var filter_name = MPF.config.get_value("filter", "filter")
+            var filter = null
+            for c in self.get_node("filters").get_children():
+                if c.name == filter_name:
+                    filter = c
+                    c.show()
+                else:
+                    c.hide()
+            assert(filter != null, "Unknown filter '%s'" % filter_name)
+            for prop in ["rows", "columns", "hardness", "color", "spacing"]:
+                if MPF.config.has_section_key("filter", prop):
+                    filter.material.set_shader_parameter(prop, MPF.config.get_value("filter", prop))
+    # For safety, disable all filters
+    else:
+        self.get_node("filters").hide()

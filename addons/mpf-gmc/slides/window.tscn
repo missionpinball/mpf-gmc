@@ -1,9 +1,10 @@
-[gd_scene load_steps=8 format=3 uid="uid://ds4gduf8660uj"]
+[gd_scene load_steps=10 format=3 uid="uid://ds4gduf8660uj"]
 
 [ext_resource type="Script" path="res://addons/mpf-gmc/classes/mpf_window.gd" id="1_ixxnq"]
-[ext_resource type="Shader" path="res://addons/mpf-gmc/resources/dotmatrix.gdshader" id="2_cbmcr"]
+[ext_resource type="Shader" path="res://addons/mpf-gmc/resources/virtual_dmd.gdshader" id="2_cbmcr"]
 [ext_resource type="Script" path="res://addons/mpf-gmc/classes/mpf_display.gd" id="2_clr31"]
 [ext_resource type="PackedScene" uid="uid://belkug6sa4arr" path="res://addons/mpf-gmc/slides/startup.tscn" id="3_8nbga"]
+[ext_resource type="Shader" path="res://addons/mpf-gmc/resources/dmd_dots.gdshader" id="5_0sixv"]
 [ext_resource type="Shader" path="res://addons/mpf-gmc/resources/pixelate.gdshader" id="5_m6y8w"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_vnlqf"]
@@ -11,13 +12,21 @@ shader = ExtResource("2_cbmcr")
 shader_parameter/color = Color(0.101961, 0, 0, 1)
 shader_parameter/hardness = 5.0
 shader_parameter/spacing = 2.0
-shader_parameter/cols = 98.0
+shader_parameter/columns = 98.0
 shader_parameter/rows = 36.0
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_gmaen"]
 shader = ExtResource("5_m6y8w")
-shader_parameter/cols = 128
+shader_parameter/columns = 128
 shader_parameter/rows = 32
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_4bkj2"]
+shader = ExtResource("5_0sixv")
+shader_parameter/color = null
+shader_parameter/hardness = 5.0
+shader_parameter/spacing = 2.0
+shader_parameter/columns = 98.0
+shader_parameter/rows = 36.0
 
 [node name="MPFWindow" type="Control"]
 custom_minimum_size = Vector2(1920, 720)
@@ -42,18 +51,44 @@ script = ExtResource("2_clr31")
 is_default = true
 initial_slide = ExtResource("3_8nbga")
 
-[node name="DMD" type="ColorRect" parent="."]
+[node name="filters" type="Control" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="virtual_dmd" type="ColorRect" parent="filters"]
 visible = false
 z_index = 4096
 material = SubResource("ShaderMaterial_vnlqf")
-layout_mode = 0
-offset_right = 1916.0
-offset_bottom = 762.0
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 
-[node name="Pixellate" type="ColorRect" parent="."]
+[node name="pixelate" type="ColorRect" parent="filters"]
+visible = false
+z_index = 4096
+material = SubResource("ShaderMaterial_gmaen")
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="dmd_dots" type="ColorRect" parent="filters"]
 visible = false
 top_level = true
-material = SubResource("ShaderMaterial_gmaen")
-layout_mode = 0
-offset_right = 1936.0
-offset_bottom = 740.0
+z_index = 4096
+material = SubResource("ShaderMaterial_4bkj2")
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
