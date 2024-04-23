@@ -90,9 +90,10 @@ func _check_config() -> void:
                 filter.show()
 
             assert(filter != null, "Unknown filter '%s'" % filter_name)
-            for prop in ["rows", "columns", "hardness", "color", "spacing"]:
-                if MPF.config.has_section_key("filter", prop):
-                    filter.material.set_shader_parameter(prop, MPF.config.get_value("filter", prop))
+            for prop in MPF.config.get_section_keys("filter"):
+                if prop == "filter":
+                    continue
+                filter.material.set_shader_parameter(prop, MPF.config.get_value("filter", prop))
     # For safety, disable all filters
     else:
         self.get_node("filters").hide()
