@@ -6,8 +6,8 @@ shader_type canvas_item;
 uniform vec4 color : source_color;
 uniform float hardness = 5.0;
 uniform float spacing = 2.0;
-uniform float columns = 98.0;
-uniform float rows = 36.0;
+uniform float columns = 128.0;
+uniform float rows = 32.0;
 uniform sampler2D SCREEN_TEXTURE : hint_screen_texture;
 
 void fragment() {
