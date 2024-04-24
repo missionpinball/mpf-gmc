@@ -56,6 +56,9 @@ func _unhandled_input(event: InputEvent) -> void:
         var cfg = keyboard[keycode]
         match cfg[0]:
             "event":
+                # Only handle events on the press, not the release
+                if not event.is_pressed():
+                    return
                 MPF.server.send_event(cfg[1])
             "switch":
                 var action
