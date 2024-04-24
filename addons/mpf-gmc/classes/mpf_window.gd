@@ -69,7 +69,9 @@ func get_display(display_name: String = "") -> MPFDisplay:
     return displays[display_name]
 
 func _check_config() -> void:
+    var filter_parent = self.get_node_or_null("filters")
     if MPF.config and MPF.config.has_section("filter"):
+        assert(filter_parent != null, "gmc.cfg has a [filters] section but MPFWindow does not have a 'filters' child")
         # Don't show the filter in the editor
         if Engine.is_editor_hint():
             return
@@ -77,7 +79,7 @@ func _check_config() -> void:
         if MPF.config.has_section_key("filter", "filter"):
             var filter_name = MPF.config.get_value("filter", "filter")
             var filter = null
-            for c in self.get_node("filters").get_children():
+            for c in filter_parent.get_children():
                 if c.name == filter_name:
                     filter = c
                     c.show()
@@ -85,7 +87,7 @@ func _check_config() -> void:
                     c.hide()
             # If the filter is a resource, look it up
             if not filter and filter_name.begins_with("res://"):
-                filter = self.get_node("filters").get_node("custom")
+                filter = filter_parent.get_node("custom")
                 filter.material.shader = load(filter_name)
                 filter.show()
 
@@ -95,5 +97,5 @@ func _check_config() -> void:
                     continue
                 filter.material.set_shader_parameter(prop, MPF.config.get_value("filter", prop))
     # For safety, disable all filters
-    else:
-        self.get_node("filters").hide()
+    elif filter_parent:
+        filter_parent.hide()
