@@ -5,7 +5,7 @@
 class_name LoggingNode
 extends Node
 
-var logger: Logger
+var logger: GMCLogger
 
 
 func configure_logging(level: int = 0):

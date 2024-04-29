@@ -1,5 +1,6 @@
 @tool
 extends Node
+class_name GMC
 
 var game
 var log
@@ -11,46 +12,43 @@ var keyboard: = {}
 var config
 
 
-
 func _enter_tree():
 
     self.config = ConfigFile.new()
     var err = self.config.load("res://gmc.cfg")
     if err != OK:
         printerr("Error loading config file: %s" % err)
-    # print("resource path is %s" % self.resource_path)
+
     # Any default script can be overridden with a custom one
     # This is done explicitly line-by-line for optimized preload and relative paths
-
     for s in [
             # Static utility functions first
-            ["util", preload("scripts/utilities.gd")],
+            ["util", preload("scripts/utilities.gd"), "GMCUtil"],
             # Log is needed for the rest
-            ["log", preload("scripts/log.gd")],
+            ["log", preload("scripts/log.gd"), "GMCLogger"],
             # Game should be loaded next
-            ["game", preload("scripts/mpf_game.gd")],
+            ["game", preload("scripts/mpf_game.gd"), "GMCGame"],
             # Server depends on Game, should be loaded after
-            ["server", preload("scripts/bcp_server.gd")],
+            ["server", preload("scripts/bcp_server.gd"), "GMCServer"],
             # Media controller can come last
-            ["media", preload("scripts/media.gd")]
+            ["media", preload("scripts/media.gd"), "GMCMedia"]
     ]:
-        var script = self.config.get_value("gmc", "%s_script" % s[0], false)
+        var script = self.config.get_value("gmc", s[2], false)
         if script:
             self[s[0]] = load(script).new()
         else:
             self[s[0]] = s[1].new()
 
-    # Process is only called on children in the tree, so add the children
-    # that need to call process or that have enter_tree methods
+    # self._process() is only called on children in the tree, so add the children
+    # that need to call _process() or that have _enter_tree() methods
     self.add_child(server)
     self.add_child(media)
 
 func _ready():
-    if self.config:
-        if self.config.has_section("keyboard"):
-            for key in self.config.get_section_keys("keyboard"):
-                keyboard[key.to_upper()] = self.config.get_value("keyboard", key)
-        self.media.sound.initialize(self.config)
+    if self.config.has_section("keyboard"):
+        for key in self.config.get_section_keys("keyboard"):
+            keyboard[key.to_upper()] = self.config.get_value("keyboard", key)
+    self.media.sound.initialize(self.config)
 
 func _unhandled_input(event: InputEvent) -> void:
     if not event.is_class("InputEventKey"):
