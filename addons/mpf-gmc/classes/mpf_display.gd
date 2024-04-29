@@ -8,6 +8,8 @@ extends MPFSceneBase
 @export var is_default: bool = false
 ## The scene to render on this display during startup
 @export var initial_slide: PackedScene
+## If not selected, this display will persist a removed slide until a new one arrives
+@export var allow_empty: bool = false
 
 # The slide stack is an array of slide nodes that are sorted by priority
 var _slide_stack: Array = []
@@ -96,10 +98,13 @@ func _update_stack(kwargs: Dictionary = {}) -> void:
     self._slide_stack.sort_custom(
         func(a: MPFSlide, b: MPFSlide): return a.priority < b.priority
     )
+    var persist_current = self.allow_empty == false and not self._slide_stack.size()
     # Update the children, rearranging and removing as necessary
     for s in self._slides.get_children():
         var idx = self._slide_stack.find(s)
         if idx == -1:
+            if persist_current and s == self._current_slide:
+                continue
             self._slides.remove_child(s)
             s.queue_free()
             # If this is in the queue, remove it as well
@@ -113,7 +118,8 @@ func _update_stack(kwargs: Dictionary = {}) -> void:
             self._slides.move_child(s, idx)
 
     if not self._slide_stack:
-        self._current_slide = null
+        if not persist_current:
+            self._current_slide = null
         return
 
     var new_slide = self._slide_stack[-1]

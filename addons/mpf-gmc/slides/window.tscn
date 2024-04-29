@@ -52,6 +52,7 @@ grow_vertical = 2
 script = ExtResource("2_clr31")
 is_default = true
 initial_slide = ExtResource("3_8nbga")
+allow_empty = null
 
 [node name="filters" type="Control" parent="."]
 layout_mode = 1
