@@ -1,4 +1,5 @@
 @tool
+class_name GMCUtil
 
 ## Traverse a node and find all MPFVariable nodes within it
 static func find_variables(n: Node, acc: Array[Node] = []) -> Array[Node]:
@@ -33,8 +34,8 @@ static func comma_sep(n: int) -> String:
 
 ## Receive a string template and an integer, return the string
 ## formatted with an "s" if the number is anything other than 1
-static func pluralize(template: String, val: int) -> String:
-  return template % ("" if val == 1 else "s")
+static func pluralize(template: String, val: int, suffix: String = "s") -> String:
+  return template % ("" if val == 1 else suffix)
 
 static func to_int(x) -> int:
   return int(x)

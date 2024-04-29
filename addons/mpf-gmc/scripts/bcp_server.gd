@@ -3,8 +3,9 @@
 # Original code © 2021 Anthony van Winkle / Paradigm Tilt
 # Released under the MIT License
 
-
+@tool
 extends Node
+class_name GMCServer
 
 signal bonus(payload)
 signal mpf_timer(payload)
@@ -78,7 +79,7 @@ func deferred_game(method: String, result=null) -> void:
     callable.call()
 
 func deferred_mc(method: String, result=null) -> void:
-  var callable = Callable(MPF.mc, method)
+  var callable = Callable(MPF.media, method)
   if result:
     callable.call(result)
   else:
@@ -200,6 +201,7 @@ func on_ball_start(ball, player_num) -> void:
 func on_ball_end() -> void:
   pass
 
+## Called when a BCP connection is opened successfully.
 func on_connect() -> void:
   pass
 

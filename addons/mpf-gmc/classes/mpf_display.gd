@@ -41,7 +41,7 @@ func process_widget(widget_name: String, action: String, settings: Dictionary, c
     slide.process_widget(widget_name, action, settings, context, priority, kwargs)
 
 func action_play(slide_name: String, settings: Dictionary, context: String, priority: int = 0, kwargs: Dictionary = {}) -> MPFSlide:
-    var slide = MPF.mc.get_slide_instance(slide_name)
+    var slide = MPF.media.get_slide_instance(slide_name)
     assert(slide is MPFSlide, "Slide scenes must use (or extend) the MPFSlide script on the root node.")
     slide.initialize(slide_name, settings, context, priority, kwargs)
     if settings.get("queue"):

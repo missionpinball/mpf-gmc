@@ -25,7 +25,7 @@ func process_widget(widget_name: String, action: String, settings: Dictionary, c
     self.process_action(widget_name, self._widgets.get_children(), action, settings, context, priority, kwargs)
 
 func action_play(widget_name: String, settings: Dictionary, context: String, priority: int = 0, kwargs: Dictionary = {}) -> MPFWidget:
-    var widget = MPF.mc.get_widget_instance(widget_name)
+    var widget = MPF.media.get_widget_instance(widget_name)
     assert(widget is MPFWidget, "Widget scenes must use (or extend) the MPFWidget script on the root node.")
     widget.initialize(widget_name, settings, context, priority, kwargs)
     self._widgets.add_child(widget)

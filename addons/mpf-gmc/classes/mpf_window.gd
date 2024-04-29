@@ -6,7 +6,7 @@ var default_display: MPFDisplay
 
 func _ready() -> void:
 
-    MPF.mc.register_window(self)
+    MPF.media.register_window(self)
     self._check_config()
     # In case no default is explicitly defined, track the first one
     var first_display: MPFDisplay
@@ -44,9 +44,9 @@ func _play_scene(scene_type: String, payload: Dictionary) -> void:
         var action: String = settings['action']
         if action == "preload":
             if scene_type == "slide":
-                MPF.mc.get_slide_instance(name, true)
+                MPF.media.get_slide_instance(name, true)
             elif scene_type == "widget":
-                MPF.mc.get_widget_instance(name, true)
+                MPF.media.get_widget_instance(name, true)
             return
 
         var context = payload.context

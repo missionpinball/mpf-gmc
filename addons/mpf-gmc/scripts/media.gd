@@ -2,6 +2,7 @@
 # including windows, displays, slides, and widgets
 @tool
 extends Node
+class_name GMCMedia
 
 var sound: Node
 var window: Node
@@ -16,9 +17,9 @@ func _init() -> void:
     for ext in ["wav", "ogg", "tres"]:
         self.traverse_tree_for("sounds", sounds, ext)
 
-    MPF.log.info("Generated slide lookups: %s", slides)
-    MPF.log.info("Generated widget lookups: %s", widgets)
-    MPF.log.info("Generated sound lookups: %s", sounds)
+    MPF.log.debug("Generated slide lookups: %s", slides)
+    MPF.log.debug("Generated widget lookups: %s", widgets)
+    MPF.log.debug("Generated sound lookups: %s", sounds)
 
 func _enter_tree():
     sound = preload("sound_player.gd").new()

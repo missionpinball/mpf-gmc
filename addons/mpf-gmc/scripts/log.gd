@@ -7,7 +7,7 @@
 # Override the log() method to change the output formatting.
 
 extends Node
-class_name Logger
+class_name GMCLogger
 
 
 var VERBOSE := 1

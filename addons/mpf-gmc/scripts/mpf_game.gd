@@ -5,7 +5,7 @@
 
 
 extends Node
-class_name MPFGame
+class_name GMCGame
 
 # The list of modes currently active in MPF
 var active_modes := []
@@ -89,11 +89,9 @@ func retrieve_preloaded_scene(path: String) -> PackedScene:
     preloaded_scenes.erase(path)
   return scene
 
-
 func start_player_turn(kwargs: Dictionary) -> void:
   # Player nums are 1-based, so subtract 1
   player = players[kwargs.player_num - 1]
-
 
 func update_machine(kwargs: Dictionary) -> void:
   var name = kwargs.get("name")
@@ -131,7 +129,6 @@ func update_player(kwargs: Dictionary) -> void:
         emit_signal(kwargs.name, kwargs.value)
       # Also broadcast the general update for all subscribers
       emit_signal("player_update", kwargs.name, kwargs.value)
-
 
 func update_settings(result: Dictionary) -> void:
   # TODO: Determine if settings changes are individual or the whole package
