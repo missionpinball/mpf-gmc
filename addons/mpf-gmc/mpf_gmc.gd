@@ -43,14 +43,14 @@ func _enter_tree():
     # Process is only called on children in the tree, so add the children
     # that need to call process or that have enter_tree methods
     self.add_child(server)
-    self.add_child(mc)
+    self.add_child(media)
 
 func _ready():
     if self.config:
         if self.config.has_section("keyboard"):
             for key in self.config.get_section_keys("keyboard"):
                 keyboard[key.to_upper()] = self.config.get_value("keyboard", key)
-        self.mc.sound.initialize(self.config)
+        self.media.sound.initialize(self.config)
 
 func _unhandled_input(event: InputEvent) -> void:
     if not event.is_class("InputEventKey"):
