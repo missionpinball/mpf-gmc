@@ -7,6 +7,8 @@ var context: String
 var key: String
 var _expirations: Dictionary = {}
 
+@export var animation_player: AnimationPlayer
+
 func initialize(name: String, settings: Dictionary, context: String, priority: int = 0, kwargs: Dictionary = {}) -> void:
     # The node name attribute is the name of the root node, which could be
     # anything or case-sensitive. Set an explicit key instead, using the name.
@@ -57,6 +59,29 @@ func action_queue(action: String, slide_name: String, settings: Dictionary, cont
 
 func action_update(settings: Dictionary, kwargs: Dictionary = {}):
     pass
+
+func on_active():
+    if self._trigger_animation("active"):
+        return self.animation_player.animation_finished
+
+func on_removed(delay_signal = null) -> void:
+    if self._trigger_animation("removed"):
+        self.animation_player.animation_finished.connect(self._remove)
+    elif delay_signal:
+        delay_signal.connect(self._remove)
+    else:
+        self._remove()
+
+func _trigger_animation(animation_name: String) -> bool:
+    if self.animation_player and self.animation_player.has_animation(animation_name):
+        self.animation_player.stop()
+        self.animation_player.play(animation_name)
+        return true
+    return false
+
+func _remove():
+    self.get_parent().remove_child(self)
+    self.queue_free()
 
 func _create_expire(child: MPFSceneBase, expiration_secs: float) -> void:
     # If there is already a timer for this child to expire, reset it
