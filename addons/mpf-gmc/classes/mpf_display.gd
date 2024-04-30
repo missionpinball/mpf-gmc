@@ -51,6 +51,7 @@ func action_play(slide_name: String, settings: Dictionary, context: String, prio
     self._slide_stack.append(slide)
     self._slides.add_child(slide)
     MPF.server.send_event("slide_%s_created" % slide.key)
+    slide.on_created()
     return slide
 
 func action_queue(action: String, slide_name: String, settings: Dictionary, context: String, priority: int = 0, kwargs: Dictionary = {}):
@@ -84,6 +85,11 @@ func update_stack(kwargs):
     self._update_stack(kwargs)
 
 func action_remove(slide) -> void:
+    slide.on_removed()
+    if slide.current_animation:
+        print("waiting for removal signal from %s: %s" % [slide, slide.current_animation])
+        await slide.current_animation
+    print("NOW removing slide %s " % slide)
     self._slide_stack.erase(slide)
     self._update_stack()
 
@@ -99,6 +105,8 @@ func _update_stack(kwargs: Dictionary = {}) -> void:
     self._slide_stack.sort_custom(
         func(a: MPFSlide, b: MPFSlide): return a.priority < b.priority
     )
+    print("Slide stack sorted")
+    print(self._slide_stack)
     var persist_current = self.allow_empty == false and not self._slide_stack.size()
     # Update the children, rearranging and removing as necessary
     for s in self._slides.get_children():
@@ -106,11 +114,12 @@ func _update_stack(kwargs: Dictionary = {}) -> void:
         if idx == -1:
             # Don't remove the current slide if it needs to persist
             if persist_current and s == self._current_slide:
+                print("persist continue on slide %s" % s.key)
                 continue
             # Don't remove the current slide until we've handled the new one
             if s != self._current_slide:
                 MPF.server.send_event("slide_%s_removed" % s.key)
-                s.on_removed()
+                s.remove()
             # If this is in the queue, remove it as well
             if self._queue and s.key == self._queue[0].key:
                 self._queue.pop_front()
@@ -118,8 +127,6 @@ func _update_stack(kwargs: Dictionary = {}) -> void:
                 # Restart this update with the new slide from the queue
                 if new_queue:
                     return self._update_stack(new_queue["kwargs"])
-        else:
-            self._slides.move_child(s, idx)
 
     if not self._slide_stack:
         if not persist_current:
@@ -127,17 +134,21 @@ func _update_stack(kwargs: Dictionary = {}) -> void:
         return
 
     var new_slide = self._slide_stack[-1]
-    if new_slide != self._current_slide:
-        var incoming_animation_signal = new_slide.on_active()
-        if self._current_slide:
-            MPF.server.send_event("slide_%s_inactive" % self._current_slide.key)
-            if self._current_slide not in self._slide_stack:
-                # Let the outgoing slide wait for the incoming animation before removing
-                self._current_slide.on_removed(incoming_animation_signal)
-                MPF.server.send_event("slide_%s_removed" % self._current_slide.key)
-
+    var old_slide = self._current_slide
+    if new_slide != old_slide:
+        new_slide.on_active()
+        if old_slide:
+            MPF.server.send_event("slide_%s_inactive" % old_slide.key)
         MPF.server.send_event_with_args("slide_%s_active" % new_slide.key, kwargs)
         self._current_slide = new_slide
+        if old_slide and old_slide not in self._slide_stack:
+            # Let the outgoing slide wait for the incoming animation before removing
+            if old_slide.priority < new_slide.priority and new_slide.current_animation:
+                print("Deferring removal of current slide %s" % old_slide.key)
+                await new_slide.animation_finished
+            else:
+                print("outgoing slide has higher priority, removing immediately")
+            self.action_remove(old_slide)
 
 func _manage_queue(action: String) -> void:
     if action == "clear":

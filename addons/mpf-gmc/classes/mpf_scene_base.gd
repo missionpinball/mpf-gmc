@@ -6,6 +6,10 @@ var priority: int = 0
 var context: String
 var key: String
 var _expirations: Dictionary = {}
+var current_animation: String:
+    get: return self.animation_player.current_animation if self.animation_player else ""
+var animation_finished: Signal:
+    get: return self.animation_player.animation_finished if self.animation_player else null
 
 @export var animation_player: AnimationPlayer
 
@@ -60,17 +64,24 @@ func action_queue(action: String, slide_name: String, settings: Dictionary, cont
 func action_update(settings: Dictionary, kwargs: Dictionary = {}):
     pass
 
+func on_created():
+    if self._trigger_animation("created"):
+        return self.animation_player.animation_finished
+
 func on_active():
     if self._trigger_animation("active"):
         return self.animation_player.animation_finished
 
-func on_removed(delay_signal = null) -> void:
+func on_removed():
     if self._trigger_animation("removed"):
-        self.animation_player.animation_finished.connect(self._remove)
-    elif delay_signal:
-        delay_signal.connect(self._remove)
-    else:
-        self._remove()
+        return self.animation_player.animation_finished
+    # Immediately cancel any created/active animations
+    if self.animation_player.current_animation in ["created", "active"]:
+        self.animation_player.stop()
+
+func remove():
+    self.get_parent().remove_child(self)
+    self.queue_free()
 
 func _trigger_animation(animation_name: String) -> bool:
     if self.animation_player and self.animation_player.has_animation(animation_name):
@@ -79,9 +90,6 @@ func _trigger_animation(animation_name: String) -> bool:
         return true
     return false
 
-func _remove():
-    self.get_parent().remove_child(self)
-    self.queue_free()
 
 func _create_expire(child: MPFSceneBase, expiration_secs: float) -> void:
     # If there is already a timer for this child to expire, reset it
