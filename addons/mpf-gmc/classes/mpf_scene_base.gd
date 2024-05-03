@@ -2,15 +2,30 @@
 class_name MPFSceneBase
 extends Control
 
+const CoreAnimation = { "CREATED": "created", "ACTIVE": "active", "INACTIVE": "inactive", "REMOVED": "removed" }
+
 var priority: int = 0
 var context: String
 var key: String
 var _expirations: Dictionary = {}
 var current_animation: String:
     get: return self.animation_player.current_animation if self.animation_player else ""
-var animation_finished: Signal:
+var animation_finished:
     get: return self.animation_player.animation_finished if self.animation_player else null
 
+## An AnimationPlayer node containing standard animations.
+##
+## Define animations with any of the following names for them to
+## be automatically played at the corresponding time.
+## [br][br]
+## [code]created[/code] - When the node is instantiated and added to the display[br]
+## [code]active[/code] - When the node is the highest-priority in the stack[br]
+## [code]inactive[/code] - When the node is no longer highest-priority in the stack[br]
+## [code]removed[/code] - When the node is removed from the display.[br]
+## [br]
+## If both 'created' and 'active' are defined and occur simultaneously,
+## 'created' will be used. If both 'inactive' and 'removed' are defined
+## and occur simultaneously, 'removed' will be used.
 @export var animation_player: AnimationPlayer
 
 func initialize(name: String, settings: Dictionary, context: String, priority: int = 0, kwargs: Dictionary = {}) -> void:
@@ -19,6 +34,9 @@ func initialize(name: String, settings: Dictionary, context: String, priority: i
     self.key = settings["key"] if settings.get("key") else name
     self.priority = settings['priority'] + priority if settings['priority'] else priority
     self.context = settings["custom_context"] if settings.get('custom_context') else context
+    # Play a created animation, if applicable
+    self._trigger_animation(CoreAnimation.CREATED)
+
 
 func process_action(child_name: String, children: Array, action: String, settings: Dictionary, context: String, priority: int = 0, kwargs: Dictionary = {}) -> void:
     var child: MPFSceneBase
@@ -84,12 +102,19 @@ func remove():
     self.queue_free()
 
 func _trigger_animation(animation_name: String) -> bool:
-    if self.animation_player and self.animation_player.has_animation(animation_name):
+    if not self.animation_player:
+        return false
+    # Created takes priority over active
+    if self.animation_player.current_animation == CoreAnimation.CREATED and animation_name == CoreAnimation.ACTIVE:
+        return true
+    # Removed takes priority over inactive
+    if self.animation_player.current_animation == CoreAnimation.REMOVED and animation_name == CoreAnimation.INACTIVE:
+        return true
+    if self.animation_player.has_animation(animation_name):
         self.animation_player.stop()
         self.animation_player.play(animation_name)
         return true
     return false
-
 
 func _create_expire(child: MPFSceneBase, expiration_secs: float) -> void:
     # If there is already a timer for this child to expire, reset it

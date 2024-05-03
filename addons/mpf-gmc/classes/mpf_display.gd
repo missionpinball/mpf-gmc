@@ -51,7 +51,6 @@ func action_play(slide_name: String, settings: Dictionary, context: String, prio
     self._slide_stack.append(slide)
     self._slides.add_child(slide)
     MPF.server.send_event("slide_%s_created" % slide.key)
-    slide.on_created()
     return slide
 
 func action_queue(action: String, slide_name: String, settings: Dictionary, context: String, priority: int = 0, kwargs: Dictionary = {}):
