@@ -5,6 +5,9 @@ var displays: Dictionary = {}
 var default_display: MPFDisplay
 
 func _ready() -> void:
+    # Force the window dimensions to match the project settings
+    self.custom_minimum_size.x = ProjectSettings.get_setting("display/window/size/viewport_width")
+    self.custom_minimum_size.y = ProjectSettings.get_setting("display/window/size/viewport_height")
 
     MPF.media.register_window(self)
     self._check_config()
