@@ -80,15 +80,14 @@ func recurse_dir(path, acc, ext="tscn") -> void:
     # If this path does not exist, that's okay
     if not dir:
         return
-    if dir:
-        dir.list_dir_begin()
-        var file_name = dir.get_next()
-        while (file_name != ""):
-            if dir.current_is_dir():
-                self.recurse_dir("%s/%s" % [path, file_name], acc, ext)
-            elif file_name.ends_with(".%s" % ext):
-                acc[file_name.rsplit(".", false, 1)[0]] = "%s/%s" % [path, file_name]
-            file_name = dir.get_next()
+    dir.list_dir_begin()
+    var file_name = dir.get_next()
+    while (file_name != ""):
+        if dir.current_is_dir():
+            self.recurse_dir("%s/%s" % [path, file_name], acc, ext)
+        elif file_name.ends_with(".%s" % ext):
+            acc[file_name.rsplit(".", false, 1)[0]] = "%s/%s" % [path, file_name]
+        file_name = dir.get_next()
 
 func recurse_modes(obj_type: String, acc: Dictionary, ext="tscn") -> void:
     # Traverse the mode folders for subfolders of this object type
@@ -100,10 +99,11 @@ func recurse_modes(obj_type: String, acc: Dictionary, ext="tscn") -> void:
     var mode = dir.get_next()
     while (mode != ""):
         var mdir = DirAccess.open("res://modes/%s" % mode)
-        mdir.list_dir_begin()
-        var file_name = mdir.get_next()
-        while (file_name != ""):
-            if file_name == obj_type and mdir.current_is_dir():
-                self.recurse_dir("res://modes/%s/%s" % [mode, obj_type], acc, ext)
-            file_name = mdir.get_next()
+        if mdir:
+            mdir.list_dir_begin()
+            var file_name = mdir.get_next()
+            while (file_name != ""):
+                if file_name == obj_type and mdir.current_is_dir():
+                    self.recurse_dir("res://modes/%s/%s" % [mode, obj_type], acc, ext)
+                file_name = mdir.get_next()
         mode = dir.get_next()
