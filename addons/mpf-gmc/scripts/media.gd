@@ -64,8 +64,14 @@ func _get_scene(name: String, collection: Dictionary, preload_only: bool = false
     return collection[name].instantiate()
 
 func traverse_tree_for(obj_type: String, acc: Dictionary, ext="tscn") -> void:
+    # Look for a specified content root
+    var content_root: String = "res://%s" % obj_type
+    if MPF.config.has_section("settings"):
+        var root = MPF.config.get_value("settings", "content_root", "")
+        if root:
+            content_root = "res://%s/%s" % [root, obj_type]
     # Start by traversing the root folder for this object type
-    self.recurse_dir("res://%s" % obj_type, acc, ext)
+    self.recurse_dir(content_root, acc, ext)
     self.recurse_modes(obj_type, acc, ext)
     # Then look for defaults included with GMC
     var defaults = {}
