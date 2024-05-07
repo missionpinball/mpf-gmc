@@ -94,7 +94,7 @@ func on_removed():
     if self._trigger_animation("removed"):
         return self.animation_player.animation_finished
     # Immediately cancel any created/active animations
-    if self.animation_player.current_animation in ["created", "active"]:
+    if self.current_animation in ["created", "active"]:
         self.animation_player.stop()
 
 func remove():
