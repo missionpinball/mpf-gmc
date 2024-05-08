@@ -1,0 +1,13 @@
+{
+	"folders": [
+		{
+			"path": "."
+		}
+	],
+	"settings": {
+		"cppbuild.isEnabled": false,
+		"editor.insertSpaces": false,
+		"editor.detectIndentation": false,
+		"editor.language.brackets": []
+	}
+}
