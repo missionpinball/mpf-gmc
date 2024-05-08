@@ -37,7 +37,6 @@ func play_widgets(payload: Dictionary) -> void:
     self._play_scene("widget", payload)
 
 func _play_scene(scene_type: String, payload: Dictionary) -> void:
-    MPF.log.info("Playing %s with payload %s", [scene_type, payload])
     var dirty_displays = []
     # Strip the settings from the payload to avoid redundant nestings
     var kwargs = payload.duplicate()

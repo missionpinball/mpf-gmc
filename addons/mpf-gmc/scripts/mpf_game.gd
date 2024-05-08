@@ -4,7 +4,7 @@
 # Released under the MIT License
 
 
-extends Node
+extends LoggingNode
 class_name GMCGame
 
 # The list of modes currently active in MPF
@@ -44,6 +44,7 @@ signal volume(bus, value, change)
 
 func _init() -> void:
   randomize()
+  self.configure_logging("Game")
 
 
 func add_player(kwargs: Dictionary) -> void:
@@ -82,7 +83,7 @@ func retrieve_preloaded_scene(path: String) -> PackedScene:
   if preloaded_scenes.has(path):
     scene = preloaded_scenes[path]
   else:
-    MPF.log.warn("Preloaded scene MISS %s", path)
+    self.log.warn("Preloaded scene MISS %s", path)
     scene = load(path)
   # Clear the reference to the scene so it can be garbage collected after the scene is done
   if not path in persisted_scenes:
