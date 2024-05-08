@@ -27,7 +27,7 @@ func _init(name: String = "", level: int = LogLevel.USE_GLOBAL_LEVEL) -> void:
 
 func setLevel(level: LogLevel) -> void:
   if level == LogLevel.USE_GLOBAL_LEVEL:
-    level = MPF.log.getLevel()
+    level = MPF.log.getLevel() as LogLevel
   _level = level
 
 func getLevel() -> int:

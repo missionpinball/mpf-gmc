@@ -12,7 +12,6 @@ var config
 
 func _init():
 	self.configure_logging("GMC", 20)
-	print("GMC has log level %s" % self.log.getLevel())
 
 func _enter_tree():
 	self.config = ConfigFile.new()

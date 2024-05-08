@@ -39,6 +39,7 @@ func _ready() -> void:
     var parent_slide = MPF.util.find_parent_slide(self)
     parent_slide.register_updater(self)
 
+@warning_ignore("native_method_override")
 func show():
     if self.visible:
         return

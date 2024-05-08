@@ -32,6 +32,7 @@ func _ready() -> void:
     if self.visible:
         self._initialize()
 
+@warning_ignore("native_method_override")
 func show() -> void:
     if self.visible:
         return
