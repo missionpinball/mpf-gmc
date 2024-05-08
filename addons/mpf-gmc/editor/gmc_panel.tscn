@@ -16,12 +16,10 @@ layout_mode = 0
 offset_right = 40.0
 offset_bottom = 40.0
 
-[node name="Status" type="Label" parent="VBoxContainer"]
+[node name="LogLevelLabel" type="Label" parent="VBoxContainer"]
 layout_mode = 2
-
-[node name="Label" type="Label" parent="VBoxContainer"]
-layout_mode = 2
-text = "Log Level"
+text = "Logging Level
+"
 
 [node name="LogLevel" type="OptionButton" parent="VBoxContainer"]
 layout_mode = 2

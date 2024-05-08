@@ -10,14 +10,14 @@ var util
 var keyboard: = {}
 var config
 
-func _init():
-	self.configure_logging("GMC", 20)
-
 func _enter_tree():
 	self.config = ConfigFile.new()
 	var err = self.config.load("res://gmc.cfg")
 	if err != OK:
 		printerr("Error loading config file: %s" % err)
+
+	# Configure logging with the value from the config
+	self.configure_logging("GMC", self.config.get_value("logging", "global", 20))
 
 	# Any default script can be overridden with a custom one
 	# This is done explicitly line-by-line for optimized preload and relative paths

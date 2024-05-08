@@ -1,14 +1,20 @@
+@tool
 extends Control
 
-func _enter_tree() -> void:
-	push_error("Uh hoh here we go")
-	$VBoxContainer/Status.text = "I AM A LOG BOX"
+@onready var logLevelSelector = $VBoxContainer/LogLevel
+@onready var config = ConfigFile.new()
+var _config_path = "res://gmc.cfg"
+
+func _ready() -> void:
+	self.config.load(self._config_path)
+	var initial_value = self.config.get_value("logging", "global", 20)
+	for i in range(0, logLevelSelector.item_count):
+		if logLevelSelector.get_item_id(i) == initial_value:
+			logLevelSelector.select(i)
+			break
 	$VBoxContainer/LogLevel.item_selected.connect(self.set_log_level)
-	$VBoxContainer/Label.text = "buttface"
 
 func set_log_level(index: int) -> void:
-	push_error("this is at hing")
 	var id = $VBoxContainer/LogLevel.get_item_id(index)
-	$VBoxContainer/Status.text = "Setting log level to %s" % id
-	MPF.log.setLevel(id)
-	MPF.config.set_value("logging", "global", id)
+	self.config.set_value("logging", "global", id)
+	self.config.save(self._config_path)

@@ -18,7 +18,7 @@ func _enter_tree():
 
 	# Create a custom dock for GMC Settings
 	dock = preload("res://addons/mpf-gmc/editor/gmc_panel.tscn").instantiate()
-	add_control_to_dock(DOCK_SLOT_RIGHT_UL, dock)
+	add_control_to_dock(DOCK_SLOT_LEFT_UR, dock)
 
 func _exit_tree():
 	# Clean-up of the plugin goes here.
