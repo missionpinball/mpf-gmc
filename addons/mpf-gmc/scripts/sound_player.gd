@@ -14,16 +14,16 @@ var default_bus: String
 var _music_loop_channel: AudioStreamPlayer
 
 # Counter for the current loop number of the music (zero-indexed)
-var _music_loops: int = 0
+# var _music_loops: int = 0
 # Counter for what the next loop number will be
-var _music_loop_pending: int = 0
+# var _music_loop_pending: int = 0
 
 var duck_attenuation := 8
 var duck_attack := 0.5
 var duck_release := 0.5
 var duck_settings
 # TODO: Make this dynamically find the music/duck target bus
-var unduck_level: int = AudioServer.get_bus_volume_db(1)
+var unduck_level: float = AudioServer.get_bus_volume_db(1)
 
 # TODO: Remove default duck, or make customizable/optional
 const default_duck = {

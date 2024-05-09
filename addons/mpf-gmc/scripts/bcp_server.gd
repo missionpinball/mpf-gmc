@@ -138,8 +138,8 @@ func send_service(subcommand: String, values: PackedStringArray = []) -> void:
 	self._send("service?subcommand=%s&sort=bool:false%s" % [subcommand, suffix])
 
 ## Set a machine variable in MPF
-func set_machine_var(name: String, value) -> void:
-	self._send("set_machine_var?name=%s&value=%s" % [name, self.wrap_value_type(value)])
+func set_machine_var(var_name: String, value) -> void:
+	self._send("set_machine_var?name=%s&value=%s" % [var_name, self.wrap_value_type(value)])
 
 ## Register an event handler for an MPFVariable
 func add_event_handler(event: String, handler: Callable) -> void:
@@ -195,7 +195,7 @@ func wrap_value_type(value) -> String:
 # The following public methods can be overridden in a subclass for game-specific behavior
 ###
 
-func on_ball_start(ball, player_num) -> void:
+func on_ball_start(_ball, _player_num) -> void:
 	pass
 
 func on_ball_end() -> void:
@@ -208,13 +208,13 @@ func on_connect() -> void:
 func on_disconnect() -> void:
 	pass
 
-func on_input(event_payload: PackedStringArray) -> void:
+func on_input(_event_payload: PackedStringArray) -> void:
 	pass
 
 func on_message(message: Dictionary) -> Dictionary:
 	return message
 
-func on_mode_start(mode_name: String) -> void:
+func on_mode_start(_mode_name: String) -> void:
 	pass
 
 func on_stop() -> void:
@@ -227,14 +227,14 @@ func on_stop() -> void:
 func _send(message: String) -> void:
 	if not _client:
 		return
-	self.log.debug("Sending BCP Message: %s" % message)
+	self.log.verbose("Sending BCP Message: %s" % message)
 	_client.put_data(("%s\n" % message).to_ascii_buffer())
 
 
 func _thread_poll(_userdata=null) -> void:
 	# TBD: What is the optimal polling rate for the BCP client?
-	var start = Time.get_ticks_msec()
-	var delay = 1000/poll_fps
+	var _start = Time.get_ticks_msec()
+	var delay = 1000.0 /poll_fps
 	while _client:
 		# If the mutex is locked, the system is shutting down
 		if not _mutex.try_lock():

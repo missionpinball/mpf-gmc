@@ -7,12 +7,15 @@ const CoreAnimation = { "CREATED": "created", "ACTIVE": "active", "INACTIVE": "i
 var priority: int = 0
 var context: String
 var key: String
+@warning_ignore("shadowed_global_identifier")
 var log: GMCLogger
 var _expirations: Dictionary = {}
 var current_animation: String:
 	get: return self.animation_player.current_animation if self.animation_player else ""
 var animation_finished:
-	get: return self.animation_player.animation_finished if self.animation_player else null
+	get:
+		@warning_ignore("incompatible_ternary")
+		return self.animation_player.animation_finished if self.animation_player else null
 
 ## An AnimationPlayer node containing standard animations.
 ##

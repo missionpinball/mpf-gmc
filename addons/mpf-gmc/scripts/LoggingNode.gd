@@ -5,7 +5,7 @@
 class_name LoggingNode
 extends Node
 
-@warning_ignore("native_method_override")
+@warning_ignore("shadowed_global_identifier")
 var log: GMCLogger
 const Logger = preload("res://addons/mpf-gmc/scripts/log.gd")
 
