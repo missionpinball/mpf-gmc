@@ -72,6 +72,7 @@ func _ready() -> void:
 
 func play_sounds(s: Dictionary) -> void:
 	assert(typeof(s) == TYPE_DICTIONARY, "Sound player called with non-dict value: %s" % s)
+	self.log.debug("play_sounds called with: %s" % s)
 	for asset in s.settings.keys():
 		var settings = s.settings[asset]
 
