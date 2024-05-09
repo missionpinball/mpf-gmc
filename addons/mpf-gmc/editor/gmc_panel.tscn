@@ -30,7 +30,7 @@ text = "Global Logging"
 [node name="LogLevel" type="OptionButton" parent="VBoxContainer/HBoxContainer"]
 layout_mode = 2
 alignment = 2
-item_count = 3
+item_count = 5
 selected = 2
 popup/item_0/text = "Verbose"
 popup/item_0/id = 1
@@ -38,3 +38,7 @@ popup/item_1/text = "Debug"
 popup/item_1/id = 10
 popup/item_2/text = "Info"
 popup/item_2/id = 20
+popup/item_3/text = "Warning"
+popup/item_3/id = 30
+popup/item_4/text = "Error"
+popup/item_4/id = 40
