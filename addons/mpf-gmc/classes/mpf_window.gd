@@ -41,14 +41,14 @@ func _play_scene(scene_type: String, payload: Dictionary) -> void:
     # Strip the settings from the payload to avoid redundant nestings
     var kwargs = payload.duplicate()
     kwargs.erase("settings")
-    for name in payload.settings.keys():
-        var settings = payload.settings[name]
+    for n in payload.settings.keys():
+        var settings = payload.settings[n]
         var action: String = settings['action']
         if action == "preload":
             if scene_type == "slide":
-                MPF.media.get_slide_instance(name, true)
+                MPF.media.get_slide_instance(n, true)
             elif scene_type == "widget":
-                MPF.media.get_widget_instance(name, true)
+                MPF.media.get_widget_instance(n, true)
             return
 
         var context = payload.context
@@ -56,9 +56,9 @@ func _play_scene(scene_type: String, payload: Dictionary) -> void:
         var target = settings.get('target')
         var display: MPFDisplay = get_display(target) if target else get_display()
         if scene_type == "slide":
-            display.process_slide(name, action, settings, context, priority, kwargs)
+            display.process_slide(n, action, settings, context, priority, kwargs)
         elif scene_type == "widget":
-            display.process_widget(name, action, settings, context, priority, kwargs)
+            display.process_widget(n, action, settings, context, priority, kwargs)
         if display not in dirty_displays:
             dirty_displays.append(display)
     for display in dirty_displays:

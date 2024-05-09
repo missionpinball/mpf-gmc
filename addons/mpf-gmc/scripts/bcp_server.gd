@@ -59,7 +59,7 @@ func _process(_delta: float) -> void:
 	if not _client and _server.is_connection_available() == true:
 		self.log.info("Client connection is available!")
 		_client = _server.take_connection()
-		var err = _thread.start(self._thread_poll, 0)
+		var err = _thread.start(self._thread_poll, Thread.Priority.PRIORITY_LOW)
 		if err != OK:
 			self.log.error("Error spawning BCP poll thread: %s", err)
 		else:

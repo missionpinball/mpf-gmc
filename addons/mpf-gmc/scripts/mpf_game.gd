@@ -95,21 +95,21 @@ func start_player_turn(kwargs: Dictionary) -> void:
   player = players[kwargs.player_num - 1]
 
 func update_machine(kwargs: Dictionary) -> void:
-  var name = kwargs.get("name")
+  var var_name = kwargs.get("name")
   var value = kwargs.get("value")
   if value is String:
     value = value.uri_decode()
-  if name.begins_with("audit"):
-    audits[name] = value
+  if var_name.begins_with("audit"):
+    audits[var_name] = value
   else:
-    machine_vars[name] = value
-    if name.begins_with("credits"):
-      emit_signal("credits", name, kwargs)
-    elif name.ends_with("_volume"):
-      emit_signal("volume", name, value, kwargs.get("change", 0))
+    machine_vars[var_name] = value
+    if var_name.begins_with("credits"):
+      emit_signal("credits", var_name, kwargs)
+    elif var_name.ends_with("_volume"):
+      emit_signal("volume", var_name, value, kwargs.get("change", 0))
   # If this machine var is a setting, update the value of the setting
-  if settings.has(name):
-    settings[name].value = value
+  if settings.has(var_name):
+    settings[var_name].value = value
 
 func update_modes(kwargs: Dictionary) -> void:
   active_modes = []
@@ -134,7 +134,7 @@ func update_player(kwargs: Dictionary) -> void:
 func update_settings(result: Dictionary) -> void:
   # TODO: Determine if settings changes are individual or the whole package
   settings = {}
-  var settingType
+  var _settingType
   for option in result.get("settings", []):
     var s := {}
     # Each setting comes as an array with the following fields:
@@ -150,7 +150,7 @@ func update_settings(result: Dictionary) -> void:
     if typeof(s.default) == TYPE_STRING and s.default == "True":
       s.default = 1
     s.type = option[6]
-    settingType = s.type
+    _settingType = s.type
     s.options = {}
     # By default, store the setting as the default value.
     # This will be overridden later with a machine_var update

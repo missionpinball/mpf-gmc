@@ -54,15 +54,15 @@ func get_sound_instance(sound_name: String, preload_only: bool = false):
 	assert(sound_name in sounds, "Unknown sound name '%s'" % sound_name)
 	return self._get_scene(sound_name, self.sounds, preload_only)
 
-func _get_scene(name: String, collection: Dictionary, preload_only: bool = false):
+func _get_scene(scene_name: String, collection: Dictionary, preload_only: bool = false):
 	# If this is the first access, load the scene
-	if collection[name] is String:
-		collection[name] = load(collection[name])
+	if collection[scene_name] is String:
+		collection[scene_name] = load(collection[scene_name])
 	if preload_only:
 		return
 	if collection == self.sounds:
-		return collection[name]
-	return collection[name].instantiate()
+		return collection[scene_name]
+	return collection[scene_name].instantiate()
 
 func traverse_tree_for(obj_type: String, acc: Dictionary, ext="tscn") -> void:
 	# Look for a specified content root

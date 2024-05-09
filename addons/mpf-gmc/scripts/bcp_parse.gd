@@ -28,7 +28,7 @@ static func parse(message: String) -> Dictionary:
   result.cmd = cmd
   return result
 
-static func string_to_obj(message: String, cmd: String) -> Dictionary:
+static func string_to_obj(message: String, _cmd: String) -> Dictionary:
   var result := {}
   if message.substr(0, 5) == "json=":
     var json = JSON.parse_string(message.substr(5))
