@@ -6,7 +6,7 @@
 # Add this file as an Autoload in your Godot project for MPF-style logging.
 # Override the log() method to change the output formatting.
 
-extends Object
+extends RefCounted
 class_name GMCLogger
 
 enum LogLevel {

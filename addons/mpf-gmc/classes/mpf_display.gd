@@ -32,20 +32,20 @@ func _ready() -> void:
     self._slides.add_child(self.initial_slide.instantiate())
     MPF.server.connect("clear", self._on_clear)
 
-func process_slide(slide_name: String, action: String, settings: Dictionary, context: String, priority: int = 0, kwargs: Dictionary = {}) -> void:
-    self.process_action(slide_name, self._slide_stack, action, settings, context, priority, kwargs)
+func process_slide(slide_name: String, action: String, settings: Dictionary, c: String, p: int = 0, kwargs: Dictionary = {}) -> void:
+    self.process_action(slide_name, self._slide_stack, action, settings, c, p, kwargs)
 
-func process_widget(widget_name: String, action: String, settings: Dictionary, context: String, priority: int = 0, kwargs: Dictionary = {}) -> void:
+func process_widget(widget_name: String, action: String, settings: Dictionary, c: String, p: int = 0, kwargs: Dictionary = {}) -> void:
     var slide = self.get_slide(settings.get('slide'))
     # The requested slide may not exist
     if not slide:
         return
-    slide.process_widget(widget_name, action, settings, context, priority, kwargs)
+    slide.process_widget(widget_name, action, settings, c, p, kwargs)
 
-func action_play(slide_name: String, settings: Dictionary, context: String, priority: int = 0, kwargs: Dictionary = {}) -> MPFSlide:
+func action_play(slide_name: String, settings: Dictionary, c: String, p: int = 0, kwargs: Dictionary = {}) -> MPFSlide:
     var slide = MPF.media.get_slide_instance(slide_name)
     assert(slide is MPFSlide, "Slide scenes must use (or extend) the MPFSlide script on the root node.")
-    slide.initialize(slide_name, settings, context, priority, kwargs)
+    slide.initialize(slide_name, settings, c, p, kwargs)
     if settings.get("queue"):
         self._manage_queue(settings['queue'])
     self._slide_stack.append(slide)
@@ -53,15 +53,15 @@ func action_play(slide_name: String, settings: Dictionary, context: String, prio
     MPF.server.send_event("slide_%s_created" % slide.key)
     return slide
 
-func action_queue(action: String, slide_name: String, settings: Dictionary, context: String, priority: int = 0, kwargs: Dictionary = {}):
+func action_queue(action: String, slide_name: String, settings: Dictionary, c: String, p: int = 0, kwargs: Dictionary = {}):
     if settings.get("queue"):
         self._manage_queue(settings['queue'])
     var queue_entry = {
         "key": settings['key'] if settings.get('key') else slide_name,
         "slide_name": slide_name,
         "settings": settings,
-        "context": context,
-        "priority": priority,
+        "context": c,
+        "priority": p,
         "kwargs": kwargs,
         "expiration": 0
     }

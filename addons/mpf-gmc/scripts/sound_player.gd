@@ -187,7 +187,7 @@ func _play(channel: AudioStreamPlayer, settings: Dictionary) -> void:
 		channel.stream.set_meta("events_when_stopped", callable)
 		channel.finished.connect(callable)
 
-  # If this is a voice or callout, duck the music
+	# If this is a voice or callout, duck the music
 	if settings.get("ducking"):
 		duck_settings = settings.ducking
 		duck_settings.release_timestamp = channel.stream.get_length() - duck_settings.get("release_point", default_duck.release_point)
@@ -331,7 +331,7 @@ func _get_channels(bus: String):
 	return self.busses[bus].channels
 
 func _clear_channel(channel):
-	if channel.stream.has_meta("loops_remaining"):
+	if channel.stream and channel.stream.has_meta("loops_remaining"):
 		channel.finished.disconnect(self._on_loop)
 		channel.stream.remove_meta("loops_remaining")
 	channel.stop()
@@ -433,7 +433,7 @@ func _duck_attack() -> void:
 func _duck_release():
 	if not duck_settings:
 		return
-  # If the music is ducked, unduck it
+	# If the music is ducked, unduck it
 	if AudioServer.get_bus_volume_db(1) < self.unduck_level:
 		self.log.debug("Unducking voice clip back to %0.2f db over %0.2f seconds", [self.unduck_level, duck_release])
 		musicDuck.kill()
