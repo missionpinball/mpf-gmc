@@ -84,7 +84,7 @@ func update_stack(kwargs):
     self._update_stack(kwargs)
 
 func action_remove(slide) -> void:
-	self._slide_stack.erase(slide)
+    self._slide_stack.erase(slide)
     self._update_stack()
 
 func get_slide(slide_name):
@@ -139,8 +139,8 @@ func _update_stack(kwargs: Dictionary = {}) -> void:
             if old_slide.priority < new_slide.priority and new_slide.current_animation:
                 await new_slide.animation_finished
            	# If the old slide is on top of the new one and has an outro, play it
-			old_slide.remove(old_slide.priority > new_slide.priority)
-			MPF.server.send_event("slide_%s_removed" % old_slide.key)
+            old_slide.remove(old_slide.priority > new_slide.priority)
+            MPF.server.send_event("slide_%s_removed" % old_slide.key)
 
 func _manage_queue(action: String) -> void:
     if action == "clear":
