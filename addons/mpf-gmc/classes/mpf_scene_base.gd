@@ -93,7 +93,10 @@ func on_active():
 
 func remove(with_animation=true):
 	if with_animation:
-		await self._trigger_animation(CoreAnimation.REMOVED)
+		self.log.info("triggering removal animation")
+		if self._trigger_animation(CoreAnimation.REMOVED):
+			await self.animation_player.animation_finished
+		self.log.info("removal animation complete, removing now")
 	# Immediately cancel any created/active animations
 	if self.current_animation in [CoreAnimation.CREATED, CoreAnimation.ACTIVE]:
 		self.animation_player.stop()
