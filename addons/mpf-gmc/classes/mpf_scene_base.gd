@@ -43,7 +43,6 @@ func initialize(n: String, settings: Dictionary, c: String, p: int = 0, _kwargs:
 	# Play a created animation, if applicable
 	self._trigger_animation(CoreAnimation.CREATED)
 
-
 func process_action(child_name: String, children: Array, action: String, settings: Dictionary, c: String, p: int = 0, kwargs: Dictionary = {}) -> void:
 	var child: MPFSceneBase
 	var ckey = settings['key'] if settings.get('key') else child_name
@@ -88,22 +87,16 @@ func action_queue(_action: String, _slide_name: String, _settings: Dictionary, _
 func action_update(_settings: Dictionary, _kwargs: Dictionary = {}):
 	pass
 
-func on_created():
-	if self._trigger_animation("created"):
-		return self.animation_player.animation_finished
-
 func on_active():
-	if self._trigger_animation("active"):
+	if self._trigger_animation(CoreAnimation.ACTIVE):
 		return self.animation_player.animation_finished
 
-func on_removed():
-	if self._trigger_animation("removed"):
-		return self.animation_player.animation_finished
+func remove(with_animation=true):
+	if with_animation:
+		await self._trigger_animation(CoreAnimation.REMOVED)
 	# Immediately cancel any created/active animations
-	if self.current_animation in ["created", "active"]:
+	if self.current_animation in [CoreAnimation.CREATED, CoreAnimation.ACTIVE]:
 		self.animation_player.stop()
-
-func remove():
 	self.get_parent().remove_child(self)
 	self.queue_free()
 
