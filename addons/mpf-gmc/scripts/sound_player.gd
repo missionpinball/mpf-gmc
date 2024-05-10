@@ -102,6 +102,10 @@ func play_sounds(s: Dictionary) -> void:
 		if action == "stop" or action == "loop_stop":
 			self.stop(file, bus, settings)
 			return
+		if action == "replace":
+			for channel in self._get_channels(bus):
+				if channel.playing:
+					self._stop(channel)
 		self.play(file, bus, settings)
 
 func play(filename: String, bus: String, settings: Dictionary = {}) -> void:
