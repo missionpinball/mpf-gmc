@@ -1,5 +1,8 @@
 @tool
-class_name MPFVideoPlayer extends VideoStreamPlayer
+class_name MPFVideoPlayer
+extends VideoStreamPlayer
+## Renders a VideoStreamPlayer with options for end behavior and events.
+
 
 enum EndBehavior {
     ## No special behavior after the video ends
@@ -11,8 +14,6 @@ enum EndBehavior {
     ## Call a custom method on the parent MPFSlide (or MPFWidget) that holds this VideoPlayer
     PARENT_METHOD
 }
-
-## Renders a VideoStreamPlayer with options for end behavior and events.
 
 ## The action to take after this video finishes playing.
 @export var end_behavior: EndBehavior
