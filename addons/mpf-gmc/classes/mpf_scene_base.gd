@@ -13,6 +13,8 @@ var key: String
 @warning_ignore("shadowed_global_identifier")
 var log: GMCLogger
 var _expirations: Dictionary = {}
+var _updaters: Array = []
+
 var current_animation: String:
 	get: return self.animation_player.current_animation if self.animation_player else ""
 var animation_finished:
@@ -87,8 +89,17 @@ func action_remove(_widget: Node) -> void:
 func action_queue(_action: String, _slide_name: String, _settings: Dictionary, _context: String, _priority: int = 0, _kwargs: Dictionary = {}):
 	assert(false, "Method 'action_queue' must be overridden in child classes of MPFSceneBase")
 
-func action_update(_settings: Dictionary, _kwargs: Dictionary = {}):
-	pass
+func action_update(settings: Dictionary, kwargs: Dictionary = {}):
+	for c in self._updaters:
+		c.update(settings, kwargs)
+
+func register_updater(node):
+	if self._updaters.find(node) == -1:
+		self._updaters.append(node)
+
+func remove_updater(node):
+	if node in self._updaters:
+		self._updaters.erase(node)
 
 func on_active():
 	if self._trigger_animation(CoreAnimation.ACTIVE):

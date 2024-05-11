@@ -3,7 +3,6 @@ class_name MPFSlide
 extends MPFSceneBase
 
 var _widgets: Node2D
-var _updaters: Array = []
 
 ## A scene root node for creating a Slide that can be added to a display stack using events and the slide_player.
 
@@ -14,10 +13,6 @@ func initialize(n: String, settings: Dictionary, c: String, p: int = 0, kwargs: 
 	# Wait for the child variables to initialize themselves
 	await self.ready
 	self.action_update(settings, kwargs)
-
-func register_updater(node):
-	if self._updaters.find(node) == -1:
-		self._updaters.append(node)
 
 func process_widget(widget_name: String, action: String, settings: Dictionary, c: String, p: int = 0, kwargs: Dictionary = {}) -> void:
 	if not self._widgets:
@@ -30,14 +25,13 @@ func action_play(widget_name: String, settings: Dictionary, c: String, p: int = 
 	assert(widget is MPFWidget, "Widget scenes must use (or extend) the MPFWidget script on the root node.")
 	widget.initialize(widget_name, settings, c, p, kwargs)
 	self._widgets.add_child(widget)
+	self._sort_widgets()
+	self.register_updater(widget)
 	return widget
-
-func action_update(settings: Dictionary, kwargs: Dictionary = {}):
-	for c in self._updaters:
-		c.update(settings, kwargs)
 
 func action_remove(widget: Node) -> void:
 	self._widgets.remove_child(widget)
+	self.remove_updater(widget)
 	widget.queue_free()
 
 func clear(context_name):
@@ -46,3 +40,11 @@ func clear(context_name):
 	for w in self._widgets.get_children():
 		if w.context == context_name:
 			self.action_remove(w)
+
+func _sort_widgets() -> void:
+	var new_order = self._widgets.get_children()
+	new_order.sort_custom(
+		func(a: MPFWidget, b: MPFWidget): return a.priority < b.priority
+	)
+	for i in range(0, new_order.size()):
+		self._widgets.move_child(new_order[i], i)

@@ -119,6 +119,8 @@ func _update_stack(kwargs: Dictionary = {}) -> void:
 				# Restart this update with the new slide from the queue
 				if new_queue:
 					return self._update_stack(new_queue["kwargs"])
+		else:
+			self._slides.move_child(s, idx)
 
 	if not self._slide_stack:
 		if not persist_current:
