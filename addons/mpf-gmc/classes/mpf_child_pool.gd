@@ -1,7 +1,6 @@
 @tool
 class_name MPFChildPool
 extends Node2D
-
 ## Chooses one child to display when entering the scene tree.
 
 enum PlaybackMethod {
@@ -14,6 +13,7 @@ enum PlaybackMethod {
     ## The first child will be chosen first, then the second, et cetera.
     SEQUENTIAL
 }
+
 
 @export var playback_method: PlaybackMethod
 ## If checked, randomness/sequences will be unique for each player.

@@ -12,6 +12,8 @@ enum EndBehavior {
     PARENT_METHOD
 }
 
+## Renders a VideoStreamPlayer with options for end behavior and events.
+
 ## The action to take after this video finishes playing.
 @export var end_behavior: EndBehavior
 ## An event (or comma-separated list of events) to be posted to MPF when the video finishes.

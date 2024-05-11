@@ -1,8 +1,11 @@
 @tool
 class_name MPFWindow extends Control
 
+## Root node for the entire GMC display screen. Hosts one or more MPFDisplay child nodes for rendering slides.
+
 var displays: Dictionary = {}
 var default_display: MPFDisplay
+
 
 func _ready() -> void:
     # Force the window dimensions to match the project settings

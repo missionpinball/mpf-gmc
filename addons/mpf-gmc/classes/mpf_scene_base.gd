@@ -2,6 +2,9 @@
 class_name MPFSceneBase
 extends Control
 
+## The parent class of MPFSlide and MPFWidget that manages entry and exit behavior.
+## Should not be used directly, implement MPFSlide or MPFWidget instead.
+
 const CoreAnimation = { "CREATED": "created", "ACTIVE": "active", "INACTIVE": "inactive", "REMOVED": "removed" }
 
 var priority: int = 0

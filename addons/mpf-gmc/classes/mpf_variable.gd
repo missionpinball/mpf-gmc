@@ -1,11 +1,10 @@
 @tool
 class_name MPFVariable extends Label
 
-## Displays a player, machine, or event variable as text on screen.
-
-
 const VariableType = preload("const.gd").VariableType
 const numbered_players = [VariableType.PLAYER_1, VariableType.PLAYER_2, VariableType.PLAYER_3, VariableType.PLAYER_4]
+
+## Displays a player, machine, or event variable as text on screen.
 
 ## The source of the variable value
 @export var variable_type: VariableType = VariableType.CURRENT_PLAYER

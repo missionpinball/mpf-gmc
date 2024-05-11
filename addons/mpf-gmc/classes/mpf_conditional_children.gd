@@ -1,7 +1,7 @@
 @tool
 class_name MPFConditionalChildren
 extends MPFConditional
-
+## A node that conditionally shows or hides its children based on a condition.
 
 ## Override this method to pass in the correct value and set visibility
 func show_or_hide():
