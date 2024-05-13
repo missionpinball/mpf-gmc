@@ -5,18 +5,21 @@ extends Node
 const LogLevel = preload("res://addons/mpf-gmc/scripts/log.gd").LogLevel
 
 @export var log_level: LogLevel = LogLevel.USE_GLOBAL_LEVEL
-@export var loggers: Array[Node]:
-	set(value): self._set_loggers(value)
+@export var loggers: Array[Node]
 
 
-# This is called on set() so that logs in _enter_tree and _ready will be output.
-# Therefore all child that set self.log as GMCLogger must do so in _init().
-func _set_loggers(value: Array[Node] = []):
-	# self.loggers = value
-	if not value:
+# This is called on _ready so that child nodes have been instantiated and named.
+# Child nodes must define self.log in their _enter_tree() function so that name
+# is available. This node must use _ready() because _enter_tree() is sensitive
+# to the DOM structure and this node may or may not be before the nodes its trying
+# to reference.
+func _ready() -> void:
+	if not self.loggers:
 		return
-	for n in value:
+	for n in self.loggers:
+		if not n:
+			printerr("Found empty array element in MPFLogger %s" % self.name)
 		if n.get("log") is GMCLogger:
 			n.log.setLevel(self.log_level)
 		else:
-			printerr("Node %s does not have a log property of type GMCLogger" % n)
+			printerr("Node %s does not have a log property of type GMCLogger. Logging will not be available for this node." % n)

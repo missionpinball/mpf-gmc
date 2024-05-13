@@ -32,16 +32,22 @@ enum EndBehavior {
 ## The name of the method to call when the video finishes when end behavior is a method.
 @export var end_method: String
 
+
+@warning_ignore("shadowed_global_identifier")
+var log: GMCLogger
+
+func _enter_tree() -> void:
+	self.log = preload("res://addons/mpf-gmc/scripts/log.gd").new(self.name)
+	if not self.is_visible_in_tree() and self.hide_behavior != HideBehavior.CONTINUE:
+		self.stop()
+
 func _ready() -> void:
 	self.finished.connect(self._on_finished)
 	self.visibility_changed.connect(self._on_visibility)
 
-func _enter_tree() -> void:
-	if not self.is_visible_in_tree() and self.hide_behavior != HideBehavior.CONTINUE:
-		self.stop()
-
 func _on_visibility() -> void:
 	var do_show: bool = self.is_visible_in_tree() and self.autoplay and not Engine.is_editor_hint()
+	self.log.info("Visibility change, visible is now %s", do_show)
 	match self.hide_behavior:
 		HideBehavior.RESTART:
 			if do_show:
@@ -50,6 +56,7 @@ func _on_visibility() -> void:
 				self.stop()
 		HideBehavior.PAUSE:
 			self.paused = not do_show
+			self.log.debug("Pause state set to %s", self.paused)
 			if not self.paused and not self.is_playing():
 				self.play()
 		HideBehavior.CONTINUE:
