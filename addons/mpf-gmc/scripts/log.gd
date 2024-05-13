@@ -21,7 +21,7 @@ enum LogLevel {
 var _level: LogLevel = LogLevel.INFO
 var log_name: String = ""
 
-func _init(name: String = "", level: int = LogLevel.USE_GLOBAL_LEVEL) -> void:
+func _init(name: String = "", level: int = LogLevel.WARNING) -> void:
   self.log_name = "%s : " % name if name else ""
   self.setLevel(level)
 

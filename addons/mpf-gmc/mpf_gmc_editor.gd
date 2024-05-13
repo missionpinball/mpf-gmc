@@ -4,6 +4,8 @@ extends EditorPlugin
 var dock
 
 func _enter_tree():
+	var theme = EditorInterface.get_editor_theme()
+	# print(theme.get_icon_list("EditorIcons"))
 	# Add the new type with a name, a parent type, a script and an icon.
 	add_custom_type("MPFChildPool", "Node", preload("classes/mpf_child_pool.gd"), null)
 	add_custom_type("MPFSceneBase", "Node2D", preload("classes/mpf_scene_base.gd"), null)
@@ -15,7 +17,7 @@ func _enter_tree():
 	add_custom_type("MPFCarousel", "Node2D", preload("classes/mpf_carousel.gd"), null)
 	add_custom_type("MPFVideoPlayer", "VideoStreamPlayer", preload("classes/mpf_video_player.gd"), null)
 	add_custom_type("MPFSoundAsset", "Resource", preload("classes/mpf_sound.gd"), null)
-
+	add_custom_type("MPFLogger", "Node", preload("classes/mpf_logger.gd"), theme.get_icon("AcceptDialog", "EditorIcons"))
 	# Create a custom dock for GMC Settings
 	dock = preload("res://addons/mpf-gmc/editor/gmc_panel.tscn").instantiate()
 	add_control_to_dock(DOCK_SLOT_LEFT_UR, dock)
@@ -33,6 +35,7 @@ func _exit_tree():
 	remove_custom_type("MPFCarousel")
 	remove_custom_type("MPFVideoPlayer")
 	remove_custom_type("MPFSoundAsset")
+	remove_custom_type("MPFLogger")
 
 	remove_control_from_docks(dock)
 	dock.free()
