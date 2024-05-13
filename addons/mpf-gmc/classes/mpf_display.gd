@@ -106,6 +106,7 @@ func _update_stack(kwargs: Dictionary = {}) -> void:
 		if idx == -1:
 			# Don't remove the current slide if it needs to persist
 			if persist_current and s == self._current_slide:
+				s.set_meta("persisted", true)
 				continue
 			# Don't remove the current slide until we've handled the new one
 			if s != self._current_slide:
@@ -137,6 +138,9 @@ func _update_stack(kwargs: Dictionary = {}) -> void:
 		self._current_slide = new_slide
 		# If the old slide is removed, check for animations
 		if old_slide and old_slide not in self._slide_stack:
+			# If the old slide is persisted, always put it at the bottom
+			if old_slide.has_meta("persisted"):
+				self._slides.move_child(old_slide, 0)
 			# Let the outgoing slide wait for the incoming animation before removing
 			if old_slide.priority < new_slide.priority and new_slide.current_animation:
 				await new_slide.animation_finished

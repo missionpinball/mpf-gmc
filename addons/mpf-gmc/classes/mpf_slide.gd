@@ -48,3 +48,6 @@ func _sort_widgets() -> void:
 	)
 	for i in range(0, new_order.size()):
 		self._widgets.move_child(new_order[i], i)
+
+func _to_string() -> String:
+	return "<%s:MPFSlide:pri=%s:%s" % [self.name, self.priority, self.get_instance_id()]
