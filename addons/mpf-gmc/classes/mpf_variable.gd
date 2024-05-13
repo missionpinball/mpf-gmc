@@ -60,6 +60,9 @@ func _ready() -> void:
 func _exit_tree() -> void:
 	if self.update_event:
 		MPF.server.remove_event_handler(self.update_event, self.update)
+	if variable_type == VariableType.EVENT_ARG:
+		var parent_slide = MPF.util.find_parent_slide_or_widget(self)
+		parent_slide.register_updater(self)
 
 func update(settings: Dictionary, kwargs: Dictionary = {}) -> void:
 	if variable_type != VariableType.EVENT_ARG:

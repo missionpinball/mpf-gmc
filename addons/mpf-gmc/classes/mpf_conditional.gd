@@ -36,8 +36,12 @@ var target
 func _ready() -> void:
     if not Engine.is_editor_hint():
         self._initialize()
-    var parent_slide = MPF.util.find_parent_slide(self)
+    var parent_slide = MPF.util.find_parent_slide_or_widget(self)
     parent_slide.register_updater(self)
+
+func _exit_tree() -> void:
+    var parent_slide = MPF.util.find_parent_slide_or_widget(self)
+    parent_slide.remove_updater(self)
 
 @warning_ignore("native_method_override")
 func show():
