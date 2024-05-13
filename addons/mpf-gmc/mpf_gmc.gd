@@ -10,14 +10,13 @@ var util
 var keyboard: = {}
 var config
 
-func _enter_tree():
+func _init():
 	self.config = ConfigFile.new()
 	var err = self.config.load("res://gmc.cfg")
 	if err != OK:
 		printerr("Error loading config file: %s" % err)
-
 	# Configure logging with the value from the config
-	self.configure_logging("GMC", self.config.get_value("logging", "global", 20))
+	var global_log_level = self.config.get_value("logging", "global", 30)
 
 	# Any default script can be overridden with a custom one
 	# This is done explicitly line-by-line for optimized preload and relative paths
@@ -34,11 +33,23 @@ func _enter_tree():
 			["media", preload("scripts/media.gd"), "GMCMedia"]
 	]:
 		var script = self.config.get_value("gmc", s[2], false)
+		# TODO: Add logging configuration as init parameters so logging
+		# is available in the _init() methods of all scripts
 		if script:
 			self[s[0]] = load(script).new()
 		else:
 			self[s[0]] = s[1].new()
+		# If an explicit value is set for this log, use it
+		if self[s[0]] is LoggingNode:
+			var script_log_level = self.config.get_value("logging", s[0], -1)
+			if script_log_level == -1:
+				script_log_level = global_log_level
+			self[s[0]].configure_logging(s[2], script_log_level)
 
+	self.configure_logging("GMC", global_log_level)
+
+
+func _enter_tree():
 	# self._process() is only called on children in the tree, so add the children
 	# that need to call _process() or that have _enter_tree() methods
 	self.add_child(server)

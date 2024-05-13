@@ -45,9 +45,6 @@ var _thread: Thread
 # Built-in virtual methods
 ###
 
-func _init() -> void:
-	self.configure_logging("BCP")
-
 func _ready() -> void:
 	# Wait until a server is actively listening before polling for clients
 	set_process(false)

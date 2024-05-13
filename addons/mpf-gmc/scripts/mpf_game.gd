@@ -44,8 +44,6 @@ signal volume(bus, value, change)
 
 func _init() -> void:
   randomize()
-  self.configure_logging("Game")
-
 
 func add_player(kwargs: Dictionary) -> void:
   players.append({

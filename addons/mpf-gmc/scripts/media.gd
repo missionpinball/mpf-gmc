@@ -10,8 +10,7 @@ var slides := {}
 var widgets := {}
 var sounds := {}
 
-func _init() -> void:
-	self.configure_logging("Media")
+func _enter_tree() -> void:
 	self.traverse_tree_for("slides", slides)
 	self.traverse_tree_for("widgets", widgets)
 	# Always do TRES files last so they'll supersede WAV/OGG files of the same name
@@ -22,7 +21,6 @@ func _init() -> void:
 	self.log.debug("Generated widget lookups: %s", widgets)
 	self.log.debug("Generated sound lookups: %s", sounds)
 
-func _enter_tree():
 	sound = preload("sound_player.gd").new()
 
 	# Process is only called on children in the tree, so add the children
