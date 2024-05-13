@@ -29,6 +29,8 @@ const VariableType = preload("const.gd").VariableType
 @export var max_players: int
 
 var initialized = false
+
+@warning_ignore("shadowed_global_identifier")
 var log: GMCLogger
 var operator
 var true_variable_name: String

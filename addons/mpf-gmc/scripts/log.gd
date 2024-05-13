@@ -35,30 +35,30 @@ func getLevel() -> int:
 
 func verbose(message: String, args=null) -> void:
   if _level <= LogLevel.VERBOSE:
-    print(self._log("VERBOSE", message, args))
+    print(GMCLogger._log(self.log_name, "VERBOSE", message, args))
 
 func debug(message: String, args=null) -> void:
   if _level <= LogLevel.DEBUG:
-    print(self._log("DEBUG", message, args))
+    print(GMCLogger._log(self.log_name, "DEBUG", message, args))
 
 func info(message: String, args=null) -> void:
   if _level <= LogLevel.INFO:
-    print(self._log("INFO", message, args))
+    print(GMCLogger._log(self.log_name, "INFO", message, args))
 
 func warn(message: String, args=null) -> void:
   if _level <= LogLevel.WARNING:
-    push_warning(self._log("WARNING", message, args))
+    push_warning(GMCLogger._log(self.log_name, "WARNING", message, args))
 
 func error(message: String, args=null) -> void:
-  push_error(self._log("ERROR", message, args))
+  push_error(GMCLogger._log(self.log_name, "ERROR", message, args))
 
 func fail(message: String, args=null) -> void:
   self.error(message, args)
   assert(false, message % args)
 
-func _log(level: String, message: String, args=null) -> String:
+static func _log(l_name: String, level: String, message: String, args=null) -> String:
   # TODO: Incorporate ProjectSettings.get_setting("logging/file_logging/enable_file_logging")
   # Get datetime to dictionary
   var dt=Time.get_datetime_dict_from_system()
   # Format and print with message
-  return "%02d:%02d:%02d.%03d : %s : %s%s" % [dt.hour,dt.minute,dt.second, int(Time.get_unix_time_from_system() * 1000) % 1000, level, log_name, message if args == null else (message % args)]
+  return "%02d:%02d:%02d.%03d : %s : %s%s" % [dt.hour,dt.minute,dt.second, int(Time.get_unix_time_from_system() * 1000) % 1000, level, l_name, message if args == null else (message % args)]
