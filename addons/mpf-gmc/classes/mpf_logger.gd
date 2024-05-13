@@ -22,4 +22,4 @@ func _ready() -> void:
 		if n.get("log") is GMCLogger:
 			n.log.setLevel(self.log_level)
 		else:
-			printerr("Node %s does not have a log property of type GMCLogger. Logging will not be available for this node." % n)
+			printerr("Node %s does not support GMCLogger. Logging will not be available for this node." % n)

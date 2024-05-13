@@ -37,10 +37,6 @@ var animation_finished:
 ## and occur simultaneously, 'removed' will be used.
 @export var animation_player: AnimationPlayer
 
-func _init():
-	# Create a log
-	self.log = preload("res://addons/mpf-gmc/scripts/log.gd").new(self.name)
-
 func initialize(n: String, settings: Dictionary, c: String, p: int = 0, _kwargs: Dictionary = {}) -> void:
 	# The node name attribute is the name of the root node, which could be
 	# anything or case-sensitive. Set an explicit key instead, using the name.
@@ -50,7 +46,17 @@ func initialize(n: String, settings: Dictionary, c: String, p: int = 0, _kwargs:
 	# Play a created animation, if applicable
 	self._trigger_animation(CoreAnimation.CREATED)
 
+func _enter_tree():
+	# Create a log
+	self.log = preload("res://addons/mpf-gmc/scripts/log.gd").new(self.name)
+
+func _exit_tree() -> void:
+	for timer in self._expirations.values():
+		if is_instance_valid(timer):
+			timer.stop()
+
 func process_action(child_name: String, children: Array, action: String, settings: Dictionary, c: String, p: int = 0, kwargs: Dictionary = {}) -> void:
+	self.log.debug("Action '%s' called with name '%s' and settings: %s", [action, child_name, settings])
 	var child: MPFSceneBase
 	var ckey = settings['key'] if settings.get('key') else child_name
 	for ch in children:
@@ -76,11 +82,6 @@ func process_action(child_name: String, children: Array, action: String, setting
 				callable.call(settings, kwargs)
 	if child and settings.expire:
 		self._create_expire(child, settings.expire)
-
-func _exit_tree() -> void:
-	for timer in self._expirations.values():
-		if is_instance_valid(timer):
-			timer.stop()
 
 func action_play(_child_name: String, _settings: Dictionary, _context: String, _priority: int = 0, _kwargs: Dictionary = {}):
 	assert(false, "Method 'action_play' must be overridden in child classes of MPFSceneBase")
@@ -109,10 +110,9 @@ func on_active():
 
 func remove(with_animation=true):
 	if with_animation:
-		self.log.info("triggering removal animation")
 		if self._trigger_animation(CoreAnimation.REMOVED):
 			await self.animation_player.animation_finished
-		self.log.info("removal animation complete, removing now")
+			self.log.info("Removal animation complete, removing now")
 	# Immediately cancel any created/active animations
 	if self.current_animation in [CoreAnimation.CREATED, CoreAnimation.ACTIVE]:
 		self.animation_player.stop()
