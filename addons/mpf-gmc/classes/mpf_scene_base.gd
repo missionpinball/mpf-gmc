@@ -37,12 +37,16 @@ var animation_finished:
 ## and occur simultaneously, 'removed' will be used.
 @export var animation_player: AnimationPlayer
 
-func initialize(n: String, settings: Dictionary, c: String, p: int = 0, _kwargs: Dictionary = {}) -> void:
+func initialize(n: String, settings: Dictionary, c: String, p: int = 0, kwargs: Dictionary = {}) -> void:
 	# The node name attribute is the name of the root node, which could be
 	# anything or case-sensitive. Set an explicit key instead, using the name.
 	self.key = settings["key"] if settings.get("key") else n
 	self.priority = settings['priority'] + p if settings['priority'] else p
 	self.context = settings["custom_context"] if settings.get('custom_context') else c
+	# Wait for the child variables to initialize themselves
+	await self.ready
+	# Update any child variables with the initial state
+	self.action_update(settings, kwargs)
 	# Play a created animation, if applicable
 	self._trigger_animation(CoreAnimation.CREATED)
 

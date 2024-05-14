@@ -10,9 +10,6 @@ func initialize(n: String, settings: Dictionary, c: String, p: int = 0, kwargs: 
 	# The node name attribute is the name of the root node, which could be
 	# anything or case-sensitive. Set an explicit key instead, using the name.
 	super(n, settings, c, p, kwargs)
-	# Wait for the child variables to initialize themselves
-	await self.ready
-	self.action_update(settings, kwargs)
 
 func process_widget(widget_name: String, action: String, settings: Dictionary, c: String, p: int = 0, kwargs: Dictionary = {}) -> void:
 	if not self._widgets:
