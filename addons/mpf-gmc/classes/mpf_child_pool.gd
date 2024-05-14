@@ -22,6 +22,8 @@ enum PlaybackMethod {
 @export var reset_on_game_end: bool
 ## If checked, the next child will be selected each time the pool becomes visible
 @export var advance_on_show: bool = false
+## If checked, the next child will be shown on a repeat event even if one is already showing
+@export var advance_when_showing: bool = false
 ## The name of a method to call when selecting a child to display.
 @export var child_method: String
 ## If checked, the child_method will be called when the scene is opened in the Editor.
@@ -36,9 +38,9 @@ func _ready() -> void:
 
 @warning_ignore("native_method_override")
 func show() -> void:
-    if self.visible:
+    if self.visible and not self.advance_when_showing:
         return
-    if self.advance_on_show or not self._tracker:
+    if self.advance_on_show or self.advance_when_showing or not self._tracker:
         self._initialize()
     self.visible = true
 
