@@ -153,6 +153,7 @@ func remove_event_handler(event: String, handler: Callable) -> void:
 	# If there are no more handlers, unsubscribe from this event
 	if not registered_handlers[event] and event not in self.registered_events and event not in self.auto_signals:
 		self._send("remove_trigger?event=%s" % event)
+		registered_handlers.erase(event)
 
 ## Disconnect the BCP server
 func stop(is_exiting: bool = false) -> void:
