@@ -11,17 +11,28 @@ extends Node2D
 
 ## The name of the MPF mode that uses Carousel as its custom mode code.
 @export var carousel_name: String
+@warning_ignore("shadowed_global_identifier")
+var log: GMCLogger
+
+
+func _enter_tree():
+	# Create a log
+	self.log = preload("res://addons/mpf-gmc/scripts/log.gd").new(self.name)
 
 func _ready():
-    for c in self.get_children():
-        c.hide()
-    MPF.server.item_highlighted.connect(self._on_item_highlighted)
+	for c in self.get_children():
+		c.hide()
+	if not carousel_name:
+		carousel_name = self.name
+	MPF.server.item_highlighted.connect(self._on_item_highlighted)
 
 func _on_item_highlighted(payload: Dictionary) -> void:
-    if payload.carousel != self.carousel_name:
-        return
-    for c in self.get_children():
-        if c.name == payload.item:
-            c.show()
-        else:
-            c.hide()
+	if payload.carousel != self.carousel_name:
+		self.log.debug("Carousel named '%s' does not match payload name '%s'", [self.carousel_name, payload.carousel])
+		return
+	self.log.info("Carousel looking for child matching name '%s'", payload.item)
+	for c in self.get_children():
+		if c.name == payload.item:
+			c.show()
+		else:
+			c.hide()
