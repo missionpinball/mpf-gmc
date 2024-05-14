@@ -4,6 +4,7 @@ extends Node
 
 const LogLevel = preload("res://addons/mpf-gmc/scripts/log.gd").LogLevel
 
+@export var enabled: bool = true
 @export var log_level: LogLevel = LogLevel.USE_GLOBAL_LEVEL
 @export var loggers: Array[Node]
 
@@ -14,7 +15,7 @@ const LogLevel = preload("res://addons/mpf-gmc/scripts/log.gd").LogLevel
 # to the DOM structure and this node may or may not be before the nodes its trying
 # to reference.
 func _ready() -> void:
-	if not self.loggers:
+	if not self.loggers or not self.enabled:
 		return
 	for n in self.loggers:
 		if not n:
