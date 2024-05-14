@@ -20,6 +20,8 @@ enum PlaybackMethod {
 @export var track_per_player: bool
 ## If checked, randomness/sequences will reset for each game.
 @export var reset_on_game_end: bool
+## If checked, the next child will be selected each time the pool becomes visible
+@export var advance_on_show: bool = false
 ## The name of a method to call when selecting a child to display.
 @export var child_method: String
 ## If checked, the child_method will be called when the scene is opened in the Editor.
@@ -36,7 +38,7 @@ func _ready() -> void:
 func show() -> void:
     if self.visible:
         return
-    if not self._tracker:
+    if self.advance_on_show or not self._tracker:
         self._initialize()
     self.visible = true
 
