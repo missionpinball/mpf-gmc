@@ -88,6 +88,8 @@ func recurse_dir(path, acc, ext="tscn") -> void:
 	dir.list_dir_begin()
 	var file_name = dir.get_next()
 	while (file_name != ""):
+		if file_name.ends_with('.remap'):
+			file_name = file_name.trim_suffix('.remap')
 		if dir.current_is_dir():
 			self.recurse_dir("%s/%s" % [path, file_name], acc, ext)
 		elif file_name.ends_with(".%s" % ext):
