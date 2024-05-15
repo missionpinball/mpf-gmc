@@ -3,6 +3,11 @@ class_name MPFConditionalChildren
 extends MPFConditional
 ## A node that conditionally shows or hides its children based on a condition.
 
+func _enter_tree() -> void:
+	super()
+	for c in self.get_children():
+		c.hide()
+
 func _validate_property(property):
 	if property.name in ["condition_type", "condition_value"]:
 		property.usage = PROPERTY_USAGE_NO_EDITOR
