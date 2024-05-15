@@ -1,7 +1,48 @@
 [gd_scene load_steps=3 format=3 uid="uid://belkug6sa4arr"]
 
-[ext_resource type="Script" path="res://addons/mpf-gmc/classes/mpf_slide.gd" id="1_sl2ba"]
 [ext_resource type="Texture2D" uid="uid://dounln3l35d26" path="res://addons/mpf-gmc/images/logo_mpf.png" id="2_v374h"]
+
+[sub_resource type="GDScript" id="GDScript_gvsqn"]
+script/source = "extends MPFSlide
+
+var ServerStatus = MPF.server.ServerStatus
+
+# Called when the node enters the scene tree for the first time.
+func _ready():
+	for c in [
+		$CenterContainer/VBoxContainer/status_main,
+		$CenterContainer/VBoxContainer/status_sub,
+		$CenterContainer/VBoxContainer/error_main,
+		$CenterContainer/VBoxContainer/error_sub,
+	]:
+		c.hide()
+	MPF.server.status_changed.connect(self._on_status)
+	self._on_status(MPF.server.status)
+
+func _on_status(new_status):
+	var error_node = $CenterContainer/VBoxContainer/error_main
+	var status_node = $CenterContainer/VBoxContainer/status_main
+	var target_child: Node
+	var message: String
+	if new_status == ServerStatus.ERROR:
+		target_child = error_node
+		message = \"Error: Unable to connect to MPF\"
+		status_node.hide()
+	else:
+		target_child = status_node
+		error_node.hide()
+		match new_status:
+			ServerStatus.WAITING:
+				message = \"Waiting for MPF...\"
+			ServerStatus.LAUNCHING:
+				message = \"Launching MPF...\"
+			ServerStatus.CONNECTED:
+				message = \"Connected to MPF\"
+			ServerStatus.IDLE:
+				message = \"\"
+	target_child.text = message
+	target_child.show()
+"
 
 [node name="MPFSlide" type="Control"]
 layout_mode = 3
@@ -10,7 +51,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-script = ExtResource("1_sl2ba")
+script = SubResource("GDScript_gvsqn")
 
 [node name="ColorRect" type="ColorRect" parent="."]
 layout_mode = 1
@@ -39,11 +80,10 @@ grow_vertical = 2
 layout_mode = 2
 
 [node name="TextureRect" type="TextureRect" parent="CenterContainer/VBoxContainer"]
+custom_minimum_size = Vector2(2.08165e-12, 300)
 layout_mode = 2
 texture = ExtResource("2_v374h")
-
-[node name="version" type="Label" parent="CenterContainer/VBoxContainer"]
-layout_mode = 2
+stretch_mode = 3
 
 [node name="status_main" type="Label" parent="CenterContainer/VBoxContainer"]
 layout_mode = 2
@@ -74,3 +114,10 @@ theme_override_colors/font_color = Color(1, 1, 1, 1)
 theme_override_font_sizes/font_size = 24
 text = "Loading Stuff"
 horizontal_alignment = 1
+
+[node name="version" type="Label" parent="CenterContainer/VBoxContainer"]
+custom_minimum_size = Vector2(2.08165e-12, 100)
+layout_mode = 2
+text = "euieuoiue"
+horizontal_alignment = 1
+vertical_alignment = 2

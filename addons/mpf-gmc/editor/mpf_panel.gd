@@ -31,6 +31,11 @@ func _ready() -> void:
 	# Always auto-save toggling the enable state
 	$main/enable/spawn_mpf.toggled.connect(self._enable_toggled)
 
+	# Use a built-in texture
+	var theme = EditorInterface.get_editor_theme()
+	$main/enable/spawn_error.texture = theme.get_icon("StatusWarning", "EditorIcons")
+	self._set_enable_available()
+
 	$main/buttons/save.disabled = true
 	$main/buttons/save.pressed.connect(self._save)
 
@@ -39,8 +44,18 @@ func _enable_toggled(toggled_on: bool) -> void:
 	MPF.save_config()
 
 func _set_dirty() -> void:
-	print("dirty dirty!")
 	$main/buttons/save.disabled = false
+
+func _set_enable_available():
+	# If no path is set, show an alert icon
+	if MPF.config.get_value(CONFIG_SECTION, "executable_path", ""):
+		$main/enable/spawn_mpf.show()
+		$main/enable/spawn_error.hide()
+	else:
+		$main/enable/spawn_mpf.hide()
+		$main/enable/spawn_error.show()
+		$main/enable/spawn_mpf.disabled = true
+
 
 func _save() -> void:
 	for child in fields:
@@ -51,6 +66,6 @@ func _save() -> void:
 				MPF.config.erase_section_key(CONFIG_SECTION, child.name)
 		elif child is CheckButton:
 			MPF.config.set_value(CONFIG_SECTION, child.name, child.button_pressed)
-	print("Values have been set: %s" % MPF.config.get_value(CONFIG_SECTION, "executable_path", "undefined"))
 	MPF.save_config()
 	$main/buttons/save.disabled = true
+	self._set_enable_available()

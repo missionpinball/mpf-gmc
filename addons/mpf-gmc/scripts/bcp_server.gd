@@ -7,6 +7,9 @@
 extends LoggingNode
 class_name GMCServer
 
+
+enum ServerStatus { IDLE, WAITING, LAUNCHING, CONNECTED, ERROR }
+
 signal bonus(payload)
 signal mpf_timer(payload)
 signal options(payload)
@@ -14,7 +17,7 @@ signal item_highlighted(payload)
 signal player_var(value, prev_value, change, player_num)
 signal service(payload)
 signal clear(mode_name)
-signal status(message, details, is_error)
+signal status_changed(status)
 
 # A list of events that trigger their own automatic signals
 var auto_signals := []
@@ -26,6 +29,8 @@ var registered_handlers := {}
 var port := 5050
 # The polling frequency to poll the server for data
 var poll_fps: int = 120
+# The current status of the server
+var status: ServerStatus = ServerStatus.IDLE
 
 # A library of static methods for parsing the incoming BCP data
 var _bcp_parse = preload("bcp_parse.gd")
@@ -57,14 +62,21 @@ func _process(_delta: float) -> void:
 		var err = _thread.start(self._thread_poll, Thread.Priority.PRIORITY_LOW)
 		if err != OK:
 			self.log.error("Error spawning BCP poll thread: %s", err)
+			self.status = ServerStatus.ERROR
 		else:
 			self.log.info("Client connected!")
+			self.status = ServerStatus.CONNECTED
 			# No need to run _process() while we have an active client connection
 			set_process(false)
+		status_changed.emit(self.status)
 
 ###
 # Public Methods
 ###
+
+func set_status(new_status: ServerStatus):
+	self.status = new_status
+	status_changed.emit(self.status)
 
 func deferred_game(method: String, result=null) -> void:
 	var callable = Callable(MPF.game, method)
@@ -92,6 +104,8 @@ func deferred_scene_to(scene_pck: Resource) -> void:
 
 ## Call this method from your main scene to open a port for MPF connections
 func listen() -> void:
+	self.status = ServerStatus.WAITING
+	status_changed.emit(self.status)
 	_thread = Thread.new()
 	var err = _server.listen(port)
 	if err != OK:

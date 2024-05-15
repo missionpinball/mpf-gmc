@@ -2,8 +2,7 @@
 extends LoggingNode
 class_name GMCProcess
 
-var mpf_pid
-var is_virtual_mpf := true
+var mpf_pid: int
 var mpf_attempts := 0
 
 func _ready() -> void:
@@ -18,10 +17,15 @@ func launch_mpf():
 
 func _spawn_mpf():
 	self.log.info("Spawning MPF process...")
+	MPF.server.set_status(MPF.server.ServerStatus.LAUNCHING)
 	var launch_timer = Timer.new()
 	launch_timer.connect("timeout", self._check_mpf)
 	self.add_child(launch_timer)
-	var exec: String = MPF.config.get_value("mpf", "executable_path")
+	var exec: String = MPF.config.get_value("mpf", "executable_path", "")
+	if not exec:
+		self.log.error("No executable path defined, unable to spawn MPF.")
+		MPF.server.set_status(MPF.server.ServerStatus.ERROR)
+		return
 	var args: PackedStringArray = OS.get_cmdline_args()
 	var machine_path: String = MPF.config.get_value("mpf", "machine_path",
 		ProjectSettings.globalize_path("res://") if OS.has_feature("editor") else OS.get_executable_path().get_base_dir())
@@ -66,6 +70,7 @@ func _check_mpf():
 			print("MPF Failed to Start, Retrying (%s/5)" % mpf_attempts)
 			self._spawn_mpf()
 		else:
+			MPF.server.set_status(MPF.server.ServerStatus.ERROR)
 			printerr("ERROR: Unable to start MPF.")
 
 func _exit_tree():
