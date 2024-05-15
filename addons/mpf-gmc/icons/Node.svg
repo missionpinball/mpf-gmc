@@ -3,10 +3,11 @@
   <defs>
     <style>
       .cls-1 {
-        fill: #f61;
-        stroke-width: 0px;
+        fill: none;
+        stroke: #f61;
+        stroke-width: 2px;
       }
     </style>
   </defs>
-  <path class="cls-1" d="M6,3c-.3,0-.5.1-.7.3L1.3,7.3c-.4.4-.4,1,0,1.4l4,4c.2.2.4.3.7.3h8c.6,0,1-.4,1-1V4c0-.6-.4-1-1-1H6ZM5,7c.6,0,1,.4,1,1s-.4,1-1,1-1-.4-1-1,.4-1,1-1Z"/>
+  <circle class="cls-1" cx="8" cy="8" r="5"/>
 </svg>
