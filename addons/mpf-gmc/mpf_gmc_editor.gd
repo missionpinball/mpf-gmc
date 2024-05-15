@@ -2,6 +2,7 @@
 extends EditorPlugin
 
 var dock
+var mpf_launch
 
 func _enter_tree():
 	var theme = EditorInterface.get_editor_theme()
@@ -25,6 +26,9 @@ func _enter_tree():
 	# Create a custom dock for GMC Settings
 	dock = preload("res://addons/mpf-gmc/editor/gmc_panel.tscn").instantiate()
 	add_control_to_dock(DOCK_SLOT_LEFT_UR, dock)
+	# Add a custom button for launching with MPF
+	mpf_launch = preload("res://addons/mpf-gmc/editor/mpf_player.tscn").instantiate()
+	add_control_to_container(CONTAINER_TOOLBAR, mpf_launch)
 
 func _exit_tree():
 	# Clean-up of the plugin goes here.
@@ -45,4 +49,6 @@ func _exit_tree():
 	remove_custom_type("MPFConditionalChildren")
 
 	remove_control_from_docks(dock)
+	remove_control_from_container(CONTAINER_TOOLBAR, mpf_launch)
 	dock.free()
+	mpf_launch.free()

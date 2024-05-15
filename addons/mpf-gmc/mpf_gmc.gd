@@ -5,6 +5,7 @@ class_name GMC
 var game
 var media
 var player
+var process
 var server
 var util
 var keyboard: = {}
@@ -29,6 +30,8 @@ func _init():
 			["game", preload("scripts/mpf_game.gd"), "GMCGame"],
 			# Server depends on Game, should be loaded after
 			["server", preload("scripts/bcp_server.gd"), "GMCServer"],
+			# Process is here too
+			["process", preload("scripts/process.gd"), "GMCProcess"],
 			# Media controller can come last
 			["media", preload("scripts/media.gd"), "GMCMedia"]
 	]:
@@ -54,6 +57,7 @@ func _enter_tree():
 	# that need to call _process() or that have _enter_tree() methods
 	self.add_child(server)
 	self.add_child(media)
+	self.add_child(process)
 
 func _ready():
 	if self.config.has_section("keyboard"):
