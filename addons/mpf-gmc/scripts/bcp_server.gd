@@ -26,8 +26,6 @@ var registered_handlers := {}
 var port := 5050
 # The polling frequency to poll the server for data
 var poll_fps: int = 120
-# The process ID for a spawned MPF
-var mpf_pid: int
 
 # A library of static methods for parsing the incoming BCP data
 var _bcp_parse = preload("bcp_parse.gd")

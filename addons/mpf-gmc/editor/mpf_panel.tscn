@@ -1,0 +1,115 @@
+[gd_scene load_steps=3 format=3 uid="uid://csb7dqgi1qvux"]
+
+[ext_resource type="Script" path="res://addons/mpf-gmc/editor/mpf_panel.gd" id="1_2lqty"]
+[ext_resource type="Texture2D" uid="uid://daqb51yge6uos" path="res://addons/mpf-gmc/icons/PlayScene.svg" id="2_y5774"]
+
+[node name="MPF" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_2lqty")
+
+[node name="main" type="VBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_bottom = 58.0
+grow_horizontal = 2
+
+[node name="enable" type="HBoxContainer" parent="main"]
+layout_mode = 2
+
+[node name="TextureRect" type="TextureRect" parent="main/enable"]
+layout_mode = 2
+size_flags_vertical = 4
+texture = ExtResource("2_y5774")
+stretch_mode = 2
+
+[node name="spawn_mpf-label" type="Label" parent="main/enable"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 1
+text = "Launch MPF with GMC"
+vertical_alignment = 1
+
+[node name="spawn_mpf" type="CheckButton" parent="main/enable"]
+layout_mode = 2
+
+[node name="HSeparator" type="HSeparator" parent="main"]
+layout_mode = 2
+
+[node name="executable_path-label" type="Label" parent="main"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Executable Path"
+
+[node name="executable_path" type="TextEdit" parent="main"]
+custom_minimum_size = Vector2(2.08165e-12, 36)
+layout_mode = 2
+text = "/Users/Anthony/mpf080/bin/mpf"
+context_menu_enabled = false
+shortcut_keys_enabled = false
+
+[node name="executable_args-label" type="Label" parent="main"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Executable Args"
+
+[node name="executable_args" type="TextEdit" parent="main"]
+custom_minimum_size = Vector2(2.08165e-12, 36)
+layout_mode = 2
+size_flags_vertical = 3
+context_menu_enabled = false
+shortcut_keys_enabled = false
+
+[node name="machine_path-label" type="Label" parent="main"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Machine Path"
+
+[node name="machine_path" type="TextEdit" parent="main"]
+custom_minimum_size = Vector2(2.08165e-12, 36)
+layout_mode = 2
+size_flags_vertical = 3
+placeholder_text = "/Users/Anthony/Git/whitewater-harley/"
+context_menu_enabled = false
+shortcut_keys_enabled = false
+
+[node name="mpf_args-label" type="Label" parent="main"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "MPF Args"
+
+[node name="mpf_args" type="TextEdit" parent="main"]
+custom_minimum_size = Vector2(2.08165e-12, 36)
+layout_mode = 2
+size_flags_vertical = 3
+context_menu_enabled = false
+shortcut_keys_enabled = false
+
+[node name="flags" type="HBoxContainer" parent="main"]
+layout_mode = 2
+
+[node name="virtual-label" type="Label" parent="main/flags"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Virtual (-x)"
+
+[node name="virtual" type="CheckButton" parent="main/flags"]
+layout_mode = 2
+button_pressed = true
+
+[node name="HSeparator2" type="HSeparator" parent="main"]
+layout_mode = 2
+
+[node name="buttons" type="HBoxContainer" parent="main"]
+layout_mode = 2
+alignment = 2
+
+[node name="save" type="Button" parent="main/buttons"]
+layout_mode = 2
+disabled = true
+text = "Save Changes"

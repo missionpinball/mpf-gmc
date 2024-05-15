@@ -1,12 +1,11 @@
 @tool
 extends EditorPlugin
 
-var dock
+var gmc_dock
+var mpf_dock
 var mpf_launch
 
 func _enter_tree():
-	var theme = EditorInterface.get_editor_theme()
-	#print(theme.get_icon_list("EditorIcons"))
 	# Add the new type with a name, a parent type, a script and an icon.
 	add_custom_type("MPFChildPool", "Node2D", preload("classes/mpf_child_pool.gd"), preload("icons/BackBufferCopy.svg"))
 	add_custom_type("MPFSceneBase", "Node2D", preload("classes/mpf_scene_base.gd"), preload("icons/Node.svg"))
@@ -24,11 +23,13 @@ func _enter_tree():
 	add_custom_type("MPFConditionalChildren", "Node2D", preload("classes/mpf_conditional_children.gd"), preload("icons/MultiMesh.svg"))
 
 	# Create a custom dock for GMC Settings
-	dock = preload("res://addons/mpf-gmc/editor/gmc_panel.tscn").instantiate()
-	add_control_to_dock(DOCK_SLOT_LEFT_UR, dock)
+	gmc_dock = preload("res://addons/mpf-gmc/editor/gmc_panel.tscn").instantiate()
+	add_control_to_dock(DOCK_SLOT_LEFT_UR, gmc_dock)
+	mpf_dock = preload("res://addons/mpf-gmc/editor/mpf_panel.tscn").instantiate()
+	add_control_to_dock(DOCK_SLOT_LEFT_UR, mpf_dock)
 	# Add a custom button for launching with MPF
-	mpf_launch = preload("res://addons/mpf-gmc/editor/mpf_player.tscn").instantiate()
-	add_control_to_container(CONTAINER_TOOLBAR, mpf_launch)
+	# mpf_launch = preload("res://addons/mpf-gmc/editor/mpf_player.tscn").instantiate()
+	# add_control_to_container(CONTAINER_TOOLBAR, mpf_launch)
 
 func _exit_tree():
 	# Clean-up of the plugin goes here.
@@ -48,7 +49,9 @@ func _exit_tree():
 	remove_custom_type("MPFConditional")
 	remove_custom_type("MPFConditionalChildren")
 
-	remove_control_from_docks(dock)
-	remove_control_from_container(CONTAINER_TOOLBAR, mpf_launch)
-	dock.free()
-	mpf_launch.free()
+	remove_control_from_docks(gmc_dock)
+	gmc_dock.free()
+	remove_control_from_docks(mpf_dock)
+	mpf_dock.free()
+	# remove_control_from_container(CONTAINER_TOOLBAR, mpf_launch)
+	# mpf_launch.free()

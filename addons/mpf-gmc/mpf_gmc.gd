@@ -2,6 +2,8 @@
 extends LoggingNode
 class_name GMC
 
+const CONFIG_PATH = "res://gmc.cfg"
+
 var game
 var media
 var player
@@ -13,7 +15,7 @@ var config
 
 func _init():
 	self.config = ConfigFile.new()
-	var err = self.config.load("res://gmc.cfg")
+	var err = self.config.load(CONFIG_PATH)
 	if err != OK:
 		printerr("Error loading config file: %s" % err)
 	# Configure logging with the value from the config
@@ -64,6 +66,9 @@ func _ready():
 		for key in self.config.get_section_keys("keyboard"):
 			keyboard[key.to_upper()] = self.config.get_value("keyboard", key)
 	self.media.sound.initialize(self.config)
+
+func save_config():
+	self.config.save(CONFIG_PATH)
 
 func _unhandled_input(event: InputEvent) -> void:
 	if not event.is_class("InputEventKey"):
