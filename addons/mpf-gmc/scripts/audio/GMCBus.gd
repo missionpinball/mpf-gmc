@@ -12,8 +12,16 @@ var queue
 func _init(n: String):
 	self.name = n
 
-func add_channel(channel: GMCChannel) -> void:
+func create_channel(channel_name: String) -> GMCChannel:
+	var channel = GMCChannel.new(channel_name, self)
 	self.channels.append(channel)
+	return channel
+
+func set_type(t: BusType):
+	self.type = t
+	# Sequential busses get a queue to store pending sounds
+	if t == BusType.SEQUENTIAL:
+		self.queue = []
 
 static func get_bus_type(bus_string: String) -> BusType:
 	return {
