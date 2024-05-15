@@ -38,26 +38,26 @@ func initialize(config: ConfigFile) -> void:
 	self.configure_logging("SoundPlayer")
 	for i in range(0, AudioServer.bus_count):
 		var bus_name = AudioServer.get_bus_name(i)
-		self.busses[bus_name] = { "name": bus_name, "channels": [] }
+		self.busses[bus_name] = GMCBus.new(bus_name)
 	if config.has_section("sound_system"):
 		for key in config.get_section_keys("sound_system"):
 			var settings = config.get_value("sound_system", key)
 			var target_bus = settings['bus'] if settings.get('bus') else key
 			assert(target_bus in self.busses, "Sound system does not have an audio bus '%s' configured." % target_bus)
 			assert(settings.get("type"), "Sound system bus '%s' missing required field 'type'." % target_bus)
-			var bus_type = settings["type"]
-			self.busses[target_bus]["type"] = bus_type
-			var channels_to_make = 2 if bus_type == "solo" else settings.get("simultaneous_sounds", 1)
+			var bus_type = GMCBus.get_bus_type(settings["type"])
+			self.busses[target_bus].type = bus_type
+			var channels_to_make = 2 if bus_type == GMCBus.BusType.SOLO else settings.get("simultaneous_sounds", 1)
 			for i in range(0, channels_to_make):
-				var channel = AudioStreamPlayer.new()
-				channel.name = "%s_%s" % [target_bus, i+1]
+				var channel_name = "%s_%s" % [target_bus, i+1]
+				var channel = GMCChannel.new(channel_name, self.busses[target_bus])
 				self.busses[target_bus].channels.append(channel)
 				self.add_child(channel)
-				if bus_type == "sequential":
+				if bus_type == GMCBus.BusType.SEQUENTIAL:
 					channel.finished.connect(self._on_queue_channel_finished.bind(target_bus))
 			# Sequential busses get a queue to store pending sounds
-			if bus_type == "sequential":
-				self.busses[target_bus]["queue"] = []
+			if bus_type == GMCBus.BusType.SEQUENTIAL:
+				self.busses[target_bus].queue = []
 			# A bus can be marked default
 			if settings.get("default", false):
 				self.default_bus = target_bus
@@ -129,7 +129,7 @@ func play(filename: String, bus: String, settings: Dictionary = {}) -> void:
 		available_channel = self._find_available_channel(bus, filepath, settings)
 
 	# If this is a solo bus, stop any other playback
-	if self.busses[bus].type == "solo":
+	if self.busses[bus].type == GMCBus.BusType.SOLO:
 		for c in self._get_channels(bus):
 			if c.playing and c != available_channel:
 				self._stop(c, settings)
