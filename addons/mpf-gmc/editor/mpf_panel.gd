@@ -51,11 +51,13 @@ func _set_enable_available():
 	if MPF.config.get_value(CONFIG_SECTION, "executable_path", ""):
 		$main/enable/spawn_mpf.show()
 		$main/enable/spawn_error.hide()
+		$main/enable/spawn_mpf.disabled = false
 	else:
 		$main/enable/spawn_mpf.hide()
 		$main/enable/spawn_error.show()
 		$main/enable/spawn_mpf.disabled = true
-
+		# If the config is saved as enabled, toggling the button will auto-save
+		$main/enable/spawn_mpf.button_pressed = false
 
 func _save() -> void:
 	for child in fields:
