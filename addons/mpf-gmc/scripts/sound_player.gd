@@ -134,7 +134,7 @@ func _stop(channel: AudioStreamPlayer, settings: Dictionary = {}, action: String
 	if not fade_out and channel.stream.has_meta("fade_out"):
 		fade_out = channel.stream.get_meta("fade_out")
 	if not fade_out:
-		self._clear_channel(channel)
+		channel.clear()
 		return
 	var tween = self.create_tween()
 	tween.tween_property(channel, "volume_db", -80.0, fade_out) \
@@ -158,7 +158,7 @@ func stop_all(fade_out: float = 1.0) -> void:
 						.set_trans(Tween.TRANS_QUINT).set_ease(Tween.EASE_IN)
 					channel.set_meta("is_stopping", true)
 				else:
-					self._clear_channel(channel)
+					channel.clear()
 	if tween:
 		tween.finished.connect(self._on_fade_complete.bind(null, tween, "stop_all"))
 		self.tweens.append(tween)
@@ -175,49 +175,21 @@ func _on_fade_complete(channel, tween, action) -> void:
 		for bus in self.buses.values():
 			for c in bus.channels:
 				if c.stream and c.get_meta("is_stopping", false):
-					self._clear_channel(channel)
+					channel.clear()
 	# If this is a stop action, stop the channel
 	elif action == "stop" or action == "clear":
 		self.log.debug("Fade out complete on channel %s" % channel)
-		self._clear_channel(channel)
+		channel.clear()
 	elif action == "play":
 		self.log.debug("Fade in to %0.2f complete on channel %s", [channel.volume_db, channel])
 	if action == "clear":
 		channel.stream = null
 
-func _on_loop(channel) -> void:
-	var loops_remaining = channel.stream.get_meta("loops_remaining") - 1
-	if loops_remaining == 0:
-		channel.stream.remove_meta("loops_remaining")
-		channel.finished.disconnect(self._on_loop)
-		if channel.stream is AudioStreamWAV:
-			channel.stream.loop_mode = 0
-		else:
-			channel.loop = false
-	else:
-		channel.stream.set_meta("loops_remaining", loops_remaining)
-
-
-func _trigger_events(state, events, channel) -> void:
-	for e in events:
-		MPF.server.send_event(e)
-	channel.finished.disconnect(channel.stream.get_meta("events_when_%s" % state))
-	channel.stream.remove_meta("events_when_%s" % state)
 
 func _get_channels(bus: String):
 	if bus not in self.buses:
 		self.log.error("Invalid bus %s requested", bus)
 	return self.buses[bus].channels
-
-func _clear_channel(channel):
-	if channel.stream and channel.stream.has_meta("loops_remaining"):
-		channel.finished.disconnect(self._on_loop)
-		channel.stream.remove_meta("loops_remaining")
-	channel.stop()
-	channel.volume_db = 0.0
-	channel.remove_meta("tween")
-	channel.remove_meta("is_stopping")
-	channel.stream = null
 
 func _on_queue_channel_finished(bus_name: String) -> void:
 	# The two queues hold dictionary objects like this:

@@ -6,6 +6,7 @@ class_name GMCChannel
 # AudioStreamPlayer class has a bus property that is the string name
 # of the AudioServer bus. This value is the GMC bus instance.
 var _bus: GMCBus
+var tweens: Array[Tween]
 
 @warning_ignore("shadowed_global_identifier")
 var log: GMCLogger
@@ -53,7 +54,7 @@ func play_with_settings(settings: Dictionary) -> void:
 			MPF.server.send_event(e)
 	if settings.get("events_when_stopped"):
 		# Store a reference to the callable so it can be disconnected
-		var callable = self._trigger_events.bind("stopped", settings["events_when_stopped"], self)
+		var callable = self._trigger_events.bind("stopped", settings["events_when_stopped"])
 		self.stream.set_meta("events_when_stopped", callable)
 		self.finished.connect(callable)
 
@@ -81,6 +82,46 @@ func play_with_settings(settings: Dictionary) -> void:
 		self.play(start_at)
 	var tween = self.create_tween()
 	tween.tween_property(self, "volume_db", 0.0, fade_in).set_trans(Tween.TRANS_QUINT).set_ease(Tween.EASE_OUT)
-	tween.finished.connect(self._on_fade_complete.bind(self, tween, "play"))
+	tween.finished.connect(self._on_fade_complete.bind(tween, "play"))
 	self.tweens.append(tween)
 	self.set_meta("tween", tween)
+
+
+func clear():
+	if self.stream and self.stream.has_meta("loops_remaining"):
+		self.finished.disconnect(self._on_loop)
+		self.stream.remove_meta("loops_remaining")
+	self.stop()
+	self.volume_db = 0.0
+	self.remove_meta("tween")
+	self.remove_meta("is_stopping")
+	self.stream = null
+
+
+func _on_fade_complete(tween, action) -> void:
+	self.tweens.erase(tween)
+	# If this is a stop_all action, finish all the channels that are stopping
+	# If this is a stop action, stop the channel
+	if action == "stop" or action == "clear":
+		self.log.debug("Fade out complete on channel %s" % self)
+		self.clear()
+	elif action == "play":
+		self.log.debug("Fade in to %0.2f complete on channel %s", [self.volume_db, self])
+
+func _on_loop() -> void:
+	var loops_remaining = self.stream.get_meta("loops_remaining") - 1
+	if loops_remaining == 0:
+		self.stream.remove_meta("loops_remaining")
+		self.finished.disconnect(self._on_loop)
+		if self.stream is AudioStreamWAV:
+			self.stream.loop_mode = 0
+		else:
+			self.loop = false
+	else:
+		self.stream.set_meta("loops_remaining", loops_remaining)
+
+func _trigger_events(state, events) -> void:
+	for e in events:
+		MPF.server.send_event(e)
+	self.finished.disconnect(self.stream.get_meta("events_when_%s" % state))
+	self.stream.remove_meta("events_when_%s" % state)
