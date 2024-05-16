@@ -52,6 +52,7 @@ func _set_enable_available():
 		$main/enable/spawn_mpf.show()
 		$main/enable/spawn_error.hide()
 		$main/enable/spawn_mpf.disabled = false
+		$main/enable/spawn_mpf.button_pressed = MPF.config.get_value(CONFIG_SECTION, "spawn_mpf", false)
 	else:
 		$main/enable/spawn_mpf.hide()
 		$main/enable/spawn_error.show()
