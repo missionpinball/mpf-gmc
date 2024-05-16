@@ -8,11 +8,11 @@ var bus: GMCBus
 @export var target_bus: String:
 	set = _set_target_bus
 @export var delay: float
-@export var attenuation: float = 0.0
-@export var attack: float = 0.5
-@export var release: float = 0.5
+@export var attenuation: float
+@export var attack: float
+@export var release: float
 @export var release_from_start: float
-@export var release_point: float = 0.0
+@export var release_point: float
 var start_time
 var duration: float
 var release_time: int
@@ -25,7 +25,7 @@ func _init(settings: Dictionary = {}, fallback: DuckSettings = null):
 		self.bus = fallback.bus
 	for p in merge_props:
 		if not self.get(p):
-			var val = settings.get(p, fallback.get(p) if fallback else null)
+			var val = settings.get(p, fallback.get(p) if fallback else 0.0)
 			if val:
 				self[p] = val
 
