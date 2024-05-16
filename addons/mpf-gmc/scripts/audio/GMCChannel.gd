@@ -10,3 +10,7 @@ var _bus: GMCBus
 func _init(n: String, b: GMCBus):
 	self.name = n
 	self._bus = b
+
+func load_stream(filepath: String) -> AudioStream:
+	self.stream = ResourceLoader.load(filepath, "AudioStreamOGGVorbis" if filepath.get_extension() == "ogg" else "AudioStreamSample") as AudioStream
+	return self.stream
