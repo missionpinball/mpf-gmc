@@ -48,17 +48,13 @@ func _ready() -> void:
 	self.visibility_changed.connect(self._on_visibility)
 	if self.is_playing() and self.ducking:
 		self.ducking.calculate_release_time(Time.get_ticks_msec())
-		print(self.ducking)
 		#self.ducking.bus.duck(self.ducking)
 		MPF.media.sound.buses[self.ducking.target_bus].duck(self.ducking)
 
-
 func _play() -> void:
-	print("VERRIDE PLAY TIME")
 	self.play()
 	if self.ducking:
 		self.ducking.bus.duck(self.ducking)
-
 
 func _on_visibility() -> void:
 	var do_show: bool = self.is_visible_in_tree() and self.autoplay and not Engine.is_editor_hint()

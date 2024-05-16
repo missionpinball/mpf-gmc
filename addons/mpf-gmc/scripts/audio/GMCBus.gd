@@ -21,7 +21,6 @@ func _init(n: String):
 	self._bus_index = AudioServer.get_bus_index(self.name)
 	assert(self._bus_index != -1, "No audio bus %s configured in Godot Audio layout.")
 	self._full_volume_db = AudioServer.get_bus_volume_db(self._bus_index)
-	print("Set audio bus %s (idx %s) volume %s" % [AudioServer.get_bus_name(self._bus_index), self._bus_index, self._full_volume_db])
 
 func create_channel(channel_name: String) -> GMCChannel:
 	var channel = GMCChannel.new(channel_name, self)
@@ -39,7 +38,7 @@ func duck(settings) -> void:
 	)
 	# If this duck is not the strongest, do nothing
 	if settings != self.duckings[0]:
-		print("Ducking %s is not the strongest, no volume adjustment triggered.", settings)
+		self.log.debug("Ducking %s is not the strongest, no volume adjustment triggered.", settings)
 		return
 
 	if self._active_duck:
@@ -57,7 +56,7 @@ func duck(settings) -> void:
 	# Track which duck we are timing
 	self._duck_release_timer.set_meta("ducking", settings)
 	self._duck_release_timer.start(settings.duration)
-	print("Ducking %s by %s over %ss, will last %s" % [self.name, settings.attenuation, settings.attack, settings.duration])
+	self.log.info("Ducking %s by %s over %ss, will last %s" % [self.name, settings.attenuation, settings.attack, settings.duration])
 
 func duck_release() -> void:
 	# Remove this duck from the list of duckings
@@ -68,12 +67,12 @@ func duck_release() -> void:
 	# If there is another duck queued, process it with relative time
 	while not self.duckings.is_empty():
 		next_duck = self.duckings[0]
-		print("Checking to next ducking: %s" % next_duck)
+		self.log.debug("Checking to next ducking: %s" % next_duck)
 		# This ducking started a while ago, so find the new release time
 		time_remaining = (next_duck.release_time - Time.get_ticks_msec()) / 1000.0
 		# If this duck has expired (with a small margin of error), remove
 		if time_remaining < 0.15:
-			print(" - ducking expired, moving on")
+			self.log.debug(" - ducking expired, moving on")
 			self.duckings.erase(next_duck)
 			continue
 		break
@@ -85,7 +84,7 @@ func duck_release() -> void:
 	# If there is a next duck in the stack, use that as the release volume
 	var attenuation = next_duck.attenuation if next_duck else 0.0
 	self._active_duck = self._create_duck_tween(attenuation, last_duck.release)
-	print("Releasing duck on %s over %ss" % [self.name, last_duck.release])
+	self.log.info("Releasing duck on %s over %ss" % [self.name, last_duck.release])
 
 	if next_duck:
 		self._duck_release_timer.set_meta("ducking", next_duck)
@@ -161,9 +160,8 @@ func play(filename: String, settings: Dictionary = {}) -> void:
 		if stream is AudioStreamRandomizer:
 			# TODO: Get current stream from AudioStreamRandomizer:
 			# https://github.com/godotengine/godot/pull/88437
-			print("Unable to duck AudioStreamRandomizer :( ")
+			self.log.warn("Unable to duck AudioStreamRandomizer :( ")
 			return
-		print("Creating a duck settings from %s (full settings %s)" % [settings.ducking, settings])
 		# If this came from an MPFSoundAsset the ducking is already configured
 		var duck_settings: DuckSettings = settings.ducking if settings.ducking is DuckSettings else DuckSettings.new(settings.ducking)
 		duck_settings.calculate_release_time(Time.get_ticks_msec(), stream)
