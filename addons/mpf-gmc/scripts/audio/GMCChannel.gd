@@ -90,7 +90,7 @@ func play_with_settings(settings: Dictionary) -> AudioStream:
 
 func clear():
 	if self.stream and self.stream.has_meta("loops_remaining"):
-		self.finished.disconnect(self._on_loop)
+		# self.finished.disconnect(self._on_loop)
 		self.stream.remove_meta("loops_remaining")
 	self.stop()
 	self.volume_db = 0.0

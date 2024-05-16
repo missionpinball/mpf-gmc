@@ -3,6 +3,7 @@ extends Resource
 class_name DuckSettings
 
 var bus: GMCBus
+@export var target_bus: String
 @export var delay: float
 @export var attenuation: float = 0.0
 @export var attack: float = 0.5
@@ -15,8 +16,10 @@ var release_time: int
 
 func _init(settings: Dictionary = {}):
 	# The bus comes as a string, convert it to a GMCBus
-	if settings["bus"]:
+	if settings.get("bus"):
 		self.bus = MPF.media.sound.buses[settings["bus"]]
+	elif self.target_bus:
+		self.bus = MPF.media.sound.buses[self.target_bus]
 	for k in settings.keys():
 		if not self.get(k):
 			self[k] = settings[k]
@@ -30,7 +33,11 @@ func calculate_release_time(start_time_msecs: int, stream: AudioStream = null) -
 	else:
 		assert(false, "Ducking release requires an AudioStream or release_from_start")
 	self.release_time = start_time_msecs + int(self.duration * 1000)
-	print("Stream %s is %s long, %ss release means a duration of %s" % [
-		stream.resource_name, stream.get_length(), self.release_point, self.duration
-	])
+
+	if stream:
+		print("Stream %s is %s long, %ss release means a duration of %s" % [
+			stream.resource_name, stream.get_length(), self.release_point, self.duration
+		])
+	else:
+		print("Ducking without stream will have a duration of %s" % self.duration)
 	return self.release_time

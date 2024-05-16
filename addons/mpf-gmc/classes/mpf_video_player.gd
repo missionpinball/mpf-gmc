@@ -31,6 +31,8 @@ enum EndBehavior {
 @export var events_when_stopped: String
 ## The name of the method to call when the video finishes when end behavior is a method.
 @export var end_method: String
+## Ducking Settings
+@export var ducking: DuckSettings
 
 
 @warning_ignore("shadowed_global_identifier")
@@ -44,6 +46,19 @@ func _enter_tree() -> void:
 func _ready() -> void:
 	self.finished.connect(self._on_finished)
 	self.visibility_changed.connect(self._on_visibility)
+	if self.is_playing() and self.ducking:
+		self.ducking.calculate_release_time(Time.get_ticks_msec())
+		print(self.ducking)
+		#self.ducking.bus.duck(self.ducking)
+		MPF.media.sound.buses[self.ducking.target_bus].duck(self.ducking)
+
+
+func _play() -> void:
+	print("VERRIDE PLAY TIME")
+	self.play()
+	if self.ducking:
+		self.ducking.bus.duck(self.ducking)
+
 
 func _on_visibility() -> void:
 	var do_show: bool = self.is_visible_in_tree() and self.autoplay and not Engine.is_editor_hint()
@@ -51,17 +66,17 @@ func _on_visibility() -> void:
 	match self.hide_behavior:
 		HideBehavior.RESTART:
 			if do_show:
-				self.play()
+				self._play()
 			else:
 				self.stop()
 		HideBehavior.PAUSE:
 			self.paused = not do_show
 			self.log.debug("Pause state set to %s", self.paused)
 			if not self.paused and not self.is_playing():
-				self.play()
+				self._play()
 		HideBehavior.CONTINUE:
 			if do_show and not self.is_playing():
-				self.play()
+				self._play()
 
 func _on_finished() -> void:
 	if end_behavior == EndBehavior.REMOVE_SLIDE:
