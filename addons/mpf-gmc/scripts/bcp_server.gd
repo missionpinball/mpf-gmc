@@ -104,8 +104,10 @@ func deferred_scene_to(scene_pck: Resource) -> void:
 
 ## Call this method from your main scene to open a port for MPF connections
 func listen() -> void:
-	self.status = ServerStatus.WAITING
-	status_changed.emit(self.status)
+	# If we are already spawning, keep that status
+	if self.status != ServerStatus.LAUNCHING:
+		self.status = ServerStatus.WAITING
+		status_changed.emit(self.status)
 	_thread = Thread.new()
 	var err = _server.listen(port)
 	if err != OK:

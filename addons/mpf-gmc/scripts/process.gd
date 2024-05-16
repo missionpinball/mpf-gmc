@@ -29,16 +29,14 @@ func _spawn_mpf():
 	var args: PackedStringArray = OS.get_cmdline_args()
 	var machine_path: String = MPF.config.get_value("mpf", "machine_path",
 		ProjectSettings.globalize_path("res://") if OS.has_feature("editor") else OS.get_executable_path().get_base_dir())
-	var production_flag := "" # "-P"
+
+	var exec_args = PackedStringArray(MPF.config.get_value("mpf", "executable_args", "").split(" "))
 
 	var mpf_args = PackedStringArray([machine_path, "-t"])
 	if MPF.config.get_value("mpf", "mpf_args", ""):
-		mpf_args.append_array(MPF.config.get_value("mpf", "mpf_args").split())
+		mpf_args.append_array(MPF.config.get_value("mpf", "mpf_args").split(" "))
 	if MPF.config.get_value("mpf", "virtual", false):
 		mpf_args.append("-x")
-	# Doesn't like an empty string, so only include if present
-	if production_flag:
-		mpf_args.append(production_flag)
 
 	# Generate a timestamped MPF log in the same place as the GMC log
 	# mpf_YYYY-MM-DD_HH.mm.ss.log
@@ -50,9 +48,10 @@ func _spawn_mpf():
 
 	if "--v" in args or "--V" in args:
 		mpf_args.push_back("-v")
-	print("Executing %s" % exec)
-	print(mpf_args)
-	mpf_pid = OS.create_process(exec, mpf_args, false)
+
+	var all_args = exec_args + mpf_args
+	self.log.info("Executing %s with args [%s]", [exec, ", ".join(all_args)])
+	mpf_pid = OS.create_process(exec, all_args, false)
 	#var output = []
 	#MPF.server.mpf_pid = OS.execute(exec, mpf_args, output, true, true)
 	#print(output)
@@ -60,21 +59,19 @@ func _spawn_mpf():
 
 func _check_mpf():
 	# Detect if the pid is still alive
-	print("Checking MPF PID %s..." % mpf_pid)
+	self.log.debug("Checking MPF PID %s..." % mpf_pid)
 	var output = []
 	OS.execute("ps", [mpf_pid, "-o", "state="], output, true, true)
-	print(output)
+	self.log.debug(" ".join(output))
 	if output and output[0].strip_edges() == "Z":
 		mpf_attempts += 1
 		if mpf_attempts <= 5:
-			print("MPF Failed to Start, Retrying (%s/5)" % mpf_attempts)
+			self.log.info("MPF Failed to Start, Retrying (%s/5)" % mpf_attempts)
 			self._spawn_mpf()
 		else:
 			MPF.server.set_status(MPF.server.ServerStatus.ERROR)
-			printerr("ERROR: Unable to start MPF.")
+			self.log.error("ERROR: Unable to start MPF.")
 
 func _exit_tree():
-	print("Process exiting tree")
 	if mpf_pid:
-		print("killing mpf")
 		OS.execute("kill", [mpf_pid])
