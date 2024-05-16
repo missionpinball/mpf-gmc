@@ -11,9 +11,11 @@ func _has_capture(prefix):
 
 func _capture(message, data, session_id):
 	print("Received message: %s" % message)
-	MPF.process.mpf_log_created.emit(data[0])
+	# MPF.process.mpf_log_created.emit(data[0])
+	output_panel._open_log(data[0])
 
 func _setup_session(session_id):
+	print("Setting up session")
 	# Add a new tab in the debugger session UI containing a label.
 	var label = Label.new()
 	label.name = "MPF Output"
@@ -36,5 +38,4 @@ func _setup_session(session_id):
 	# label.add_child(output_panel)
 
 func _stop_session():
-	print("Stopping session")
 	output_panel.stop()

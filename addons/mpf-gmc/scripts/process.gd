@@ -61,7 +61,6 @@ func _spawn_mpf():
 	self.log.info("Executing %s with args [%s]", [exec, ", ".join(mpf_args)])
 	mpf_pid = OS.create_process(exec, mpf_args, false)
 	print("going to send a message now")
-	mpf_log_created.emit(log_file_path)
 	EngineDebugger.send_message("mpf_log_created:butts", [log_file_path])
 	#var output = []
 	#MPF.server.mpf_pid = OS.execute(exec, mpf_args, output, true, true)
