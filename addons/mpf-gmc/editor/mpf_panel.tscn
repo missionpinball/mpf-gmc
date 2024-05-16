@@ -90,7 +90,6 @@ text = "Machine Path"
 custom_minimum_size = Vector2(2.08165e-12, 36)
 layout_mode = 2
 size_flags_vertical = 3
-placeholder_text = "/Users/Anthony/Git/mpf-examples/gmc_slides_and_widgets/"
 context_menu_enabled = false
 shortcut_keys_enabled = false
 
@@ -112,7 +111,7 @@ layout_mode = 2
 [node name="virtual-label" type="Label" parent="main/flags"]
 layout_mode = 2
 size_flags_horizontal = 3
-text = "Virtual (-x)"
+text = "Virtual Mode (-x)"
 
 [node name="virtual" type="CheckButton" parent="main/flags"]
 layout_mode = 2
