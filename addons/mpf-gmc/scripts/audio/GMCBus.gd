@@ -159,10 +159,13 @@ func play(filename: String, settings: Dictionary = {}) -> void:
 
 	if settings.ducking:
 		if stream is AudioStreamRandomizer:
+			# TODO: Get current stream from AudioStreamRandomizer:
+			# https://github.com/godotengine/godot/pull/88437
 			print("Unable to duck AudioStreamRandomizer :( ")
 			return
-		print("Ducking for stream %s: %s" % [stream, settings.ducking])
-		var duck_settings = DuckSettings.new(settings.ducking)
+		print("Creating a duck settings from %s (full settings %s)" % [settings.ducking, settings])
+		# If this came from an MPFSoundAsset the ducking is already configured
+		var duck_settings: DuckSettings = settings.ducking if settings.ducking is DuckSettings else DuckSettings.new(settings.ducking)
 		duck_settings.calculate_release_time(Time.get_ticks_msec(), stream)
 		duck_settings.bus.duck(duck_settings)
 

@@ -9,9 +9,8 @@ var musicDuck: Tween
 
 var buses = {}
 var tweens = []
-var default_bus: String
-
-var _music_loop_channel: AudioStreamPlayer
+var default_bus: GMCBus
+var default_duck_bus: GMCBus
 
 # Counter for the current loop number of the music (zero-indexed)
 # var _music_loops: int = 0
@@ -59,15 +58,27 @@ func initialize(config: ConfigFile) -> void:
 					channel.finished.connect(self._on_queue_channel_finished.bind(target_bus_name))
 			# A bus can be marked default
 			if settings.get("default", false):
-				self.default_bus = target_bus_name
+				self.default_bus = self.buses[target_bus_name]
+			# A bus can be default for ducking
+			if settings.get("duck_default", false):
+				self.default_duck_bus = self.buses[target_bus_name]
 
 func _ready() -> void:
-	# duckAttackTimer.one_shot = true
-	# duckAttackTimer.timeout.connect(self._duck_attack)
-	# duckReleaseTimer.one_shot = true
-	# duckReleaseTimer.timeout.connect(self._duck_release)
 	MPF.game.volume.connect(self._on_volume)
 	MPF.server.connect("clear", self._on_clear_context)
+
+func get_bus(bus_name: String = "") -> GMCBus:
+	if not bus_name:
+		assert(self.default_bus, "No default bus defined.")
+		return self.default_bus
+	assert(bus_name in self.buses, "No bus named '%s'" % bus_name)
+	return self.buses[bus_name]
+
+func get_ducking_bus(bus_name: String = "") -> GMCBus:
+	if not bus_name:
+		assert(self.default_duck_bus, "No default duck bus defined.")
+		return self.default_duck_bus
+	return self.get_bus(bus_name)
 
 func play_sounds(s: Dictionary) -> void:
 	assert(typeof(s) == TYPE_DICTIONARY, "Sound player called with non-dict value: %s" % s)
@@ -90,23 +101,30 @@ func play_sounds(s: Dictionary) -> void:
 				# asset property values not defined from the event.
 				if settings.get(prop) == null and config.get(prop):
 					settings[prop] = config[prop]
+			# If the MPFSoundAsset has ducking, use that
+			if config.ducking:
+				print("Creating a new ducking instance for asset %s" % asset)
+				print("settings ducking: %s" % settings.get("ducking"))
+				print("config ducking: %s" % config.ducking)
+				# Create a new ducking that merges the settings (overwrites MPFSoundAsset)
+				settings.ducking = DuckSettings.new(settings.get("ducking"), config.ducking)
 		else:
 			assert(false, "Cannot play sound of class %s" % config.get_class())
 
-		var bus: String = settings["bus"] if settings.get("bus") else self.default_bus
+		var bus: GMCBus = self.buses[settings["bus"]] if settings.get("bus") else self.default_bus
 		var file: String = settings.get("file", asset)
 		var action: String = settings.get("action", "play")
 		settings['context'] = settings.get("custom_context", s.context)
 
 		if action == "stop" or action == "loop_stop":
-			self.stop(file, bus, settings)
+			# TODO: Accept GMCBus as a stop param?
+			self.stop(file, bus.name, settings)
 			return
 		if action == "replace":
-			for channel in self._get_channels(bus):
+			for channel in bus.channels:
 				if channel.playing:
 					self._stop(channel)
-		self.buses[bus].play(file, settings)
-#		self.play(file, bus, settings)
+		bus.play(file, settings)
 
 func stop(filename: String, bus: String, settings: Dictionary) -> void:
 	var filepath: String
