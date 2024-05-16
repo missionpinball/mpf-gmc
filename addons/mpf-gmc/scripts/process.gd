@@ -30,7 +30,9 @@ func _spawn_mpf():
 	var machine_path: String = MPF.config.get_value("mpf", "machine_path",
 		ProjectSettings.globalize_path("res://") if OS.has_feature("editor") else OS.get_executable_path().get_base_dir())
 
-	var exec_args = PackedStringArray(MPF.config.get_value("mpf", "executable_args", "").split(" "))
+	var exec_args: PackedStringArray
+	if MPF.config.get_value("mpf", "executable_args", ""):
+		exec_args = PackedStringArray(MPF.config.get_value("mpf", "executable_args").split(" "))
 
 	var mpf_args = PackedStringArray([machine_path, "-t"])
 	if MPF.config.get_value("mpf", "mpf_args", ""):
@@ -49,9 +51,12 @@ func _spawn_mpf():
 	if "--v" in args or "--V" in args:
 		mpf_args.push_back("-v")
 
-	var all_args = exec_args + mpf_args
-	self.log.info("Executing %s with args [%s]", [exec, ", ".join(all_args)])
-	mpf_pid = OS.create_process(exec, all_args, false)
+	# Empty values break the args list, so only add if necessary
+	if exec_args:
+		mpf_args = exec_args + mpf_args
+
+	self.log.info("Executing %s with args [%s]", [exec, ", ".join(mpf_args)])
+	mpf_pid = OS.create_process(exec, mpf_args, false)
 	#var output = []
 	#MPF.server.mpf_pid = OS.execute(exec, mpf_args, output, true, true)
 	#print(output)
