@@ -1,6 +1,6 @@
 [gd_scene load_steps=3 format=3 uid="uid://belkug6sa4arr"]
 
-[ext_resource type="Script" path="res://addons/mpf-gmc/classes/mpf_slide.gd" id="1_sl2ba"]
+[ext_resource type="Script" path="res://addons/mpf-gmc/slides/startup.gd" id="1_cfjlx"]
 [ext_resource type="Texture2D" uid="uid://dounln3l35d26" path="res://addons/mpf-gmc/images/logo_mpf.png" id="2_v374h"]
 
 [node name="MPFSlide" type="Control"]
@@ -10,7 +10,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-script = ExtResource("1_sl2ba")
+script = ExtResource("1_cfjlx")
 
 [node name="ColorRect" type="ColorRect" parent="."]
 layout_mode = 1
@@ -39,11 +39,10 @@ grow_vertical = 2
 layout_mode = 2
 
 [node name="TextureRect" type="TextureRect" parent="CenterContainer/VBoxContainer"]
+custom_minimum_size = Vector2(2.08165e-12, 300)
 layout_mode = 2
 texture = ExtResource("2_v374h")
-
-[node name="version" type="Label" parent="CenterContainer/VBoxContainer"]
-layout_mode = 2
+stretch_mode = 3
 
 [node name="status_main" type="Label" parent="CenterContainer/VBoxContainer"]
 layout_mode = 2
@@ -74,3 +73,9 @@ theme_override_colors/font_color = Color(1, 1, 1, 1)
 theme_override_font_sizes/font_size = 24
 text = "Loading Stuff"
 horizontal_alignment = 1
+
+[node name="version" type="Label" parent="CenterContainer/VBoxContainer"]
+custom_minimum_size = Vector2(2.08165e-12, 100)
+layout_mode = 2
+horizontal_alignment = 1
+vertical_alignment = 2

@@ -138,6 +138,8 @@ func _update_stack(kwargs: Dictionary = {}) -> void:
 		self._current_slide = new_slide
 		# If the old slide is removed, check for animations
 		if old_slide and old_slide not in self._slide_stack:
+			# Store the old slide key in case its removed
+			var old_slide_key = old_slide.key
 			# If the old slide is persisted, always put it at the bottom
 			if old_slide.has_meta("persisted"):
 				self._slides.move_child(old_slide, 0)
@@ -145,8 +147,9 @@ func _update_stack(kwargs: Dictionary = {}) -> void:
 			if old_slide.priority < new_slide.priority and new_slide.current_animation:
 				await new_slide.animation_finished
 		   	# If the old slide is on top of the new one and has an outro, play it
-			await old_slide.remove(old_slide.priority > new_slide.priority)
-			MPF.server.send_event("slide_%s_removed" % old_slide.key)
+			if is_instance_valid(old_slide):
+				await old_slide.remove(old_slide.priority > new_slide.priority)
+			MPF.server.send_event("slide_%s_removed" % old_slide_key)
 
 func _manage_queue(action: String) -> void:
 	if action == "clear":

@@ -2,9 +2,12 @@
 extends LoggingNode
 class_name GMC
 
+const CONFIG_PATH = "res://gmc.cfg"
+
 var game
 var media
 var player
+var process
 var server
 var util
 var keyboard: = {}
@@ -12,7 +15,7 @@ var config
 
 func _init():
 	self.config = ConfigFile.new()
-	var err = self.config.load("res://gmc.cfg")
+	var err = self.config.load(CONFIG_PATH)
 	if err != OK:
 		printerr("Error loading config file: %s" % err)
 	# Configure logging with the value from the config
@@ -29,6 +32,8 @@ func _init():
 			["game", preload("scripts/mpf_game.gd"), "GMCGame"],
 			# Server depends on Game, should be loaded after
 			["server", preload("scripts/bcp_server.gd"), "GMCServer"],
+			# Process is here too
+			["process", preload("scripts/process.gd"), "GMCProcess"],
 			# Media controller can come last
 			["media", preload("scripts/media.gd"), "GMCMedia"]
 	]:
@@ -54,12 +59,16 @@ func _enter_tree():
 	# that need to call _process() or that have _enter_tree() methods
 	self.add_child(server)
 	self.add_child(media)
+	self.add_child(process)
 
 func _ready():
 	if self.config.has_section("keyboard"):
 		for key in self.config.get_section_keys("keyboard"):
 			keyboard[key.to_upper()] = self.config.get_value("keyboard", key)
 	self.media.sound.initialize(self.config)
+
+func save_config():
+	self.config.save(CONFIG_PATH)
 
 func _unhandled_input(event: InputEvent) -> void:
 	if not event.is_class("InputEventKey"):
