@@ -126,7 +126,13 @@ func play(filename: String, settings: Dictionary = {}) -> void:
 	if not available_channel.stream:
 		self.log.error("Failed to load stream for filepath '%s' on channel %s", [filepath, available_channel])
 		return
-	available_channel.play_with_settings(settings)
+	var stream = available_channel.play_with_settings(settings)
+
+	if settings.ducking:
+		print("Ducking: %s" % settings.ducking)
+		var duck_settings = DuckSettings.new(settings.ducking)
+		duck_settings.calculate_release_time(Time.get_ticks_msec(), stream)
+		duck_settings.bus.duck(duck_settings)
 
 func clear_queue() -> void:
 	if not queue:

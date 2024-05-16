@@ -21,7 +21,7 @@ func load_stream(filepath: String) -> AudioStream:
 	return self.stream
 
 
-func play_with_settings(settings: Dictionary) -> void:
+func play_with_settings(settings: Dictionary) -> AudioStream:
 	if not self.stream:
 		printerr("Attempting to play on channel %s with no stream. %s ", [self, settings])
 		return
@@ -75,7 +75,7 @@ func play_with_settings(settings: Dictionary) -> void:
 		# Ensure full volume in case it was tweened out previously
 		self.volume_db = settings["volume"] if settings.get("volume") else 0.0
 		self.play(start_at)
-		return
+		return self.stream
 	# Set the volume and begin playing
 	if not self.playing:
 		self.volume_db = -80.0
@@ -85,7 +85,7 @@ func play_with_settings(settings: Dictionary) -> void:
 	tween.finished.connect(self._on_fade_complete.bind(tween, "play"))
 	self.tweens.append(tween)
 	self.set_meta("tween", tween)
-
+	return self.stream
 
 func clear():
 	if self.stream and self.stream.has_meta("loops_remaining"):

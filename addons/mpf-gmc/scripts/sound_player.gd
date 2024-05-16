@@ -39,6 +39,8 @@ func initialize(config: ConfigFile) -> void:
 	for i in range(0, AudioServer.bus_count):
 		var bus_name = AudioServer.get_bus_name(i)
 		self.buses[bus_name] = GMCBus.new(bus_name)
+		# Buses have tweens so must be in the tree
+		self.add_child(self.buses[bus_name])
 	if config.has_section("sound_system"):
 		for key in config.get_section_keys("sound_system"):
 			var settings = config.get_value("sound_system", key)
