@@ -7,8 +7,9 @@ class_name DuckSettings
 @export var attack: float = 0.5
 @export var release: float = 0.5
 @export var release_from_start: float
-@export var release_point: float = 0.5
+@export var release_point: float = 0.0
 var start_time
+var duration: float
 var release_time: int
 
 func _init(settings: Dictionary = {}):
@@ -16,11 +17,12 @@ func _init(settings: Dictionary = {}):
 		if self.get(k):
 			self[k] = settings[k]
 
-func calculate_release_time(stream: AudioStream = null) -> float:
+func calculate_release_time(start_time_msecs: int, stream: AudioStream = null) -> float:
 	if stream:
-		self.release_time = Time.get_ticks_msec() + int((stream.get_length() - self.release_point) * 1000)
+		self.duration = stream.get_length() - self.release_point
 	elif self.release_from_start:
-		self.release_time = Time.get_ticks_msec() + int(release_from_start * 1000)
+		self.duration = release_from_start
 	else:
 		assert(false, "Ducking release requires an AudioStream or release_from_start")
+	self.release_time = start_time_msecs + int(self.duration * 1000)
 	return self.release_time

@@ -60,10 +60,10 @@ func initialize(config: ConfigFile) -> void:
 				self.default_bus = target_bus_name
 
 func _ready() -> void:
-	duckAttackTimer.one_shot = true
-	duckAttackTimer.timeout.connect(self._duck_attack)
-	duckReleaseTimer.one_shot = true
-	duckReleaseTimer.timeout.connect(self._duck_release)
+	# duckAttackTimer.one_shot = true
+	# duckAttackTimer.timeout.connect(self._duck_attack)
+	# duckReleaseTimer.one_shot = true
+	# duckReleaseTimer.timeout.connect(self._duck_release)
 	MPF.game.volume.connect(self._on_volume)
 	MPF.server.connect("clear", self._on_clear_context)
 
@@ -208,21 +208,9 @@ func _on_volume(bus: String, value: float, _change: float):
 	# The Master bus is fixed and capitalized
 	if bus_name == "master":
 		bus_name = "Master"
-	AudioServer.set_bus_volume_db(AudioServer.get_bus_index(bus_name), linear_to_db(value))
-
-func get_current_sound(bus: String) -> String:
-	var channels = self._get_channels(bus)
-	for channel in channels:
-		if channel.playing:
-			return channel.stream.resource_path.split("/")[-1]
-	return ""
-
-func is_resource_playing(bus: String, filepath: String) -> bool:
-	var channels = self._get_channels(bus)
-	for channel in channels:
-		if channel.playing and channel.stream.resource_path == filepath:
-			return true
-	return false
+		AudioServer.set_bus_volume_db(AudioServer.get_bus_index(bus_name), linear_to_db(value))
+		return
+	self.buses[bus_name].set_bus_volume_full(linear_to_db(value))
 
 func _duck_music(value: float):
 	AudioServer.set_bus_volume_db(1, value)

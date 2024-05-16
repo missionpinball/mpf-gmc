@@ -9,15 +9,68 @@ var type: BusType = BusType.SIMULTANEOUS
 var queue
 var duckings: Array[DuckSettings] = []
 var _next_release: float
+var _full_volume_db: float
+var _bus_index: int
+var _active_duck: Tween
+var _duck_release_timer: Timer
 
 func _init(n: String):
 	self.name = n
 	self.configure_logging("Bus<%s>" % self.name)
+	# Store the target restore volume for post-ducks
+	self._bus_index = AudioServer.get_bus_index(self.name)
+	assert(self._bus_index != -1, "No audio bus %s configured in Godot Audio layout.")
+	self._full_volume_db = AudioServer.get_bus_volume_db(self._bus_index)
 
 func create_channel(channel_name: String) -> GMCChannel:
 	var channel = GMCChannel.new(channel_name, self)
 	self.channels.append(channel)
 	return channel
+
+
+func duck(settings) -> void:
+	if not settings is DuckSettings:
+		settings = DuckSettings.new(settings)
+	#var current_duck = null if self.duckings.is_empty() else self.duckings[0]
+	self.duckings.append(settings)
+	self.duckings.sort_custom(
+		func(a, b): return a.attenuation < b.attenuation
+	)
+	# If this duck is not the strongest, do nothing
+	if settings != self.duckings[0]:
+		self.log.debug("Ducking %s is not the strongest, no volume adjustment triggered.", settings)
+		return
+
+	if self._active_duck:
+		self._active_duck.kill()
+
+	self._active_duck = self._create_duck_tween(settings.attenuation, settings.attack)
+	# We need to know how long to release, so attach it as metadata
+	self._active_duck.set_meta("release", settings.release)
+
+	if not self._duck_release_timer:
+		self._duck_release_timer = Timer.new()
+		self._duck_release_timer.one_shot = true
+		self._duck_release_timer.timeout.connect(self.duck_release)
+	self._duck_release_timer.start(settings.duration)
+
+func duck_release() -> void:
+	# If there is a next duck in the stack, use that as the release volume
+	var attenuation = self.duckings[1].attenuation if self.duckings.size() > 1 else 0.0
+	# Just in case the math is bad and the release happens before the attack finishes
+	var release = 0.0
+	if self._active_duck:
+		self._active_duck.kill()
+		release = self._active_duck.get_meta("release", release)
+	self._active_duck = self._create_duck_tween(attenuation, release)
+
+func set_bus_volume(value: float):
+	AudioServer.set_bus_volume_db(self._bus_index, value)
+
+func set_bus_volume_full(value: float):
+	# If the user has changed the system volume, store the new value as "full"
+	self.set_bus_volume(value)
+	self._full_volume_db = value
 
 func set_type(t: BusType):
 	self.type = t
@@ -75,14 +128,6 @@ func play(filename: String, settings: Dictionary = {}) -> void:
 		return
 	available_channel.play_with_settings(settings)
 
-# func duck(settings) -> void:
-# 	if not settings is DuckSettings:
-# 		settings = DuckSettings.new(settings)
-# 	self.duckings.append(settings)
-# 	self.duckings.sort_custom(
-# 		func(a, b): return a.attenuation < b.attenuation
-# 	)
-
 func clear_queue() -> void:
 	if not queue:
 		return
@@ -92,6 +137,30 @@ func clear_queue() -> void:
 			q["channel"].stream = null
 	# Remove all items from the queue
 	queue.clear()
+
+func get_current_sound() -> String:
+	for channel in self.channels:
+		if channel.playing:
+			return channel.stream.resource_path.split("/")[-1]
+	return ""
+
+
+func is_resource_playing(filepath: String) -> bool:
+	for channel in self.channels:
+		if channel.playing and channel.stream.resource_path == filepath:
+			return true
+	return false
+
+func _create_duck_tween(attenuation: float, duration: float) -> Tween:
+	var duck_tween = self.create_tween()
+	duck_tween.tween_method(self.set_bus_volume,
+		# Always use the current level in case we're interrupting
+		AudioServer.get_bus_volume_db(self._bus_index),
+		# TODO: Integrate default values
+		self._full_volume_db - attenuation,
+		duration
+	).set_trans(Tween.TRANS_LINEAR).set_ease(Tween.EASE_IN)
+	return duck_tween
 
 
 func _find_available_channel(filepath: String, settings: Dictionary) -> AudioStreamPlayer:
