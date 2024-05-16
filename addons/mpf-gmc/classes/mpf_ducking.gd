@@ -30,4 +30,7 @@ func calculate_release_time(start_time_msecs: int, stream: AudioStream = null) -
 	else:
 		assert(false, "Ducking release requires an AudioStream or release_from_start")
 	self.release_time = start_time_msecs + int(self.duration * 1000)
+	print("Stream %s is %s long, %ss release means a duration of %s" % [
+		stream.resource_name, stream.get_length(), self.release_point, self.duration
+	])
 	return self.release_time

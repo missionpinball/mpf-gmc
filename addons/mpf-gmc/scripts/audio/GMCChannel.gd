@@ -14,6 +14,7 @@ var log: GMCLogger
 func _init(n: String, b: GMCBus):
 	self.name = n
 	self._bus = b
+	self.bus = b.name
 	self.log = b.log
 
 func load_stream(filepath: String) -> AudioStream:
