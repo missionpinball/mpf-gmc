@@ -71,7 +71,6 @@ func get_bus(bus_name: String = "") -> GMCBus:
 	if not bus_name:
 		assert(self.default_bus, "No default bus defined.")
 		return self.default_bus
-	assert(bus_name in self.buses, "No bus named '%s'" % bus_name)
 	return self.buses[bus_name]
 
 func get_ducking_bus(bus_name: String = "") -> GMCBus:
