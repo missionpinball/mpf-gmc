@@ -219,15 +219,6 @@ func _clear_channel(channel):
 	channel.remove_meta("is_stopping")
 	channel.stream = null
 
-func _generate_queue_item(filename: String, max_queue_time: float, settings: Dictionary) -> Dictionary:
-	# Negative queue means infinite queue
-	var expiration = INF if max_queue_time < 0 else (Time.get_ticks_msec() + (1000 * max_queue_time))
-	return {
-		"filename": filename,
-		"expiration": expiration,
-		"settings": settings
-	}
-
 func _on_queue_channel_finished(bus_name: String) -> void:
 	# The two queues hold dictionary objects like this:
 	#{ "filename": filename, "expiration": some_time, "settings": settings }

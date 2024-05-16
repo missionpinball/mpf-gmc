@@ -73,72 +73,7 @@ func play(filename: String, settings: Dictionary = {}) -> void:
 	if not available_channel.stream:
 		self.log.error("Failed to load stream for filepath '%s' on channel %s", [filepath, available_channel])
 		return
-	self._play(available_channel, settings)
-
-func _play(channel: AudioStreamPlayer, settings: Dictionary) -> void:
-	if not channel.stream:
-		self.log.error("Attempting to play on channel %s with no stream. %s ", [channel, settings])
-		return
-
-	self.log.debug("playing %s (%s) on %s with settings %s", [channel.stream.resource_path, channel.stream, channel, settings])
-	channel.stream.set_meta("context", settings.context)
-	var start_at: float = settings["start_at"] if settings.get("start_at") else 0.0
-	var fade_in: float = settings["fade_in"] if settings.get("fade_in") else 0.0
-	if settings.get("fade_out"):
-		channel.stream.set_meta("fade_out", settings.fade_out)
-
-	if settings.get("loops"):
-		# OGG and MPF use the 'loop' property, while WAV uses 'loop_mode
-		if channel.stream is AudioStreamWAV:
-			channel.stream.loop_mode = 1 if settings["loops"] != 0 else 0
-		else:
-			channel.stream.loop = settings["loops"] != 0
-		# Attach metadata to track the loops
-		if settings["loops"] > 0:
-			channel.stream.set_meta("loops_remaining", settings["loops"])
-			# AVW Disabling this during refactor
-			#channel.finished.connect(self._on_loop.bind(channel))
-	# elif start_at == -1.0:
-	# 	# Map the sound start position relative to the music position
-	# 	start_at = fmod(_music_loop_channel.get_playback_position(), channel.stream.get_length())
-
-	# TODO: Support marker events
-	if settings.get("events_when_started"):
-		for e in settings["events_when_started"]:
-			MPF.server.send_event(e)
-	if settings.get("events_when_stopped"):
-		# Store a reference to the callable so it can be disconnected
-		var callable = self._trigger_events.bind("stopped", settings["events_when_stopped"], channel)
-		channel.stream.set_meta("events_when_stopped", callable)
-		channel.finished.connect(callable)
-
-	# If this is a voice or callout, duck the music
-	# if settings.get("ducking"):
-	# 	duck_settings = settings.ducking
-	# 	duck_settings.release_timestamp = channel.stream.get_length() - duck_settings.get("release_point", default_duck.release_point)
-	# 	if duck_settings.get("delay"):
-	# 		duckAttackTimer.start(duck_settings.delay)
-	# 	else:
-	# 		self._duck_attack()
-
-	# If the current volume is less than the target volume, e.g. this was fading out
-	# but was re-played, force a quick fade to avoid jumping back to full
-	if not fade_in and channel.playing and channel.volume_db < 0:
-		fade_in = 0.5
-	if not fade_in:
-		# Ensure full volume in case it was tweened out previously
-		channel.volume_db = settings["volume"] if settings.get("volume") else 0.0
-		channel.play(start_at)
-		return
-	# Set the channel volume and begin playing
-	if not channel.playing:
-		channel.volume_db = -80.0
-		channel.play(start_at)
-	var tween = self.create_tween()
-	tween.tween_property(channel, "volume_db", 0.0, fade_in).set_trans(Tween.TRANS_QUINT).set_ease(Tween.EASE_OUT)
-	tween.finished.connect(self._on_fade_complete.bind(channel, tween, "play"))
-	self.tweens.append(tween)
-	channel.set_meta("tween", tween)
+	available_channel.play_with_settings(settings)
 
 # func duck(settings) -> void:
 # 	if not settings is DuckSettings:
