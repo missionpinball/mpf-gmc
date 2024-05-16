@@ -2,6 +2,8 @@
 extends LoggingNode
 class_name GMCProcess
 
+signal mpf_log_created(log_file_path)
+
 var mpf_pid: int
 var mpf_attempts := 0
 
@@ -45,8 +47,9 @@ func _spawn_mpf():
 	var log_path_base = "%s/logs" % OS.get_user_data_dir()
 	var dt = Time.get_datetime_dict_from_system()
 	var log_file_name = "mpf_%04d-%02d-%02d_%02d.%02d.%02d.log" % [dt.year, dt.month, dt.day, dt.hour, dt.minute, dt.second]
+	var log_file_path = "%s/%s" % [log_path_base, log_file_name]
 	mpf_args.push_back("-l")
-	mpf_args.push_back("%s/%s" % [log_path_base, log_file_name])
+	mpf_args.push_back(log_file_path)
 
 	if "--v" in args or "--V" in args:
 		mpf_args.push_back("-v")
@@ -57,6 +60,9 @@ func _spawn_mpf():
 
 	self.log.info("Executing %s with args [%s]", [exec, ", ".join(mpf_args)])
 	mpf_pid = OS.create_process(exec, mpf_args, false)
+	print("going to send a message now")
+	mpf_log_created.emit(log_file_path)
+	EngineDebugger.send_message("mpf_log_created:butts", [log_file_path])
 	#var output = []
 	#MPF.server.mpf_pid = OS.execute(exec, mpf_args, output, true, true)
 	#print(output)
