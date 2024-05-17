@@ -173,8 +173,4 @@ func _on_volume(bus: String, value: float, _change: float):
 func _on_clear_context(context_name: String) -> void:
 	# Loop through all the channels and stop any that are playing this context
 	for bus in self.buses.values():
-		for channel in bus.channels:
-			if channel.stream and channel.stream.has_meta("context") and \
-			channel.stream.get_meta("context") == context_name and \
-			channel.playing and not channel.get_meta("is_stopping", false):
-				channel.stop_with_settings()
+		bus.clear_context(context_name)

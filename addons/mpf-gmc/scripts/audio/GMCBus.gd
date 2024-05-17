@@ -167,6 +167,15 @@ func play(filename: String, settings: Dictionary = {}) -> void:
 		duck_settings.calculate_release_time(Time.get_ticks_msec(), stream)
 		duck_settings.bus.duck(duck_settings)
 
+func clear_context(context_name: String) -> void:
+	print("Bus %s is clearing context %s" % [self.name, context_name])
+	for channel in self.channels:
+		if channel.stream and channel.stream.has_meta("context") and \
+		channel.stream.get_meta("context") == context_name and \
+		channel.playing and not channel.get_meta("is_stopping", false):
+			channel.stop_with_settings()
+	self._abort_ducking_check()
+
 func clear_queue() -> void:
 	if not queue:
 		return
@@ -179,10 +188,9 @@ func clear_queue() -> void:
 
 func get_current_sound() -> String:
 	for channel in self.channels:
-		if channel.playing:
+		if channel.playing and not channel.get_meta("is_stopping", false):
 			return channel.stream.resource_path.split("/")[-1]
 	return ""
-
 
 func is_resource_playing(filepath: String) -> bool:
 	for channel in self.channels:
@@ -190,16 +198,32 @@ func is_resource_playing(filepath: String) -> bool:
 			return true
 	return false
 
-
 func stop(key: String, settings: Dictionary) -> void:
+	var is_bus_playing := false
 	# Find the channel playing this file
 	for channel in self.channels:
-		if channel.stream and channel.stream.get_meta("key") == key and channel.playing and not channel.get_meta("is_stopping", false):
-			channel.stop_with_settings(settings)
-			return
+		if channel.stream and channel.playing and not channel.get_meta("is_stopping", false):
+			if channel.stream.get_meta("key") == key:
+				channel.stop_with_settings(settings)
+			else:
+				is_bus_playing = false
+	if not is_bus_playing:
+		self._abort_ducking_check()
 	# It's possible that the stop was called just for safety.
 	# If no channel is found with this file, that's okay.
 
+func _abort_ducking_check():
+	# However, if nothing is playing and there's a duck, kill it
+	if not self._duck_release_timer or not self._duck_release_timer.time_left:
+		self.log.debug(" - no active timer, no ducking to abort")
+		return
+	if self.get_current_sound():
+		self.log.debug(" - channel still playing, not going to abort ducking")
+		return
+	self.log.info("Bus %s is stopping, will kill active ducking." % self.name)
+	self._duck_release_timer.stop()
+	self.duckings.clear()
+	self.duck_release()
 
 func _create_duck_tween(attenuation: float, duration: float) -> Tween:
 	var duck_tween = self.create_tween()
