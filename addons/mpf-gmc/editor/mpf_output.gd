@@ -16,16 +16,18 @@ var _client: StreamPeerTCP
 var _server: TCPServer
 var _thread: Thread
 
+@export var terminal: TextEdit
+
 # A mutex for managing threadsafe operations
 @onready var _mutex := Mutex.new()
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
 	print("Hello I'm mpf output panel")
-	text_target = TextEdit.new()
-	text_target.text = "Buttface McGee"
-	text_target.size_flags_vertical = SizeFlags.SIZE_EXPAND_FILL
-	self.add_child(text_target)
+	# text_target = TextEdit.new()
+	# text_target.text = "Buttface McGee"
+	# text_target.size_flags_vertical = SizeFlags.SIZE_EXPAND_FILL
+	# self.add_child(text_target)
 
 	print("Here goes teh server")
 	self._server = TCPServer.new()
@@ -36,9 +38,15 @@ func _exit_tree() -> void:
 
 
 func _process(delta: float) -> void:
+	time += delta
+	if time < 0.01:
+		return
+
 	if not _client and _server.is_connection_available():
 		print("Client available!")
 		_client = _server.take_connection()
+		terminal.clear()
+		terminal.insert_text_at_caret("Opened connection to MPF.")
 		print("client connected!")
 		# var err = _thread.start(self._thread_poll, Thread.PRIORITY_LOW)
 		# if err != OK:
@@ -47,28 +55,42 @@ func _process(delta: float) -> void:
 		# 	print("Client connected")
 		# set_process(false)
 
-	time += delta
-	if time < 1.0:
-		return
-	time = 0.0
 	if not _client:
-		print("no client!")
+		time = 0.0
 		return
+
+	# if not _client:
+	# 	print("no client!")
+	# 	return
 
 	var bytes = _client.get_available_bytes()
-	if not bytes:
-		print("no bytes, client_status is %s." % _client.get_status())
-		return
-	print(bytes)
+	while bytes:
+		var messages = _client.get_string(bytes)
+		terminal.insert_text_at_caret(messages)
+		terminal.insert_text_at_caret("\n")
+		bytes = _client.get_available_bytes()
+
+	var err = _client.poll()
+	var status = _client.get_status()
+	# print("no bytes, client_status is %s and error is %s." % [status, err])
+	if not status:
+		_client.disconnect_from_host()
+		_client = null
+		self.listen()
+
+	# print(bytes)
 	# var data = _client.get_data(bytes)
 	# print(data)
-	var messages = _client.get_string(bytes).split("\n")
-	for message_raw in messages:
-		print(message_raw)
 
+	# for message_raw in messages:
+	# 	print(message_raw)
+	# 	terminal.insert_text_at_caret(message_raw)
+	# 	terminal.insert_text_at_caret("\n")
+
+	time = 0.0
 
 func listen() -> void:
-	_thread = Thread.new()
+	# _thread = Thread.new()
 	var err = _server.listen(port)
 	if err != OK:
 		printerr("Error opening socket: %s" % err)
@@ -84,19 +106,28 @@ func _thread_poll(_userdata=null) -> void:
 		if not _mutex.try_lock():
 			print("mutex locked")
 			return
-		_client.poll()
 		var bytes = _client.get_available_bytes()
 		if not bytes:
+			_client.poll()
 			print("no bytes, client_status is %s. will delay %sms" % [_client.get_status(), delay])
 			OS.delay_msec(delay)
 		else:
-			var messages := _client.get_string(bytes).split("\n")
-			for message_raw in messages:
-				if message_raw.is_empty():
-					continue
-				print("Received SOCKET data: %s" % message_raw)
+			call_deferred("add_text", _client.get_string(bytes))
+			# terminal.insert_text_at_caret(_client.get_string(bytes))
+			# var messages := _client.get_string(bytes).split("\n")
+			# for message_raw in messages:
+			# 	if message_raw.is_empty():
+			# 		continue
+			# 	terminal.insert_text_at_caret(message_raw)
+			# 	terminal.insert_text_at_caret("\n")
 		_mutex.unlock()
 	print("out of loop!")
+
+func on_disconnect() -> void:
+	if _thread and _thread.is_started():
+		_thread.wait_to_finish()
+	_thread = null
+	self.listen()
 
 func stop() -> void:
 	_mutex.lock()
@@ -108,6 +139,10 @@ func stop() -> void:
 
 	if _thread and _thread.is_started():
 		_thread.wait_to_finish()
+
+func add_text(text):
+	terminal.insert_text_at_caret(text)
+	terminal.insert_text_at_caret("\n")
 
 # func stop():
 # 	if timer:

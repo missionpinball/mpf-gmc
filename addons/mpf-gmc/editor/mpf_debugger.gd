@@ -27,13 +27,13 @@ func _setup_session(session_id):
 	# session.add_session_tab(label)
 	session.stopped.connect(self._stop_session)
 
-	output_panel = preload("res://addons/mpf-gmc/editor/mpf_output.gd").new()
+	output_panel = preload("res://addons/mpf-gmc/editor/mpf_output.tscn").instantiate()
 	output_panel.name = "MPF 4 Realz"
 
 	output_panel.size_flags_vertical = Control.SizeFlags.SIZE_EXPAND_FILL
 	output_panel.custom_minimum_size.x = 400
 	output_panel.custom_minimum_size.y = 400
-	output_panel.initialize()
+	# output_panel.initialize()
 	session.add_session_tab(output_panel)
 	# label.add_child(output_panel)
 
