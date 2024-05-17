@@ -12,26 +12,6 @@ var tweens = []
 var default_bus: GMCBus
 var default_duck_bus: GMCBus
 
-# Counter for the current loop number of the music (zero-indexed)
-# var _music_loops: int = 0
-# Counter for what the next loop number will be
-# var _music_loop_pending: int = 0
-
-var duck_attenuation := 8
-var duck_attack := 0.5
-var duck_release := 0.5
-var duck_settings
-# TODO: Make this dynamically find the music/duck target bus
-var unduck_level: float = AudioServer.get_bus_volume_db(1)
-
-# TODO: Remove default duck, or make customizable/optional
-const default_duck = {
-	"delay": 0.0,
-	"attack": 0.4,
-	"attenuation": 8,
-	"release_point": 0.3,
-	"release": 0.6
-}
 
 func initialize(config: ConfigFile) -> void:
 	self.configure_logging("SoundPlayer")
@@ -130,7 +110,6 @@ func play_sounds(s: Dictionary) -> void:
 
 func stop_all(fade_out: float = 1.0) -> void:
 	self.log.debug("STOP ALL called with fadeout of %s" , fade_out)
-	duck_settings = null
 	var tween = self.create_tween() if fade_out > 0 else null
 	for bus_name in self.buses.keys():
 		# Clear any queued buses as well, lest they be triggered after the stop
@@ -170,11 +149,6 @@ func _on_fade_complete(channel, tween, action) -> void:
 		channel.stream = null
 
 
-func _get_channels(bus: String):
-	if bus not in self.buses:
-		self.log.error("Invalid bus %s requested", bus)
-	return self.buses[bus].channels
-
 func _on_queue_channel_finished(bus_name: String) -> void:
 	# The two queues hold dictionary objects like this:
 	#{ "filename": filename, "expiration": some_time, "settings": settings }
@@ -195,39 +169,6 @@ func _on_volume(bus: String, value: float, _change: float):
 		AudioServer.set_bus_volume_db(AudioServer.get_bus_index(bus_name), linear_to_db(value))
 		return
 	self.buses[bus_name].set_bus_volume_full(linear_to_db(value))
-
-func _duck_music(value: float):
-	AudioServer.set_bus_volume_db(1, value)
-
-func _duck_attack() -> void:
-	if not duck_settings:
-		return
-	# We only have one duck at a time, so store the return values globally
-	duck_release = duck_settings.get("release", default_duck.release)
-	musicDuck = self.create_tween()
-	musicDuck.tween_method(self._duck_music,
-		# Always use the current level in case we're interrupting
-		AudioServer.get_bus_volume_db(1),
-		self.unduck_level - duck_settings.get("attenuation", default_duck.attenuation),
-		duck_settings.get("attack", default_duck.attack),
-	).set_trans(Tween.TRANS_LINEAR).set_ease(Tween.EASE_IN)
-	self.log.debug("Ducking voice clip down with settings: %s", duck_settings)
-	duckReleaseTimer.start(duck_settings.release_timestamp)
-
-
-func _duck_release():
-	if not duck_settings:
-		return
-	# If the music is ducked, unduck it
-	if AudioServer.get_bus_volume_db(1) < self.unduck_level:
-		self.log.debug("Unducking voice clip back to %0.2f db over %0.2f seconds", [self.unduck_level, duck_release])
-		musicDuck.kill()
-		musicDuck = self.create_tween()
-		musicDuck.tween_method(self._duck_music,
-			AudioServer.get_bus_volume_db(1),
-			self.unduck_level,
-			duck_release
-		).set_trans(Tween.TRANS_LINEAR).set_ease(Tween.EASE_OUT)
 
 func _on_clear_context(context_name: String) -> void:
 	# Loop through all the channels and stop any that are playing this context
