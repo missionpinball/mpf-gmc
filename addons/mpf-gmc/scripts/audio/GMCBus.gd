@@ -16,7 +16,7 @@ var _duck_release_timer: Timer
 
 func _init(n: String):
 	self.name = n
-	self.configure_logging("Bus<%s>" % self.name)
+	self.configure_logging("Bus<%s>" % self.name, 1)
 	# Store the target restore volume for post-ducks
 	self._bus_index = AudioServer.get_bus_index(self.name)
 	assert(self._bus_index != -1, "No audio bus %s configured in Godot Audio layout.")
@@ -25,6 +25,8 @@ func _init(n: String):
 func create_channel(channel_name: String) -> GMCChannel:
 	var channel = GMCChannel.new(channel_name, self)
 	self.channels.append(channel)
+	if self.type == BusType.SEQUENTIAL:
+		channel.finished.connect(self._on_queue_channel_finished)
 	return channel
 
 
@@ -141,7 +143,7 @@ func play(filename: String, settings: Dictionary = {}) -> void:
 
 	if not available_channel:
 		# Queue the filename if this bus type has a queue
-		if self.queue:
+		if self.queue != null:
 			# By default, max queue time is forever
 			var max_queue_time: float = settings.get("max_queue_time", -1.0)
 			if max_queue_time != 0:
@@ -282,6 +284,16 @@ func _generate_queue_item(filename: String, max_queue_time: float, settings: Dic
 		"settings": settings
 	}
 
+func _on_queue_channel_finished() -> void:
+	# The two queues hold dictionary objects like this:
+	#{ "filename": filename, "expiration": some_time, "settings": settings }
+	var now := Time.get_ticks_msec()
+	# Find the first item in the queue that's not expired
+	while self.queue:
+		var q_item: Dictionary = queue.pop_front()
+		if q_item.expiration > now:
+			self.play(q_item.filename, q_item.settings)
+			return
 
 static func get_bus_type(bus_string: String) -> BusType:
 	return {

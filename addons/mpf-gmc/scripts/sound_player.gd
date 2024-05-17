@@ -32,9 +32,8 @@ func initialize(config: ConfigFile) -> void:
 			for i in range(0, channels_to_make):
 				var channel_name = "%s_%s" % [target_bus_name, i+1]
 				var channel = bus.create_channel(channel_name)
+				# TBD: Do the buses need to be in the tree too?
 				self.add_child(channel)
-				if bus_type == GMCBus.BusType.SEQUENTIAL:
-					channel.finished.connect(self._on_queue_channel_finished.bind(target_bus_name))
 			# A bus can be marked default
 			if settings.get("default", false):
 				self.default_bus = self.buses[target_bus_name]
@@ -112,18 +111,6 @@ func stop_all(fade_out: float = 1.0) -> void:
 	self.log.debug("STOP ALL called with fadeout of %s" , fade_out)
 	for bus in self.buses.values():
 		bus.stop_all(fade_out)
-
-func _on_queue_channel_finished(bus_name: String) -> void:
-	# The two queues hold dictionary objects like this:
-	#{ "filename": filename, "expiration": some_time, "settings": settings }
-	var now := Time.get_ticks_msec()
-	var queue = self.buses[bus_name].queue
-	# Find the first item in the queue that's not expired
-	while queue:
-		var q_item: Dictionary = queue.pop_front()
-		if q_item.expiration > now:
-			self.buses[bus_name].play(q_item.filename, q_item.settings)
-			return
 
 func _on_volume(bus: String, value: float, _change: float):
 	var bus_name: String = bus.trim_suffix("_volume")
