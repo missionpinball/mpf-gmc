@@ -117,7 +117,7 @@ func play(filename: String, settings: Dictionary = {}) -> void:
 		filepath = "res://assets/%s/%s" % [self.name, filename]
 	var available_channel: AudioStreamPlayer
 	# REFACT:R is this needed?
-	settings["bus"] = self.name
+	#settings["bus"] = self.name
 
 	# Clear out the queue if necessary, to free up channels
 	if settings.get("clear_queue", false):
@@ -189,6 +189,17 @@ func is_resource_playing(filepath: String) -> bool:
 		if channel.playing and channel.stream.resource_path == filepath:
 			return true
 	return false
+
+
+func stop(key: String, settings: Dictionary) -> void:
+	# Find the channel playing this file
+	for channel in self.channels:
+		if channel.stream and channel.stream.get_meta("key") == key and channel.playing and not channel.get_meta("is_stopping", false):
+			channel.stop_with_settings(settings)
+			return
+	# It's possible that the stop was called just for safety.
+	# If no channel is found with this file, that's okay.
+
 
 func _create_duck_tween(attenuation: float, duration: float) -> Tween:
 	var duck_tween = self.create_tween()

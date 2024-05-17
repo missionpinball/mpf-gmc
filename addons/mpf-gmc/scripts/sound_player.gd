@@ -86,6 +86,18 @@ func play_sounds(s: Dictionary) -> void:
 		var settings = s.settings[asset]
 
 		assert(MPF.media.sounds.has(asset), "Unknown sound file or resource '%s'" % asset)
+		# A key can override the default value
+		if not settings.get("key"):
+			settings["key"] = asset
+
+		var bus: GMCBus = self.buses[settings["bus"]] if settings.get("bus") else self.default_bus
+		var action: String = settings.get("action", "play")
+
+		# A key is all we need to stop
+		if action == "stop" or action == "loop_stop":
+			# TODO: Accept GMCBus as a stop param?
+			bus.stop(settings.key, settings)
+			return
 
 		var config = MPF.media.get_sound_instance(asset)
 		# If the result is a stream, there's no custom asset resource
@@ -102,66 +114,19 @@ func play_sounds(s: Dictionary) -> void:
 					settings[prop] = config[prop]
 			# If the MPFSoundAsset has ducking, use that
 			if config.ducking:
-				print("Creating a new ducking instance for asset %s" % asset)
-				print("settings ducking: %s" % settings.get("ducking"))
-				print("config ducking: %s" % config.ducking)
 				# Create a new ducking that merges the settings (overwrites MPFSoundAsset)
 				settings.ducking = DuckSettings.new(settings.get("ducking"), config.ducking)
 		else:
 			assert(false, "Cannot play sound of class %s" % config.get_class())
 
-		var bus: GMCBus = self.buses[settings["bus"]] if settings.get("bus") else self.default_bus
 		var file: String = settings.get("file", asset)
-		var action: String = settings.get("action", "play")
 		settings['context'] = settings.get("custom_context", s.context)
 
-		if action == "stop" or action == "loop_stop":
-			# TODO: Accept GMCBus as a stop param?
-			self.stop(file, bus.name, settings)
-			return
 		if action == "replace":
 			for channel in bus.channels:
 				if channel.playing:
-					self._stop(channel)
+					channel.stop_with_settings()
 		bus.play(file, settings)
-
-func stop(filename: String, bus: String, settings: Dictionary) -> void:
-	var filepath: String
-	# TODO: Track the stop by key, not filename
-	if filename.left(4) == "res:":
-		filepath = filename
-	else:
-		filepath = "res://assets/%s/%s" % [bus, filename]
-	# Find the channel playing this file
-	for channel in self._get_channels(bus):
-		if channel.stream and channel.stream.resource_path == filepath and channel.playing and not channel.get_meta("is_stopping", false):
-			self._stop(channel, settings)
-			return
-	# It's possible that the stop was called just for safety.
-	# If no channel is found with this file, that's okay.
-
-
-func _stop(channel: AudioStreamPlayer, settings: Dictionary = {}, action: String = "stop") -> void:
-	if settings.get("action") == "loop_stop":
-		# The position is reset when the loop mode changes, so store it first
-		var pos: float = channel.get_playback_position()
-		channel.stream.loop_mode = 0
-		# Play the sound to the end of the file
-		channel.play(pos)
-		return
-	var fade_out = settings.get("fade_out")
-	if not fade_out and channel.stream.has_meta("fade_out"):
-		fade_out = channel.stream.get_meta("fade_out")
-	if not fade_out:
-		channel.clear()
-		return
-	var tween = self.create_tween()
-	tween.tween_property(channel, "volume_db", -80.0, fade_out) \
-		.set_trans(Tween.TRANS_QUINT).set_ease(Tween.EASE_IN)
-	tween.finished.connect(self._on_fade_complete.bind(channel, tween, action))
-	self.tweens.append(tween)
-	channel.set_meta("tween", tween)
-	channel.set_meta("is_stopping", true)
 
 func stop_all(fade_out: float = 1.0) -> void:
 	self.log.debug("STOP ALL called with fadeout of %s" , fade_out)
@@ -271,4 +236,4 @@ func _on_clear_context(context_name: String) -> void:
 			if channel.stream and channel.stream.has_meta("context") and \
 			channel.stream.get_meta("context") == context_name and \
 			channel.playing and not channel.get_meta("is_stopping", false):
-				self._stop(channel)
+				channel.stop_with_settings()

@@ -29,6 +29,7 @@ func play_with_settings(settings: Dictionary) -> AudioStream:
 
 	self.log.debug("playing %s (%s) on %s with settings %s", [self.stream.resource_path, self.stream, self, settings])
 	self.stream.set_meta("context", settings.context)
+	self.stream.set_meta("key", settings.key)
 	var start_at: float = settings["start_at"] if settings.get("start_at") else 0.0
 	var fade_in: float = settings["fade_in"] if settings.get("fade_in") else 0.0
 	if settings.get("fade_out"):
@@ -98,6 +99,27 @@ func clear():
 	self.remove_meta("is_stopping")
 	self.stream = null
 
+func stop_with_settings(settings: Dictionary = {}, action: String = "stop") -> void:
+	if settings.get("action") == "loop_stop":
+		# The position is reset when the loop mode changes, so store it first
+		var pos: float = self.get_playback_position()
+		self.stream.loop_mode = 0
+		# Play the sound to the end of the file
+		self.play(pos)
+		return
+	var fade_out = settings.get("fade_out")
+	if not fade_out and self.stream.has_meta("fade_out"):
+		fade_out = self.stream.get_meta("fade_out")
+	if not fade_out:
+		self.clear()
+		return
+	var tween = self.create_tween()
+	tween.tween_property(self, "volume_db", -80.0, fade_out) \
+		.set_trans(Tween.TRANS_QUINT).set_ease(Tween.EASE_IN)
+	tween.finished.connect(self._on_fade_complete.bind(self, tween, action))
+	self.tweens.append(tween)
+	self.set_meta("tween", tween)
+	self.set_meta("is_stopping", true)
 
 func _on_fade_complete(tween, action) -> void:
 	self.tweens.erase(tween)
