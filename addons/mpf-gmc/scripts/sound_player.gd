@@ -8,7 +8,6 @@ extends LoggingNode
 var musicDuck: Tween
 
 var buses = {}
-var tweens = []
 var default_bus: GMCBus
 var default_duck_bus: GMCBus
 
@@ -108,46 +107,11 @@ func play_sounds(s: Dictionary) -> void:
 					channel.stop_with_settings()
 		bus.play(file, settings)
 
+# Not currently implemented anywhere
 func stop_all(fade_out: float = 1.0) -> void:
 	self.log.debug("STOP ALL called with fadeout of %s" , fade_out)
-	var tween = self.create_tween() if fade_out > 0 else null
-	for bus_name in self.buses.keys():
-		# Clear any queued buses as well, lest they be triggered after the stop
-		self.buses[bus_name].clear_queue()
-		for channel in self.buses[bus_name].channels:
-			if channel.playing and not channel.get_meta("is_stopping", false):
-				if tween:
-					tween.tween_property(channel, "volume_db", -80.0, fade_out) \
-						.set_trans(Tween.TRANS_QUINT).set_ease(Tween.EASE_IN)
-					channel.set_meta("is_stopping", true)
-				else:
-					channel.clear()
-	if tween:
-		tween.finished.connect(self._on_fade_complete.bind(null, tween, "stop_all"))
-		self.tweens.append(tween)
-		tween.start()
-	else:
-		for t in self.tweens:
-			t.stop()
-		self.tweens = []
-
-func _on_fade_complete(channel, tween, action) -> void:
-	self.tweens.erase(tween)
-	# If this is a stop_all action, finish all the channels that are stopping
-	if action == "stop_all":
-		for bus in self.buses.values():
-			for c in bus.channels:
-				if c.stream and c.get_meta("is_stopping", false):
-					channel.clear()
-	# If this is a stop action, stop the channel
-	elif action == "stop" or action == "clear":
-		self.log.debug("Fade out complete on channel %s" % channel)
-		channel.clear()
-	elif action == "play":
-		self.log.debug("Fade in to %0.2f complete on channel %s", [channel.volume_db, channel])
-	if action == "clear":
-		channel.stream = null
-
+	for bus in self.buses.values():
+		bus.stop_all(fade_out)
 
 func _on_queue_channel_finished(bus_name: String) -> void:
 	# The two queues hold dictionary objects like this:

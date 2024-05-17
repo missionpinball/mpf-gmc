@@ -109,7 +109,9 @@ func stop_with_settings(settings: Dictionary = {}, action: String = "stop") -> v
 		return
 	var fade_out = settings.get("fade_out")
 	if not fade_out and self.stream.has_meta("fade_out"):
-		fade_out = self.stream.get_meta("fade_out")
+		# On a stop-all call, bypass the stream's built-in fade_out value
+		if action != "stop_all":
+			fade_out = self.stream.get_meta("fade_out")
 	if not fade_out:
 		self.clear()
 		return

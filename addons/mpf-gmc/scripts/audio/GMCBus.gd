@@ -210,6 +210,13 @@ func stop(key: String, settings: Dictionary) -> void:
 	# It's possible that the stop was called just for safety.
 	# If no channel is found with this file, that's okay.
 
+func stop_all(fade_out: float = 1.0) -> void:
+	# Clear any queued channels as well, lest they be triggered after the stop
+	self.clear_queue()
+	for channel in self.channels:
+		if channel.playing and not channel.get_meta("is_stopping", false):
+			channel.stop_with_settings({ "fade_out": fade_out }, "stop_all")
+
 func _abort_ducking_check():
 	# However, if nothing is playing and there's a duck, kill it
 	if not self._duck_release_timer or not self._duck_release_timer.time_left:
