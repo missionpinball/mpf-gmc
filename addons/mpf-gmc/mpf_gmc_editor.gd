@@ -29,13 +29,13 @@ func _enter_tree():
 	add_control_to_dock(DOCK_SLOT_LEFT_UR, gmc_dock)
 	mpf_dock = preload("res://addons/mpf-gmc/editor/mpf_panel.tscn").instantiate()
 	add_control_to_dock(DOCK_SLOT_LEFT_UR, mpf_dock)
-	# mpf_output = preload("res://addons/mpf-gmc/editor/mpf_output.tscn").instantiate()
-	# add_control_to_bottom_panel(mpf_output, "MPF Output")
+	mpf_output = preload("res://addons/mpf-gmc/editor/mpf_output.tscn").instantiate()
+	add_control_to_bottom_panel(mpf_output, "MPF Output")
 	# Add a custom button for launching with MPF
 	# mpf_launch = preload("res://addons/mpf-gmc/editor/mpf_player.tscn").instantiate()
 	# add_control_to_container(CONTAINER_TOOLBAR, mpf_launch)
-	mpf_debugger = preload("res://addons/mpf-gmc/editor/mpf_debugger.gd").new()
-	add_debugger_plugin(mpf_debugger)
+	# mpf_debugger = preload("res://addons/mpf-gmc/editor/mpf_debugger.gd").new()
+	# add_debugger_plugin(mpf_debugger)
 
 func _exit_tree():
 	# Clean-up of the plugin goes here.
@@ -59,8 +59,8 @@ func _exit_tree():
 	gmc_dock.free()
 	remove_control_from_docks(mpf_dock)
 	mpf_dock.free()
-	# remove_control_from_bottom_panel(mpf_output)
-	# mpf_output.free()
+	remove_control_from_bottom_panel(mpf_output)
+	mpf_output.free()
 	# remove_control_from_container(CONTAINER_TOOLBAR, mpf_launch)
 	# mpf_launch.free()
-	remove_debugger_plugin(mpf_debugger)
+	# remove_debugger_plugin(mpf_debugger)

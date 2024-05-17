@@ -79,6 +79,9 @@ func play_sounds(s: Dictionary) -> void:
 		assert(MPF.media.sounds.has(asset), "Unknown sound file or resource '%s'" % asset)
 
 		var config = MPF.media.get_sound_instance(asset)
+		if not config:
+			printerr("Unable to find sound instance for asset '%s'" % asset)
+			return
 		# If the result is a stream, there's no custom asset resource
 		if config is AudioStream:
 			settings["file"] = config.resource_path
