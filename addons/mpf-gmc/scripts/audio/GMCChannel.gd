@@ -116,7 +116,7 @@ func stop_with_settings(settings: Dictionary = {}, action: String = "stop") -> v
 	var tween = self.create_tween()
 	tween.tween_property(self, "volume_db", -80.0, fade_out) \
 		.set_trans(Tween.TRANS_QUINT).set_ease(Tween.EASE_IN)
-	tween.finished.connect(self._on_fade_complete.bind(self, tween, action))
+	tween.finished.connect(self._on_fade_complete.bind(tween, action))
 	self.tweens.append(tween)
 	self.set_meta("tween", tween)
 	self.set_meta("is_stopping", true)

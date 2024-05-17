@@ -131,9 +131,7 @@ func play(filename: String, settings: Dictionary = {}) -> void:
 	if self.type == BusType.SOLO:
 		for c in self.channels:
 			if c.playing and c != available_channel:
-				# AVW Restore this after refactor
-				pass
-				#self._stop(c, settings)
+				c.stop_with_settings(settings)
 
 	# If the available channel we got back is already playing, it's playing this file
 	# and we don't need to do anything further.
