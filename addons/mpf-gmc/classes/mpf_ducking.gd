@@ -44,3 +44,7 @@ func _set_target_bus(value: String) -> void:
 	# The saved bus may have been overridden by _init settings
 	if not bus:
 		bus = MPF.media.sound.get_bus(value)
+
+func _to_string() -> String:
+	return "<DuckSettings>{ delay: %s, attenuation: %s, attack: %s, release: %s, release_from_start: %s, release_point: %s, bus: %s" % \
+		[delay, attenuation, attack, release, release_from_start, release_point, bus.name]

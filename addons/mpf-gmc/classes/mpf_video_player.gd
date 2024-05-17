@@ -54,6 +54,7 @@ func _ready() -> void:
 func _play() -> void:
 	self.play()
 	if self.ducking:
+		self.ducking.calculate_release_time(Time.get_ticks_msec())
 		self.ducking.bus.duck(self.ducking)
 
 func _on_visibility() -> void:
