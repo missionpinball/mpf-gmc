@@ -301,3 +301,6 @@ static func get_bus_type(bus_string: String) -> BusType:
 		"sequential": BusType.SEQUENTIAL,
 		"simultaneous": BusType.SIMULTANEOUS
 	}.get(bus_string)
+
+func _to_string() -> String:
+	return "<GMCBus:%s>" % self.name

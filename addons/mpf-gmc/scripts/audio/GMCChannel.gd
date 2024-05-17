@@ -150,3 +150,6 @@ func _trigger_events(state, events) -> void:
 		MPF.server.send_event(e)
 	self.finished.disconnect(self.stream.get_meta("events_when_%s" % state))
 	self.stream.remove_meta("events_when_%s" % state)
+
+func _to_string() -> String:
+	return "<GMCChannel:%s:current_stream=%s>" % [self.name, self.stream or "None"]
