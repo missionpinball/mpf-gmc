@@ -11,23 +11,38 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_7ovm7")
 
-[node name="VBoxContainer" type="VBoxContainer" parent="."]
+[node name="main" type="VBoxContainer" parent="."]
 layout_mode = 1
 anchors_preset = 10
 anchor_right = 1.0
 offset_bottom = 58.0
 grow_horizontal = 2
 
-[node name="HBoxContainer" type="HBoxContainer" parent="VBoxContainer"]
+[node name="flags" type="HBoxContainer" parent="main"]
+layout_mode = 2
+
+[node name="fullscreen-label" type="Label" parent="main/flags"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Fullscreen Mode"
+
+[node name="fullscreen" type="CheckButton" parent="main/flags"]
+layout_mode = 2
+button_pressed = true
+
+[node name="HSeparator" type="HSeparator" parent="main"]
+layout_mode = 2
+
+[node name="loggers" type="HBoxContainer" parent="main"]
 layout_mode = 2
 size_flags_vertical = 3
 
-[node name="LogLevelLabel" type="Label" parent="VBoxContainer/HBoxContainer"]
+[node name="LogLevelLabel" type="Label" parent="main/loggers"]
 layout_mode = 2
 size_flags_horizontal = 3
 text = "Global Logging"
 
-[node name="LogLevel" type="OptionButton" parent="VBoxContainer/HBoxContainer"]
+[node name="LogLevel" type="OptionButton" parent="main/loggers"]
 layout_mode = 2
 alignment = 2
 item_count = 5

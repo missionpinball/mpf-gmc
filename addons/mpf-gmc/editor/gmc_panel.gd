@@ -1,9 +1,15 @@
 @tool
-extends Control
+extends GMCPanelBase
 
-@onready var logLevelSelector = $VBoxContainer/HBoxContainer/LogLevel
+
+@onready var logLevelSelector = $main/loggers/LogLevel
 
 func _ready() -> void:
+	config_section = "gmc"
+	fields = [
+		$main/flags/fullscreen,
+	]
+	super()
 	var initial_value = MPF.config.get_value("logging", "global", 20)
 	for i in range(0, logLevelSelector.item_count):
 		if logLevelSelector.get_item_id(i) == initial_value:
