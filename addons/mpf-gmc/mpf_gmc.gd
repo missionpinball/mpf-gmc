@@ -17,7 +17,11 @@ func _init():
 	self.config = ConfigFile.new()
 	var err = self.config.load(CONFIG_PATH)
 	if err != OK:
-		printerr("Error loading config file: %s" % err)
+		# Error 7 is file not found, that's okay
+		if err == ERR_FILE_NOT_FOUND:
+			pass
+		else:
+			printerr("Error loading config file: %s" % err)
 	# Configure logging with the value from the config
 	var global_log_level = self.config.get_value("logging", "global", 30)
 

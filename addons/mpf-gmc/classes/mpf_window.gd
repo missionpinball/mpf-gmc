@@ -6,6 +6,10 @@ class_name MPFWindow extends Control
 var displays: Dictionary = {}
 var default_display: MPFDisplay
 
+func _enter_tree() -> void:
+	if not Engine.is_editor_hint():
+		if MPF.config.has_section("gmc") and MPF.config.get_value("gmc", "fullscreen", false):
+			get_window().mode = Window.MODE_EXCLUSIVE_FULLSCREEN
 
 func _ready() -> void:
 	# Force the window dimensions to match the project settings
@@ -31,9 +35,6 @@ func _ready() -> void:
 		default_display = first_display
 	if not Engine.is_editor_hint():
 		MPF.server.listen()
-
-func _enter_tree():
-	pass
 
 func play_slides(payload: Dictionary) -> void:
 	self._play_scene("slide", payload)
