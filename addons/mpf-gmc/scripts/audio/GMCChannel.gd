@@ -15,12 +15,12 @@ func _init(n: String, b: GMCBus):
 	self.name = n
 	self._bus = b
 	self.bus = b.name
+	# Channels don't use unique logs, just ref the Bus log
 	self.log = b.log
 
 func load_stream(filepath: String) -> AudioStream:
 	self.stream = ResourceLoader.load(filepath, "AudioStreamOGGVorbis" if filepath.get_extension() == "ogg" else "AudioStreamSample") as AudioStream
 	return self.stream
-
 
 func play_with_settings(settings: Dictionary) -> AudioStream:
 	if not self.stream:

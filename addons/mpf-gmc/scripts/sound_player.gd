@@ -12,11 +12,11 @@ var default_bus: GMCBus
 var default_duck_bus: GMCBus
 
 
-func initialize(config: ConfigFile) -> void:
+func initialize(config: ConfigFile, log_level: int = 30) -> void:
 	self.configure_logging("SoundPlayer")
 	for i in range(0, AudioServer.bus_count):
 		var bus_name = AudioServer.get_bus_name(i)
-		self.buses[bus_name] = GMCBus.new(bus_name)
+		self.buses[bus_name] = GMCBus.new(bus_name, log_level)
 		# Buses have tweens so must be in the tree
 		self.add_child(self.buses[bus_name])
 	if config.has_section("sound_system"):

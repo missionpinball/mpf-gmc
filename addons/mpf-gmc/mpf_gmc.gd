@@ -23,6 +23,7 @@ func _init():
 		else:
 			printerr("Error loading config file: %s" % err)
 	# Configure logging with the value from the config
+	# TODO: Switch default to 40 when in production mode
 	var global_log_level = self.config.get_value("logging", "global", 30)
 
 	# Any default script can be overridden with a custom one
@@ -69,7 +70,8 @@ func _ready():
 	if self.config.has_section("keyboard"):
 		for key in self.config.get_section_keys("keyboard"):
 			keyboard[key.to_upper()] = self.config.get_value("keyboard", key)
-	self.media.sound.initialize(self.config)
+	var sound_log_level = self.config.get_value("gmc", "logging_sound_player", self.log.getLevel())
+	self.media.sound.initialize(self.config, sound_log_level)
 
 func save_config():
 	self.config.save(CONFIG_PATH)

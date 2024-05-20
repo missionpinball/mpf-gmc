@@ -14,9 +14,9 @@ var _bus_index: int
 var _active_duck: Tween
 var _duck_release_timer: Timer
 
-func _init(n: String):
+func _init(n: String, log_level: int = 30):
 	self.name = n
-	self.configure_logging("Bus<%s>" % self.name, 1)
+	self.configure_logging("Bus<%s>" % self.name, log_level)
 	# Store the target restore volume for post-ducks
 	self._bus_index = AudioServer.get_bus_index(self.name)
 	assert(self._bus_index != -1, "No audio bus %s configured in Godot Audio layout.")
