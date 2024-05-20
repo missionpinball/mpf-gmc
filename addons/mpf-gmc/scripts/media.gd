@@ -11,30 +11,17 @@ var widgets := {}
 var sounds := {}
 
 func _enter_tree() -> void:
-	print("MEDIA entering tree")
-	if OS.has_feature("macos"):
-		print("This is macos")
-	# If this is an exported project, the traversal is already done
-	# if OS.has_feature("gmc_export"):
-	if not Engine.is_editor_hint():
-		print("Retrieving exported traversal")
+	# Look for an exported traversal file
+	if ResourceLoader.exists("res://_media.res"):
+		self.log.info("Retrieving exported media tree traversal.")
 		# Cannot use preload because the file may not exist
-		var traversal = load("res://media.res")
-		print("retrieved traversal: %s" % traversal)
-		print(" - slides are: %s" % traversal["slides"])
+		var traversal = load("res://_media.res")
 		for m in ["slides", "sounds", "widgets"]:
 			for k in traversal[m]:
 				self[m][k] = traversal[m][k]
-		# slides = traversal["slides"] as Dictionary
-		# widgets = traversal["widgets"] as Dictionary
-		# sounds = traversal["sounds"] as Dictionary
 	else:
-		print("Manually traversing tree")
-		self.traverse_tree_for("slides", slides)
-		self.traverse_tree_for("widgets", widgets)
-		# Always do TRES files last so they'll supersede WAV/OGG files of the same name
-		for ext in ["wav", "ogg", "tres"]:
-			self.traverse_tree_for("sounds", sounds, ext)
+		self.log.info("Manually traversing tree for media.")
+		self.generate_traversal()
 
 	self.log.debug("Generated slide lookups: %s", slides)
 	self.log.debug("Generated widget lookups: %s", widgets)
@@ -70,6 +57,16 @@ func get_widget_instance(widget_name: String, preload_only: bool = false) -> MPF
 func get_sound_instance(sound_name: String, preload_only: bool = false):
 	assert(sound_name in sounds, "Unknown sound name '%s'" % sound_name)
 	return self._get_scene(sound_name, self.sounds, preload_only)
+
+func generate_traversal() -> void:
+	slides = {}
+	widgets = {}
+	sounds = {}
+	self.traverse_tree_for("slides", slides)
+	self.traverse_tree_for("widgets", widgets)
+	# Always do TRES files last so they'll supersede WAV/OGG files of the same name
+	for ext in ["wav", "ogg", "tres"]:
+		self.traverse_tree_for("sounds", sounds, ext)
 
 func _get_scene(scene_name: String, collection: Dictionary, preload_only: bool = false):
 	# If this is the first access, load the scene
