@@ -10,6 +10,7 @@ func _ready() -> void:
 		$main/global_logger/logging_global,
 		$main/loggers/loggers_margin/loggers_list/bcp_logger/logging_bcp,
 		$main/loggers/loggers_margin/loggers_list/game_logger/logging_game,
+		$main/loggers/loggers_margin/loggers_list/media_logger/logging_media,
 		$main/loggers/loggers_margin/loggers_list/process_logger/logging_process,
 		$main/loggers/loggers_margin/loggers_list/sound_logger/logging_sound_player,
 	]

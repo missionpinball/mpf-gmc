@@ -24,7 +24,7 @@ func _init():
 			printerr("Error loading config file: %s" % err)
 	# Configure logging with the value from the config
 	# TODO: Switch default to 40 when in production mode
-	var global_log_level = self.config.get_value("logging", "global", 30)
+	var global_log_level = self.config.get_value("gmc", "logging_global", 30)
 
 	# Any default script can be overridden with a custom one
 	# This is done explicitly line-by-line for optimized preload and relative paths

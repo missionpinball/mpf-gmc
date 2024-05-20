@@ -46,7 +46,7 @@ text = "Global Logging Level"
 layout_mode = 2
 alignment = 2
 item_count = 5
-selected = 2
+selected = 1
 popup/item_0/text = "Verbose"
 popup/item_0/id = 1
 popup/item_1/text = "Debug"
@@ -114,6 +114,33 @@ size_flags_horizontal = 3
 text = "Game Data"
 
 [node name="logging_game" type="OptionButton" parent="main/loggers/loggers_margin/loggers_list/game_logger"]
+layout_mode = 2
+alignment = 2
+item_count = 6
+selected = 0
+popup/item_0/text = "Use Global"
+popup/item_0/id = 0
+popup/item_1/text = "Verbose"
+popup/item_1/id = 1
+popup/item_2/text = "Debug"
+popup/item_2/id = 10
+popup/item_3/text = "Info"
+popup/item_3/id = 20
+popup/item_4/text = "Warning"
+popup/item_4/id = 30
+popup/item_5/text = "Error"
+popup/item_5/id = 40
+
+[node name="media_logger" type="HBoxContainer" parent="main/loggers/loggers_margin/loggers_list"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="LogLevelLabel" type="Label" parent="main/loggers/loggers_margin/loggers_list/media_logger"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Media Loader"
+
+[node name="logging_media" type="OptionButton" parent="main/loggers/loggers_margin/loggers_list/media_logger"]
 layout_mode = 2
 alignment = 2
 item_count = 6
