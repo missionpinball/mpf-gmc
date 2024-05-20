@@ -31,7 +31,7 @@ func _set_option_button(button: OptionButton, value: int) -> int:
 			return i
 	return -1
 
-func _set_dirty(_param) -> void:
+func _set_dirty(_param = null) -> void:
 	# By default, auto-save changes. Override if necessary.
 	self._save()
 

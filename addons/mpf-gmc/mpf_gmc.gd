@@ -85,11 +85,13 @@ func _unhandled_input(event: InputEvent) -> void:
 		return
 	var keycode = OS.get_keycode_string(event.get_key_label_with_modifiers()).to_upper()
 	#print(keycode)
-	if keycode == "ESCAPE":
+	if keycode == "ESCAPE" and self.config.get_value("gmc", "exit_on_esc", false):
+		if not event.is_pressed():
+			return
 		# Cannot use quit() method because it won't cleanly shut down threads
 		# Instead, send a notification to the main thread to shut down
-		#get_tree().notification(NOTIFICATION_WM_CLOSE_REQUEST)
-		# get_tree().quit()
+		get_tree().notification(NOTIFICATION_WM_CLOSE_REQUEST)
+		get_tree().quit()
 		return
 
 	if keycode in keyboard:

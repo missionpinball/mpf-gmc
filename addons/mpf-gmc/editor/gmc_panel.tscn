@@ -18,15 +18,16 @@ anchor_right = 1.0
 offset_bottom = 58.0
 grow_horizontal = 2
 
-[node name="flags" type="HBoxContainer" parent="main"]
+[node name="flags_top" type="GridContainer" parent="main"]
 layout_mode = 2
+columns = 2
 
-[node name="fullscreen-label" type="Label" parent="main/flags"]
+[node name="fullscreen-label" type="Label" parent="main/flags_top"]
 layout_mode = 2
 size_flags_horizontal = 3
 text = "Fullscreen Mode"
 
-[node name="fullscreen" type="CheckButton" parent="main/flags"]
+[node name="fullscreen" type="CheckButton" parent="main/flags_top"]
 layout_mode = 2
 
 [node name="HSeparator" type="HSeparator" parent="main"]
@@ -185,4 +186,26 @@ popup/item_5/text = "Error"
 popup/item_5/id = 40
 
 [node name="HSeparator2" type="HSeparator" parent="main/loggers"]
+layout_mode = 2
+
+[node name="flags_bottom" type="GridContainer" parent="main"]
+layout_mode = 2
+columns = 2
+
+[node name="escape-label" type="Label" parent="main/flags_bottom"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Exit Game on ESC"
+
+[node name="exit_on_esc" type="CheckButton" parent="main/flags_bottom"]
+layout_mode = 2
+
+[node name="fullscreen-label" type="Label" parent="main/flags_bottom"]
+visible = false
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Fullscreen Mode"
+
+[node name="fullscreen" type="CheckButton" parent="main/flags_bottom"]
+visible = false
 layout_mode = 2

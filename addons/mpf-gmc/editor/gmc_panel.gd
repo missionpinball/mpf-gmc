@@ -5,7 +5,8 @@ extends GMCPanelBase
 func _ready() -> void:
 	config_section = "gmc"
 	fields = [
-		$main/flags/fullscreen,
+		$main/flags_top/fullscreen,
+		$main/flags_bottom/exit_on_esc,
 		$main/global_logger/logging_global,
 		$main/loggers/loggers_margin/loggers_list/bcp_logger/logging_bcp,
 		$main/loggers/loggers_margin/loggers_list/game_logger/logging_game,
