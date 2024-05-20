@@ -19,8 +19,19 @@ func _ready() -> void:
 			if value != null:
 				child.button_pressed = value
 			child.pressed.connect(self._set_dirty)
+		elif child is OptionButton:
+			if value != null:
+				self._set_option_button(child, value)
+			child.item_selected.connect(self._set_dirty)
 
-func _set_dirty() -> void:
+func _set_option_button(button: OptionButton, value: int) -> int:
+	for i in range(0, button.item_count):
+		if button.get_item_id(i) == value:
+			button.select(i)
+			return i
+	return -1
+
+func _set_dirty(_param) -> void:
 	# By default, auto-save changes. Override if necessary.
 	self._save()
 
@@ -33,4 +44,8 @@ func _save() -> void:
 				MPF.config.erase_section_key(config_section, child.name)
 		elif child is CheckButton:
 			MPF.config.set_value(config_section, child.name, child.button_pressed)
+		elif child is OptionButton:
+			MPF.config.set_value(config_section, child.name,
+				child.get_item_id(child.selected)
+			)
 	MPF.save_config()

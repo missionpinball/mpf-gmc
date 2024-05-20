@@ -2,22 +2,18 @@
 extends GMCPanelBase
 
 
-@onready var logLevelSelector = $main/loggers/LogLevel
-
 func _ready() -> void:
 	config_section = "gmc"
 	fields = [
 		$main/flags/fullscreen,
+		$main/global_logger/logging_global,
+		$main/loggers/loggers_margin/loggers_list/sound_logger/logging_sound_player,
+		$main/loggers/loggers_margin/loggers_list/bcp_logger/logging_bcp,
 	]
 	super()
-	var initial_value = MPF.config.get_value("logging", "global", 20)
-	for i in range(0, logLevelSelector.item_count):
-		if logLevelSelector.get_item_id(i) == initial_value:
-			logLevelSelector.select(i)
-			break
-	logLevelSelector.item_selected.connect(self.set_log_level)
+	$main/show_all_toggle.toggled.connect(self._toggle_loggers)
+	$main/show_all_toggle.button_pressed = false
+	self._toggle_loggers(false)
 
-func set_log_level(index: int) -> void:
-	var id = logLevelSelector.get_item_id(index)
-	MPF.config.set_value("logging", "global", id)
-	MPF.save_config()
+func _toggle_loggers(toggled_on: bool) -> void:
+	$main/loggers.visible = toggled_on

@@ -28,7 +28,7 @@ func _enable_toggled(toggled_on: bool) -> void:
 	MPF.config.set_value(config_section, "spawn_mpf", toggled_on)
 	MPF.save_config()
 
-func _set_dirty() -> void:
+func _set_dirty(_param) -> void:
 	$main/buttons/save.disabled = false
 
 func _set_enable_available():

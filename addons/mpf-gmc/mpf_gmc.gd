@@ -50,8 +50,8 @@ func _init():
 			self[s[0]] = s[1].new()
 		# If an explicit value is set for this log, use it
 		if self[s[0]] is LoggingNode:
-			var script_log_level = self.config.get_value("logging", s[0], -1)
-			if script_log_level == -1:
+			var script_log_level = self.config.get_value("gmc", "logging_%s" % s[0], 0)
+			if script_log_level == 0:
 				script_log_level = global_log_level
 			self[s[0]].configure_logging(s[2], script_log_level)
 
