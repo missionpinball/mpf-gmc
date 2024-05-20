@@ -109,7 +109,8 @@ func set_type(t: BusType):
 		self.queue = []
 
 func play(filename: String, settings: Dictionary = {}) -> void:
-	self.log.info("play called for %s with settings %s" % [filename, settings])
+	self.log.info("Playing sound '%s'", filename)
+	self.log.debug(" - with sound settings %s", settings)
 	# Accept an absolute filepath too
 	var filepath: String
 	if filename.left(4) == "res:":
@@ -168,7 +169,7 @@ func play(filename: String, settings: Dictionary = {}) -> void:
 		duck_settings.bus.duck(duck_settings)
 
 func clear_context(context_name: String) -> void:
-	print("Bus %s is clearing context %s" % [self.name, context_name])
+	self.log.debug("Bus %s is clearing context %s" % [self.name, context_name])
 	for channel in self.channels:
 		if channel.stream and channel.stream.has_meta("context") and \
 		channel.stream.get_meta("context") == context_name and \
