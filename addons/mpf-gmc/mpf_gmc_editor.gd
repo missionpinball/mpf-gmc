@@ -4,6 +4,7 @@ extends EditorPlugin
 var gmc_dock
 var mpf_dock
 var mpf_launch
+var gmc_export
 
 func _enter_tree():
 	# Add the new type with a name, a parent type, a script and an icon.
@@ -30,6 +31,9 @@ func _enter_tree():
 	# Add a custom button for launching with MPF
 	# mpf_launch = preload("res://addons/mpf-gmc/editor/mpf_player.tscn").instantiate()
 	# add_control_to_container(CONTAINER_TOOLBAR, mpf_launch)
+	# Add an Export plugin to manage export behavior
+	gmc_export = preload("res://addons/mpf-gmc/editor/mpf_gmc_export.gd").new()
+	add_export_plugin(gmc_export)
 
 func _exit_tree():
 	# Clean-up of the plugin goes here.
@@ -55,3 +59,4 @@ func _exit_tree():
 	mpf_dock.free()
 	# remove_control_from_container(CONTAINER_TOOLBAR, mpf_launch)
 	# mpf_launch.free()
+	remove_export_plugin(gmc_export)

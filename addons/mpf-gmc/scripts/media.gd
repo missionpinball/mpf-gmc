@@ -11,11 +11,30 @@ var widgets := {}
 var sounds := {}
 
 func _enter_tree() -> void:
-	self.traverse_tree_for("slides", slides)
-	self.traverse_tree_for("widgets", widgets)
-	# Always do TRES files last so they'll supersede WAV/OGG files of the same name
-	for ext in ["wav", "ogg", "tres"]:
-		self.traverse_tree_for("sounds", sounds, ext)
+	print("MEDIA entering tree")
+	if OS.has_feature("macos"):
+		print("This is macos")
+	# If this is an exported project, the traversal is already done
+	# if OS.has_feature("gmc_export"):
+	if not Engine.is_editor_hint():
+		print("Retrieving exported traversal")
+		# Cannot use preload because the file may not exist
+		var traversal = load("res://media.res")
+		print("retrieved traversal: %s" % traversal)
+		print(" - slides are: %s" % traversal["slides"])
+		for m in ["slides", "sounds", "widgets"]:
+			for k in traversal[m]:
+				self[m][k] = traversal[m][k]
+		# slides = traversal["slides"] as Dictionary
+		# widgets = traversal["widgets"] as Dictionary
+		# sounds = traversal["sounds"] as Dictionary
+	else:
+		print("Manually traversing tree")
+		self.traverse_tree_for("slides", slides)
+		self.traverse_tree_for("widgets", widgets)
+		# Always do TRES files last so they'll supersede WAV/OGG files of the same name
+		for ext in ["wav", "ogg", "tres"]:
+			self.traverse_tree_for("sounds", sounds, ext)
 
 	self.log.debug("Generated slide lookups: %s", slides)
 	self.log.debug("Generated widget lookups: %s", widgets)
