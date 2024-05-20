@@ -22,9 +22,12 @@ func _init():
 			pass
 		else:
 			printerr("Error loading config file: %s" % err)
-	# Configure logging with the value from the config
-	# TODO: Switch default to 40 when in production mode
-	var global_log_level = self.config.get_value("gmc", "logging_global", 30)
+	# Configure logging with the value from the config, if provided.
+	# Otherwise will default to INFO for debug builds and LOG for production.
+	var default_log_level = 20 if OS.has_feature("debug") else 25
+	var global_log_level = self.config.get_value("gmc", "logging_global", default_log_level)
+	# Set the GMC level as global log level before instantiating other loggers
+	self.configure_logging("GMC", global_log_level, true)
 
 	# Any default script can be overridden with a custom one
 	# This is done explicitly line-by-line for optimized preload and relative paths
@@ -51,13 +54,8 @@ func _init():
 			self[s[0]] = s[1].new()
 		# If an explicit value is set for this log, use it
 		if self[s[0]] is LoggingNode:
-			var script_log_level = self.config.get_value("gmc", "logging_%s" % s[0], 0)
-			if script_log_level == 0:
-				script_log_level = global_log_level
+			var script_log_level = self.config.get_value("gmc", "logging_%s" % s[0], -1)
 			self[s[0]].configure_logging(s[2], script_log_level)
-
-	self.configure_logging("GMC", global_log_level)
-
 
 func _enter_tree():
 	# self._process() is only called on children in the tree, so add the children
