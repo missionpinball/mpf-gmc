@@ -4,15 +4,16 @@ extends GMCPanelBase
 func _ready() -> void:
 	config_section = "mpf"
 	fields = [
-		$main/executable_path,
-		$main/executable_args,
-		$main/mpf_args,
-		$main/flags/virtual,
+		$main/ScrollContainer/scroll_contents/executable_path,
+		$main/ScrollContainer/scroll_contents/executable_args,
+		$main/ScrollContainer/scroll_contents/machine_path,
+		$main/ScrollContainer/scroll_contents/mpf_args,
+		$main/ScrollContainer/scroll_contents/flags/virtual,
+		$main/ScrollContainer/scroll_contents/flags/verbose,
 	]
 	super()
 	# Set a placeholder for the machine path
-	if not $main/machine_path.text:
-		$main/machine_path.placeholder_text = ProjectSettings.globalize_path("res://")
+	$main/ScrollContainer/scroll_contents/machine_path.placeholder_text = ProjectSettings.globalize_path("res://")
 	# Always auto-save toggling the enable state
 	$main/enable/spawn_mpf.toggled.connect(self._enable_toggled)
 

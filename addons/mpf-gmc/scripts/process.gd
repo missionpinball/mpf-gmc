@@ -39,6 +39,8 @@ func _spawn_mpf():
 		mpf_args.append_array(MPF.config.get_value("mpf", "mpf_args").split(" "))
 	if MPF.config.get_value("mpf", "virtual", false):
 		mpf_args.append("-x")
+	if MPF.config.get_value("mpf", "verbose", false):
+		mpf_args.append("-vV")
 
 	# Generate a timestamped MPF log in the same place as the GMC log
 	# mpf_YYYY-MM-DD_HH.mm.ss.log
