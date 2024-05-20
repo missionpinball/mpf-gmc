@@ -7,8 +7,10 @@ func _ready() -> void:
 	fields = [
 		$main/flags/fullscreen,
 		$main/global_logger/logging_global,
-		$main/loggers/loggers_margin/loggers_list/sound_logger/logging_sound_player,
 		$main/loggers/loggers_margin/loggers_list/bcp_logger/logging_bcp,
+		$main/loggers/loggers_margin/loggers_list/game_logger/logging_game,
+		$main/loggers/loggers_margin/loggers_list/process_logger/logging_process,
+		$main/loggers/loggers_margin/loggers_list/sound_logger/logging_sound_player,
 	]
 	super()
 	$main/show_all_toggle.toggled.connect(self._toggle_loggers)

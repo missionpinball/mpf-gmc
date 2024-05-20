@@ -70,6 +70,7 @@ func _ready():
 	if self.config.has_section("keyboard"):
 		for key in self.config.get_section_keys("keyboard"):
 			keyboard[key.to_upper()] = self.config.get_value("keyboard", key)
+	# Sound Player can have its own log level
 	var sound_log_level = self.config.get_value("gmc", "logging_sound_player", self.log.getLevel())
 	self.media.sound.initialize(self.config, sound_log_level)
 
