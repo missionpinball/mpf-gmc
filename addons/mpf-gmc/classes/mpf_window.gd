@@ -8,7 +8,7 @@ var default_display: MPFDisplay
 
 func _enter_tree() -> void:
 	if not Engine.is_editor_hint():
-		if MPF.config.has_section("gmc") and MPF.config.get_value("gmc", "fullscreen", false):
+		if MPF.get_config_value("gmc", "fullscreen", false):
 			get_window().mode = Window.MODE_EXCLUSIVE_FULLSCREEN
 
 func _ready() -> void:
@@ -78,14 +78,14 @@ func get_display(display_name: String = "") -> MPFDisplay:
 
 func _check_config() -> void:
 	var filter_parent = self.get_node_or_null("filters")
-	if MPF.config and MPF.config.has_section("filter"):
+	if MPF.has_config_section("filter"):
 		assert(filter_parent != null, "gmc.cfg has a [filters] section but MPFWindow does not have a 'filters' child")
 		# Don't show the filter in the editor
 		if Engine.is_editor_hint():
 			return
 		# Check for a filter
-		if MPF.config.has_section_key("filter", "filter"):
-			var filter_name = MPF.config.get_value("filter", "filter")
+		var filter_name = MPF.get_config_value("filter", "filter", false)
+		if filter_name:
 			var filter = null
 			for c in filter_parent.get_children():
 				if c.name == filter_name:
@@ -100,10 +100,10 @@ func _check_config() -> void:
 				filter.show()
 
 			assert(filter != null, "Unknown filter '%s'" % filter_name)
-			for prop in MPF.config.get_section_keys("filter"):
+			for prop in MPF.get_config_keys("filter"):
 				if prop == "filter":
 					continue
-				filter.material.set_shader_parameter(prop, MPF.config.get_value("filter", prop))
+				filter.material.set_shader_parameter(prop, MPF.get_config_value("filter", prop))
 	# For safety, disable all filters
 	elif filter_parent:
 		filter_parent.hide()
