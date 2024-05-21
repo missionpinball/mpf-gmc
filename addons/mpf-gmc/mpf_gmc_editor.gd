@@ -3,7 +3,6 @@ extends EditorPlugin
 
 var gmc_dock
 var mpf_dock
-var mpf_launch
 var gmc_export
 
 func _enter_tree():
@@ -28,9 +27,6 @@ func _enter_tree():
 	add_control_to_dock(DOCK_SLOT_LEFT_UR, gmc_dock)
 	mpf_dock = preload("res://addons/mpf-gmc/editor/mpf_panel.tscn").instantiate()
 	add_control_to_dock(DOCK_SLOT_LEFT_UR, mpf_dock)
-	# Add a custom button for launching with MPF
-	# mpf_launch = preload("res://addons/mpf-gmc/editor/mpf_player.tscn").instantiate()
-	# add_control_to_container(CONTAINER_TOOLBAR, mpf_launch)
 	# Add an Export plugin to manage export behavior
 	gmc_export = preload("res://addons/mpf-gmc/editor/mpf_gmc_export.gd").new()
 	add_export_plugin(gmc_export)
@@ -57,6 +53,4 @@ func _exit_tree():
 	gmc_dock.free()
 	remove_control_from_docks(mpf_dock)
 	mpf_dock.free()
-	# remove_control_from_container(CONTAINER_TOOLBAR, mpf_launch)
-	# mpf_launch.free()
 	remove_export_plugin(gmc_export)
