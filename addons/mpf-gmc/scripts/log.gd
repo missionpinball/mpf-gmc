@@ -49,7 +49,11 @@ func info(message: String, args=null) -> void:
 	if _level <= LogLevel.INFO:
 		print(GMCLogger._log(self.log_name, "INFO", message, args))
 
-func warn(message: String, args=null) -> void:
+func log(message: String, args=null) -> void:
+	if _level <= LogLevel.LOG:
+		print(GMCLogger._log(self.log_name, "LOG", message, args))
+
+func warning(message: String, args=null) -> void:
 	if _level <= LogLevel.WARNING:
 		push_warning(GMCLogger._log(self.log_name, "WARNING", message, args))
 

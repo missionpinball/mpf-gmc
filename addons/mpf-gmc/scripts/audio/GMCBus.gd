@@ -161,7 +161,7 @@ func play(filename: String, settings: Dictionary = {}) -> void:
 		if stream is AudioStreamRandomizer:
 			# TODO: Get current stream from AudioStreamRandomizer:
 			# https://github.com/godotengine/godot/pull/88437
-			self.log.warn("Unable to duck AudioStreamRandomizer :( ")
+			self.log.warning("AudioStreamRandomizer ducking is not supported. Waiting for a Godot update.")
 			return
 		# If this came from an MPFSoundAsset the ducking is already configured
 		var duck_settings: DuckSettings = settings.ducking if settings.ducking is DuckSettings else DuckSettings.new(settings.ducking)

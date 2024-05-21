@@ -57,14 +57,14 @@ func _exit_tree():
 
 func _process(_delta: float) -> void:
 	if not _client and _server.is_connection_available() == true:
-		self.log.info("Client connection is available!")
+		self.log.info("Client connection is available.")
 		_client = _server.take_connection()
 		var err = _thread.start(self._thread_poll, Thread.Priority.PRIORITY_LOW)
 		if err != OK:
 			self.log.error("Error spawning BCP poll thread: %s", err)
 			self.status = ServerStatus.ERROR
 		else:
-			self.log.info("Client connected!")
+			self.log.log("Client connected from %s:%s", [_client.get_connected_host(), _client.get_connected_port()])
 			self.status = ServerStatus.CONNECTED
 			# No need to run _process() while we have an active client connection
 			set_process(false)
@@ -178,7 +178,7 @@ func remove_event_handler(event: String, handler: Callable) -> void:
 
 ## Disconnect the BCP server
 func stop(is_exiting: bool = false) -> void:
-	self.log.info("Shutting down BCP Server and %s", "will not restart" if is_exiting else "awaiting new connection")
+	self.log.log("Shutting down BCP Server and %s", "will not restart" if is_exiting else "awaiting new connection")
 	# Lock the mutex to prevent the BCP thread from polling
 	_mutex.lock()
 	_server.stop()
@@ -246,7 +246,7 @@ func on_stop() -> void:
 func _send(message: String) -> void:
 	if not _client:
 		return
-	self.log.verbose("Sending BCP Message: %s" % message)
+	self.log.verbose("Sending: %s" % message)
 	_client.put_data(("%s\n" % message).to_ascii_buffer())
 
 
@@ -360,7 +360,7 @@ func _thread_poll(_userdata=null) -> void:
 						call_deferred("deferred_mc", "play", message)
 					_:
 						if message.get("name") not in self.registered_handlers:
-							self.log.warn("No action defined for BCP message %s" % message_raw)
+							self.log.warning("No handler defined for BCP action %s" % message_raw)
 
 				# If any handlers are registered for this event, post them
 				if message.get("name") in self.registered_handlers:

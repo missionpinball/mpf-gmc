@@ -81,7 +81,7 @@ func retrieve_preloaded_scene(path: String) -> PackedScene:
   if preloaded_scenes.has(path):
     scene = preloaded_scenes[path]
   else:
-    self.log.warn("Preloaded scene MISS %s", path)
+    self.log.warning("Preloaded scene MISS %s", path)
     scene = load(path)
   # Clear the reference to the scene so it can be garbage collected after the scene is done
   if not path in persisted_scenes:

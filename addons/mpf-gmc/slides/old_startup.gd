@@ -30,7 +30,7 @@ func _init() -> void:
     MPF.log.setLevel(MPF.log.DEBUG)
   # Else here so that we can still verbose in prod
   elif "--prod" in args:
-    MPF.log.setLevel(MPF.log.WARNING)
+    MPF.log.setLevel(MPF.log.LOG)
   if "--fs" in args or "--prod" in args:
     Input.set_mouse_mode(Input.MOUSE_MODE_HIDDEN)
     DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_FULLSCREEN)
