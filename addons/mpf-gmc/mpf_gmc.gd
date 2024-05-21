@@ -3,6 +3,7 @@ extends LoggingNode
 class_name GMC
 
 const CONFIG_PATH = "res://gmc.cfg"
+const LOCAL_CONFIG_PATH = "user://gmc.local.cfg"
 
 var game
 var media
@@ -12,16 +13,20 @@ var server
 var util
 var keyboard: = {}
 var config
+var local_config
 
 func _init():
-	self.config = ConfigFile.new()
-	var err = self.config.load(CONFIG_PATH)
-	if err != OK:
-		# Error 7 is file not found, that's okay
-		if err == ERR_FILE_NOT_FOUND:
-			pass
-		else:
-			printerr("Error loading config file: %s" % err)
+	for cfg in [[CONFIG_PATH, "config"], [LOCAL_CONFIG_PATH, "local_config"]]:
+		self[cfg[1]] = ConfigFile.new()
+		var err = self[cfg[1]].load(cfg[0])
+		if err == OK:
+			print("Found GMC configuration file %s." % ProjectSettings.globalize_path(cfg[0]))
+		if err != OK:
+			# Error 7 is file not found, that's okay
+			if err == ERR_FILE_NOT_FOUND:
+				pass
+			else:
+				printerr("Error loading config file '%s': %s" % [cfg[0],err])
 	# Configure logging with the value from the config, if provided.
 	# Otherwise will default to INFO for debug builds and LOG for production.
 	var default_log_level = 20 if OS.has_feature("debug") else 25
@@ -74,6 +79,25 @@ func _ready():
 
 func save_config():
 	self.config.save(CONFIG_PATH)
+
+func get_config_value(section: String, key: String, default = null) -> Variant:
+	if self.has_local_config_value(section, key):
+		return self.local_config.get_value(section, key)
+	return self.config.get_value(section, key, default)
+
+func get_config_keys(section: String) -> PackedStringArray:
+	var result = PackedStringArray()
+	if self.local_config.has_section(section):
+		result.append_array(self.local_config.get_section_keys(section))
+	if self.config.has_section(section):
+		result.append_array(self.config.get_section_keys(section))
+	return result
+
+func has_config_section(section: String) -> bool:
+	return self.local_config.has_section(section) or self.config.has_section(section)
+
+func has_local_config_value(section: String, key: String) -> bool:
+	return self.local_config.has_section_key(section, key)
 
 func _unhandled_input(event: InputEvent) -> void:
 	if not event.is_class("InputEventKey"):
