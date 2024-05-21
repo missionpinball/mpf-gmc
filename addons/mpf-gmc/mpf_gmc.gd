@@ -1,6 +1,5 @@
 @tool
 extends LoggingNode
-class_name GMC
 
 const CONFIG_PATH = "res://gmc.cfg"
 const LOCAL_CONFIG_PATH = "user://gmc.local.cfg"
