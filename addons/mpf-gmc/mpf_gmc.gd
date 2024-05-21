@@ -30,7 +30,7 @@ func _init():
 	# Configure logging with the value from the config, if provided.
 	# Otherwise will default to INFO for debug builds and LOG for production.
 	var default_log_level = 20 if OS.has_feature("debug") else 25
-	var global_log_level = self.config.get_value("gmc", "logging_global", default_log_level)
+	var global_log_level = self.get_config_value("gmc", "logging_global", default_log_level)
 	# Set the GMC level as global log level before instantiating other loggers
 	self.configure_logging("GMC", global_log_level, true)
 
@@ -50,7 +50,7 @@ func _init():
 			# Media controller can come last
 			["media", preload("scripts/media.gd"), "GMCMedia"]
 	]:
-		var script = self.config.get_value("gmc", s[2], false)
+		var script = self.get_config_value("gmc", s[2], false)
 		# TODO: Add logging configuration as init parameters so logging
 		# is available in the _init() methods of all scripts
 		if script:
@@ -59,7 +59,7 @@ func _init():
 			self[s[0]] = s[1].new()
 		# If an explicit value is set for this log, use it
 		if self[s[0]] is LoggingNode:
-			var script_log_level = self.config.get_value("gmc", "logging_%s" % s[0], -1)
+			var script_log_level = self.get_config_value("gmc", "logging_%s" % s[0], -1)
 			self[s[0]].configure_logging(s[2], script_log_level)
 
 func _enter_tree():
@@ -72,9 +72,9 @@ func _enter_tree():
 func _ready():
 	if self.config.has_section("keyboard"):
 		for key in self.config.get_section_keys("keyboard"):
-			keyboard[key.to_upper()] = self.config.get_value("keyboard", key)
+			keyboard[key.to_upper()] = self.get_config_value("keyboard", key)
 	# Sound Player can have its own log level
-	var sound_log_level = self.config.get_value("gmc", "logging_sound_player", self.log.getLevel())
+	var sound_log_level = self.get_config_value("gmc", "logging_sound_player", self.log.getLevel())
 	self.media.sound.initialize(self.config, sound_log_level)
 
 func save_config():
@@ -107,7 +107,7 @@ func _unhandled_input(event: InputEvent) -> void:
 		return
 	var keycode = OS.get_keycode_string(event.get_key_label_with_modifiers()).to_upper()
 	#print(keycode)
-	if keycode == "ESCAPE" and self.config.get_value("gmc", "exit_on_esc", false):
+	if keycode == "ESCAPE" and self.get_config_value("gmc", "exit_on_esc", false):
 		if not event.is_pressed():
 			return
 		# Cannot use quit() method because it won't cleanly shut down threads
