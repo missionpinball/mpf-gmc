@@ -19,7 +19,10 @@ func _init():
 		self[cfg[1]] = ConfigFile.new()
 		var err = self[cfg[1]].load(cfg[0])
 		if err == OK:
-			print("Found GMC configuration file %s." % ProjectSettings.globalize_path(cfg[0]))
+			if cfg[1] == "local_config":
+				print("Found local GMC config override file: %s" % ProjectSettings.globalize_path(cfg[0]))
+			else:
+				print("Found GMC configuration file %s." % ProjectSettings.globalize_path(cfg[0]))
 		if err != OK:
 			# Error 7 is file not found, that's okay
 			if err == ERR_FILE_NOT_FOUND:

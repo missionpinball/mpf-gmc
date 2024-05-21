@@ -17,7 +17,7 @@ var log: GMCLogger
 
 func _enter_tree():
 	# Create a log
-	self.log = preload("res://addons/mpf-gmc/scripts/log.gd").new(self.name)
+	self.log = preload("res://addons/mpf-gmc/scripts/log.gd").new("Carousel<%s>" % self.name)
 
 func _ready():
 	for c in self.get_children():
@@ -28,7 +28,6 @@ func _ready():
 
 func _on_item_highlighted(payload: Dictionary) -> void:
 	if payload.carousel != self.carousel_name:
-		self.log.debug("Carousel named '%s' does not match payload name '%s'", [self.carousel_name, payload.carousel])
 		return
 	self.log.info("Carousel looking for child matching name '%s'", payload.item)
 	for c in self.get_children():

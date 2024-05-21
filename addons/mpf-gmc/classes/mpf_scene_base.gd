@@ -52,7 +52,8 @@ func initialize(n: String, settings: Dictionary, c: String, p: int = 0, kwargs: 
 
 func _enter_tree():
 	# Create a log
-	self.log = preload("res://addons/mpf-gmc/scripts/log.gd").new(self.name)
+	var scene_type = "Slide" if self is MPFSlide else "Display" if self is MPFDisplay else "Widget" if self is MPFWidget else "MPFSceneBase"
+	self.log = preload("res://addons/mpf-gmc/scripts/log.gd").new("%s<%s>" % [scene_type, self.name])
 
 func _exit_tree() -> void:
 	for timer in self._expirations.values():

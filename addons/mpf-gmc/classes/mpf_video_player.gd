@@ -39,7 +39,7 @@ enum EndBehavior {
 var log: GMCLogger
 
 func _enter_tree() -> void:
-	self.log = preload("res://addons/mpf-gmc/scripts/log.gd").new(self.name)
+	self.log = preload("res://addons/mpf-gmc/scripts/log.gd").new("VideoPlayer<%s>" % self.name)
 	if not self.is_visible_in_tree() and self.hide_behavior != HideBehavior.CONTINUE:
 		self.stop()
 
@@ -59,7 +59,7 @@ func _play() -> void:
 
 func _on_visibility() -> void:
 	var do_show: bool = self.is_visible_in_tree() and self.autoplay and not Engine.is_editor_hint()
-	self.log.info("Visibility change, visible is now %s", do_show)
+	self.log.debug("Visibility change, visible is now %s", do_show)
 	match self.hide_behavior:
 		HideBehavior.RESTART:
 			if do_show:
