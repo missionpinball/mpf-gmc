@@ -70,6 +70,14 @@ func _process(_delta: float) -> void:
 			set_process(false)
 		status_changed.emit(self.status)
 
+## Handle connection validation before public on_connect method
+func _on_connect(payload: Dictionary) -> void:
+	if payload.controller_name == "Mission Pinball Framework":
+		if not MPF.validate_min_version(payload.controller_version):
+			self.log.error("MPF %s does not meet minimum version requirement %s", [payload.controller_version, MPF.MPF_MIN_VERSION])
+			assert(false, "GMC requires MPF version %s, but found %s." % [MPF.MPF_MIN_VERSION, payload.controller_version])
+	self.on_connect()
+
 ###
 # Public Methods
 ###
@@ -97,7 +105,6 @@ func deferred_game_player(result) -> void:
 
 func deferred_scene(scene_res: String) -> void:
 	get_tree().change_scene_to_file(scene_res)
-
 
 func deferred_scene_to(scene_pck: Resource) -> void:
 	get_tree().change_scene_to_packed(scene_pck)
@@ -259,7 +266,7 @@ func _thread_poll(_userdata=null) -> void:
 			for message_raw in messages:
 				if message_raw.is_empty():
 					continue
-				self.log.verbose("Received BCP command: %s", message_raw)
+				self.log.verbose("Received: %s", message_raw)
 				var message: Dictionary = _bcp_parse.parse(message_raw)
 				# Log any errors
 				if message.has("error"):
@@ -286,7 +293,7 @@ func _thread_poll(_userdata=null) -> void:
 						call_deferred("set_process", true)
 					"hello":
 						_send("hello")
-						call_deferred("on_connect")
+						call_deferred("_on_connect", message)
 					"item_highlighted":
 						call_deferred("emit_signal", "item_highlighted", message)
 					"list_coils":

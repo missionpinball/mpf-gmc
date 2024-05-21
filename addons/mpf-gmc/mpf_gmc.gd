@@ -3,6 +3,7 @@ extends LoggingNode
 
 const CONFIG_PATH = "res://gmc.cfg"
 const LOCAL_CONFIG_PATH = "user://gmc.local.cfg"
+const MPF_MIN_VERSION = "0.80.0"
 
 var game
 var media
@@ -100,6 +101,16 @@ func has_config_section(section: String) -> bool:
 
 func has_local_config_value(section: String, key: String) -> bool:
 	return self.local_config.has_section_key(section, key)
+
+func validate_min_version(compare_version: String) -> bool:
+	return _explode_version_string(compare_version) >= _explode_version_string(MPF_MIN_VERSION)
+
+func _explode_version_string(version: String) -> int:
+	var bits = version.split(".")
+	while bits.size() < 4:
+		bits.append("0")
+	bits[3] = bits[3].trim_prefix("dev")
+	return int(bits[0]) * 1_000_000 + int(bits[1]) * 10_000 + int(bits[2]) * 100 + int(bits[3])
 
 func _unhandled_input(event: InputEvent) -> void:
 	if not event.is_class("InputEventKey"):
