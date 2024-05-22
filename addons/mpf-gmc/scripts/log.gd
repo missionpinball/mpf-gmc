@@ -30,7 +30,8 @@ func _init(name: String = "", level: int = LogLevel.USE_GLOBAL_LEVEL, set_global
 		_global_level = level
 
 func setLevel(level: LogLevel) -> void:
-	if level == LogLevel.USE_GLOBAL_LEVEL:
+	# GMC panel doesn't allow -1 as an index, so 0 counts as -1.
+	if level <=0:
 		level = _global_level
 	_level = level
 

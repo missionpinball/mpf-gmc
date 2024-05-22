@@ -163,16 +163,20 @@ func set_machine_var(var_name: String, value) -> void:
 func add_event_handler(event: String, handler: Callable) -> void:
 	# Add a listener for this event if we don't already have one
 	if event not in registered_handlers:
+		self.log.debug("Registering MPF event trigger for event '%s'", event)
 		self._send("register_trigger?event=%s" % event)
 		registered_handlers[event] = []
 	if handler not in registered_handlers[event]:
 		registered_handlers[event].append(handler)
+		self.log.debug("Adding handler %s to event trigger for event '%s'", [handler, event])
 
 func remove_event_handler(event: String, handler: Callable) -> void:
 	# TODO: Any fallback logic or error catching if it's not here?
+	self.log.debug("Removing handler %s from event trigger for event '%s'", [handler, event])
 	registered_handlers[event].erase(handler)
 	# If there are no more handlers, unsubscribe from this event
 	if not registered_handlers[event] and event not in self.registered_events and event not in self.auto_signals:
+		self.log.debug("Deregistering MPF event trigger for event '%s' because it has no more handlers", event)
 		self._send("remove_trigger?event=%s" % event)
 		registered_handlers.erase(event)
 

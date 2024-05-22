@@ -8,7 +8,7 @@ func _ready() -> void:
 		$main/flags_top/fullscreen,
 		$main/flags_bottom/exit_on_esc,
 		$main/global_logger/logging_global,
-		$main/loggers/loggers_margin/loggers_list/bcp_logger/logging_bcp,
+		$main/loggers/loggers_margin/loggers_list/server_logger/logging_server,
 		$main/loggers/loggers_margin/loggers_list/game_logger/logging_game,
 		$main/loggers/loggers_margin/loggers_list/media_logger/logging_media,
 		$main/loggers/loggers_margin/loggers_list/process_logger/logging_process,

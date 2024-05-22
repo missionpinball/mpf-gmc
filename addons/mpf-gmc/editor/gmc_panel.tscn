@@ -77,16 +77,16 @@ theme_override_constants/margin_left = 28
 [node name="loggers_list" type="VBoxContainer" parent="main/loggers/loggers_margin"]
 layout_mode = 2
 
-[node name="bcp_logger" type="HBoxContainer" parent="main/loggers/loggers_margin/loggers_list"]
+[node name="server_logger" type="HBoxContainer" parent="main/loggers/loggers_margin/loggers_list"]
 layout_mode = 2
 size_flags_vertical = 3
 
-[node name="LogLevelLabel" type="Label" parent="main/loggers/loggers_margin/loggers_list/bcp_logger"]
+[node name="LogLevelLabel" type="Label" parent="main/loggers/loggers_margin/loggers_list/server_logger"]
 layout_mode = 2
 size_flags_horizontal = 3
 text = "BCP Server"
 
-[node name="logging_bcp" type="OptionButton" parent="main/loggers/loggers_margin/loggers_list/bcp_logger"]
+[node name="logging_server" type="OptionButton" parent="main/loggers/loggers_margin/loggers_list/server_logger"]
 layout_mode = 2
 alignment = 2
 item_count = 6
