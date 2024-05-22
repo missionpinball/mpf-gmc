@@ -117,10 +117,12 @@ func remove(with_animation=true):
 	if with_animation:
 		if self._trigger_animation(CoreAnimation.REMOVED):
 			await self.animation_player.animation_finished
-			self.log.info("Removal animation complete, removing now")
 	# Immediately cancel any created/active animations
 	if self.current_animation in [CoreAnimation.CREATED, CoreAnimation.ACTIVE]:
 		self.animation_player.stop()
+	# If the removal animation is already playing, ignore this remove call
+	elif self.current_animation == CoreAnimation.REMOVED:
+		return
 	self.get_parent().remove_child(self)
 	self.queue_free()
 

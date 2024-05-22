@@ -149,7 +149,7 @@ func _update_stack(kwargs: Dictionary = {}) -> void:
 				await new_slide.animation_finished
 		   	# If the old slide is on top of the new one and has an outro, play it
 			if is_instance_valid(old_slide):
-				await old_slide.remove(old_slide.priority > new_slide.priority)
+				await old_slide.remove(old_slide.priority >= new_slide.priority)
 			MPF.server.send_event("slide_%s_removed" % old_slide_key)
 
 func _manage_queue(action: String) -> void:
