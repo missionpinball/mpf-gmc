@@ -8,7 +8,7 @@ var channels: Array[GMCChannel] = []
 var type: BusType = BusType.SIMULTANEOUS
 var queue
 var duckings: Array[DuckSettings] = []
-var _next_release: float
+
 var _full_volume_db: float
 var _bus_index: int
 var _active_duck: Tween

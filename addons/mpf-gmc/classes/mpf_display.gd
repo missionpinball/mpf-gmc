@@ -22,6 +22,7 @@ var _queue: Array = []
 func _ready() -> void:
 	self._register_display_in_window()
 	self._slides = Control.new()
+	self._slides.name = "_%s_slides" % self.name
 	self._slides.set_anchors_preset(PRESET_FULL_RECT)
 	self._slides.size_flags_horizontal = SIZE_EXPAND
 	self._slides.size_flags_vertical = SIZE_EXPAND
