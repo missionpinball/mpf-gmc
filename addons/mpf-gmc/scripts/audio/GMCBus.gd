@@ -157,7 +157,7 @@ func play(filename: String, settings: Dictionary = {}) -> void:
 		return
 	var stream = available_channel.play_with_settings(settings)
 
-	if settings.ducking:
+	if settings.get("ducking", false):
 		if stream is AudioStreamRandomizer:
 			# TODO: Get current stream from AudioStreamRandomizer:
 			# https://github.com/godotengine/godot/pull/88437
