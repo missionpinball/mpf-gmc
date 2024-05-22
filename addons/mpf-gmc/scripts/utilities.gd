@@ -26,6 +26,16 @@ static func find_parent_slide(n: Node, allow_widget: bool = false):
 static func find_parent_slide_or_widget(n: Node):
 	return find_parent_slide(n, true)
 
+static func find_parent_window(n: Node):
+	var parent = n
+	while parent:
+		if parent is MPFWindow:
+			return parent
+		parent = parent.get_parent()
+	if not parent:
+		printerr("No parent window found in for %s" % n.name)
+		return
+
 ## Receive an integer value and return a comma-separated string
 static func comma_sep(n: int) -> String:
 	var result := ""

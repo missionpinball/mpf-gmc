@@ -20,6 +20,7 @@ var _current_slide: MPFSlide
 var _queue: Array = []
 
 func _ready() -> void:
+	self._register_display_in_window()
 	self._slides = Control.new()
 	self._slides.set_anchors_preset(PRESET_FULL_RECT)
 	self._slides.size_flags_horizontal = SIZE_EXPAND
@@ -189,3 +190,11 @@ func _on_clear(context_name) -> void:
 	# For the remaining slides, clear out any widgets from that context
 	for s in self._slide_stack:
 		s.clear(context_name)
+
+func _register_display_in_window() -> void:
+	var window = MPF.util.find_parent_window(self)
+	if window:
+		window.register_display(self)
+
+func _to_string() -> String:
+	return "MPFDisplay<%s>" % self.name

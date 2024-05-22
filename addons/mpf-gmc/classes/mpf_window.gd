@@ -18,21 +18,6 @@ func _ready() -> void:
 
 	MPF.media.register_window(self)
 	self._check_config()
-	# In case no default is explicitly defined, track the first one
-	var first_display: MPFDisplay
-	for display in self.get_children():
-		if display is Window:
-			display = display.get_child(0)
-		if not display is MPFDisplay:
-			continue
-		if not first_display:
-			first_display = display
-		if display.is_default:
-			assert(not default_display, "More than one Display cannot be default")
-			default_display = display
-		displays[display.name] = display
-	if not default_display:
-		default_display = first_display
 	if not Engine.is_editor_hint():
 		MPF.server.listen()
 
@@ -75,6 +60,20 @@ func get_display(display_name: String = "") -> MPFDisplay:
 		return default_display
 	assert(display_name in displays, "Unknown display name '%s'" % display_name)
 	return displays[display_name]
+
+func register_display(display: MPFDisplay) -> void:
+	# Register this display by name
+	self.displays[display.name] = display
+	# If no display is registered default, the first one becomes default
+	if not self.default_display:
+		self.default_display = display
+	elif display.is_default:
+		# If one is flagged as default and the first one is not, reassign
+		if not self.default_display.is_default:
+			self.default_display = display
+		else:
+			assert(false, "More than one Display cannot be default")
+	MPF.log.info("Registered display %s", display)
 
 func _check_config() -> void:
 	var filter_parent = self.get_node_or_null("filters")
