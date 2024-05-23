@@ -18,3 +18,5 @@ extends Resource
 @export var max_queue_time: float
 ## Ducking settings for this sound. Can be overridden with sound_player config.
 @export var ducking: DuckSettings
+## Marker settings for this sound.
+@export var markers: Array[SoundMarker]
