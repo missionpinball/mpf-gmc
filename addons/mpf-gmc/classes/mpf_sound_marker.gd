@@ -24,7 +24,6 @@ func mark(current_time:float) -> int:
 	# If this marker was skipped
 	if current_time - self.time > FLOAT_MARGIN:
 		return 0
-	print("MARK: %s" % self)
 	self.last_marked = current_time
 	MPF.server.send_event(self.event)
 	MPF.media.sound.marker.emit(self.event)

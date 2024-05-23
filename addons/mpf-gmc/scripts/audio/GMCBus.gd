@@ -29,7 +29,6 @@ func create_channel(channel_name: String) -> GMCChannel:
 		channel.finished.connect(self._on_queue_channel_finished)
 	return channel
 
-
 func duck(settings) -> void:
 	if not settings is DuckSettings:
 		settings = DuckSettings.new(settings)

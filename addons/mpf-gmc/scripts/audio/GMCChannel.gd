@@ -7,6 +7,7 @@ class_name GMCChannel
 # of the AudioServer bus. This value is the GMC bus instance.
 var _bus: GMCBus
 var tweens: Array[Tween]
+var markers: Array[SoundMarker]
 
 @warning_ignore("shadowed_global_identifier")
 var log: GMCLogger
@@ -17,6 +18,14 @@ func _init(n: String, b: GMCBus):
 	self.bus = b.name
 	# Channels don't use unique logs, just ref the Bus log
 	self.log = b.log
+
+func _process(_delta) -> void:
+	var playback_time = self.get_playback_position()
+	var remaining_markers = 0
+	for m in self.markers:
+		remaining_markers += m.mark(playback_time)
+	if not remaining_markers:
+		set_process(false)
 
 func load_stream(filepath: String) -> AudioStream:
 	self.stream = ResourceLoader.load(filepath, "AudioStreamOGGVorbis" if filepath.get_extension() == "ogg" else "AudioStreamSample") as AudioStream
@@ -60,14 +69,14 @@ func play_with_settings(settings: Dictionary) -> AudioStream:
 		self.stream.set_meta("events_when_stopped", callable)
 		self.finished.connect(callable)
 
-	# If this is a voice or callout, duck the music
-	# if settings.get("ducking"):
-	# 	duck_settings = settings.ducking
-	# 	duck_settings.release_timestamp = channel.stream.get_length() - duck_settings.get("release_point", default_duck.release_point)
-	# 	if duck_settings.get("delay"):
-	# 		duckAttackTimer.start(duck_settings.delay)
-	# 	else:
-	# 		self._duck_attack()
+	# Check for markers
+	self.markers = settings.get("markers", [])
+	if self.markers:
+		for m in self.markers:
+			m.reset()
+		set_process(true)
+	else:
+		set_process(false)
 
 	# If the current volume is less than the target volume, e.g. this was fading out
 	# but was re-played, force a quick fade to avoid jumping back to full
@@ -97,7 +106,9 @@ func clear():
 	self.volume_db = 0.0
 	self.remove_meta("tween")
 	self.remove_meta("is_stopping")
+	self.markers = []
 	self.stream = null
+	set_process(false)
 
 func stop_with_settings(settings: Dictionary = {}, action: String = "stop") -> void:
 	if settings.get("action") == "loop_stop":

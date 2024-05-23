@@ -3,6 +3,8 @@
 @tool
 extends LoggingNode
 
+signal marker(event_name: String)
+
 @onready var duckAttackTimer = Timer.new()
 @onready var duckReleaseTimer = Timer.new()
 var musicDuck: Tween
@@ -94,6 +96,8 @@ func play_sounds(s: Dictionary) -> void:
 			if config.ducking:
 				# Create a new ducking that merges the settings (overwrites MPFSoundAsset)
 				settings.ducking = DuckSettings.new(settings.get("ducking"), config.ducking)
+			if config.markers:
+				settings.markers = config.markers
 		else:
 			assert(false, "Cannot play sound of class %s" % config.get_class())
 
