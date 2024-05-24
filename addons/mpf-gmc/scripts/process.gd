@@ -65,10 +65,7 @@ func _spawn_mpf():
 	print("going to send a message now")
 	print("Does have capture before sending? %s" % EngineDebugger.has_capture("mpf_log_created"))
 
-	EngineDebugger.send_message("mpf_log_created:butts", [log_file_path])
-	#var output = []
-	#MPF.server.mpf_pid = OS.execute(exec, mpf_args, output, true, true)
-	#print(output)
+	EngineDebugger.send_message("mpf_log_created:debugger", [log_file_path])
 	launch_timer.start(5)
 
 func _check_mpf():
