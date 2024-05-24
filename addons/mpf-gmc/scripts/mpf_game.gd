@@ -41,7 +41,6 @@ signal player_added(total_players)
 signal credits
 signal volume(bus, value, change)
 
-
 func _init() -> void:
 	randomize()
 
@@ -99,6 +98,10 @@ func update_machine(kwargs: Dictionary) -> void:
 		value = value.uri_decode()
 	if var_name.begins_with("audit"):
 		audits[var_name] = value
+	elif var_name == "log_file_path":
+		print("BCP got us a log file at '%s'" % value)
+		EngineDebugger.send_message("mpf_log_created:server", [value])
+
 	else:
 		machine_vars[var_name] = value
 		if var_name.begins_with("credits"):

@@ -62,10 +62,8 @@ func _spawn_mpf():
 
 	self.log.info("Executing %s with args [%s]", [exec, ", ".join(mpf_args)])
 	mpf_pid = OS.create_process(exec, mpf_args, false)
-	print("going to send a message now")
-	print("Does have capture before sending? %s" % EngineDebugger.has_capture("mpf_log_created"))
 
-	EngineDebugger.send_message("mpf_log_created:debugger", [log_file_path])
+	EngineDebugger.send_message("mpf_log_created:process", [log_file_path])
 	launch_timer.start(5)
 
 func _check_mpf():
