@@ -11,11 +11,17 @@ var widgets := {}
 var sounds := {}
 
 func _enter_tree() -> void:
-	self.traverse_tree_for("slides", slides)
-	self.traverse_tree_for("widgets", widgets)
-	# Always do TRES files last so they'll supersede WAV/OGG files of the same name
-	for ext in ["wav", "ogg", "tres"]:
-		self.traverse_tree_for("sounds", sounds, ext)
+	# Look for an exported traversal file
+	if ResourceLoader.exists("res://_media.res"):
+		self.log.info("Retrieving exported media tree traversal.")
+		# Cannot use preload because the file may not exist
+		var traversal = load("res://_media.res")
+		for m in ["slides", "sounds", "widgets"]:
+			for k in traversal[m]:
+				self[m][k] = traversal[m][k]
+	else:
+		self.log.info("Manually traversing tree for media.")
+		self.generate_traversal()
 
 	self.log.debug("Generated slide lookups: %s", slides)
 	self.log.debug("Generated widget lookups: %s", widgets)
@@ -52,6 +58,16 @@ func get_sound_instance(sound_name: String, preload_only: bool = false):
 	assert(sound_name in sounds, "Unknown sound name '%s'" % sound_name)
 	return self._get_scene(sound_name, self.sounds, preload_only)
 
+func generate_traversal() -> void:
+	slides = {}
+	widgets = {}
+	sounds = {}
+	self.traverse_tree_for("slides", slides)
+	self.traverse_tree_for("widgets", widgets)
+	# Always do TRES files last so they'll supersede WAV/OGG files of the same name
+	for ext in ["wav", "ogg", "tres"]:
+		self.traverse_tree_for("sounds", sounds, ext)
+
 func _get_scene(scene_name: String, collection: Dictionary, preload_only: bool = false):
 	# If this is the first access, load the scene
 	if collection[scene_name] is String:
@@ -65,8 +81,8 @@ func _get_scene(scene_name: String, collection: Dictionary, preload_only: bool =
 func traverse_tree_for(obj_type: String, acc: Dictionary, ext="tscn") -> void:
 	# Look for a specified content root
 	var content_root: String = "res://%s" % obj_type
-	if MPF.config.has_section("settings"):
-		var root = MPF.config.get_value("settings", "content_root", "")
+	if MPF.has_config_section("settings"):
+		var root = MPF.get_config_value("gmc", "content_root", "")
 		if root:
 			content_root = "res://%s/%s" % [root, obj_type]
 	# Start by traversing the root folder for this object type

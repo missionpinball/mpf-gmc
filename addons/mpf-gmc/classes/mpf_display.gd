@@ -20,7 +20,9 @@ var _current_slide: MPFSlide
 var _queue: Array = []
 
 func _ready() -> void:
+	self._register_display_in_window()
 	self._slides = Control.new()
+	self._slides.name = "_%s_slides" % self.name
 	self._slides.set_anchors_preset(PRESET_FULL_RECT)
 	self._slides.size_flags_horizontal = SIZE_EXPAND
 	self._slides.size_flags_vertical = SIZE_EXPAND
@@ -148,7 +150,7 @@ func _update_stack(kwargs: Dictionary = {}) -> void:
 				await new_slide.animation_finished
 		   	# If the old slide is on top of the new one and has an outro, play it
 			if is_instance_valid(old_slide):
-				await old_slide.remove(old_slide.priority > new_slide.priority)
+				await old_slide.remove(old_slide.priority >= new_slide.priority)
 			MPF.server.send_event("slide_%s_removed" % old_slide_key)
 
 func _manage_queue(action: String) -> void:
@@ -189,3 +191,11 @@ func _on_clear(context_name) -> void:
 	# For the remaining slides, clear out any widgets from that context
 	for s in self._slide_stack:
 		s.clear(context_name)
+
+func _register_display_in_window() -> void:
+	var window = MPF.util.find_parent_window(self)
+	if window:
+		window.register_display(self)
+
+func _to_string() -> String:
+	return "MPFDisplay<%s>" % self.name

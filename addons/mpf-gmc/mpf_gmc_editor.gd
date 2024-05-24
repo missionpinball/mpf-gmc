@@ -6,6 +6,7 @@ var mpf_dock
 var mpf_output
 var mpf_launch
 var mpf_debugger
+var gmc_export
 
 func _enter_tree():
 	# Add the new type with a name, a parent type, a script and an icon.
@@ -34,8 +35,14 @@ func _enter_tree():
 	# Add a custom button for launching with MPF
 	# mpf_launch = preload("res://addons/mpf-gmc/editor/mpf_player.tscn").instantiate()
 	# add_control_to_container(CONTAINER_TOOLBAR, mpf_launch)
-	# mpf_debugger = preload("res://addons/mpf-gmc/editor/mpf_debugger.gd").new()
-	# add_debugger_plugin(mpf_debugger)
+	mpf_debugger = preload("res://addons/mpf-gmc/editor/mpf_debugger.gd").new()
+	add_debugger_plugin(mpf_debugger)
+	# Add an Export plugin to manage export behavior
+	gmc_export = preload("res://addons/mpf-gmc/editor/mpf_gmc_export.gd").new()
+	add_export_plugin(gmc_export)
+
+func _ready():
+	mpf_debugger.attach_panel(mpf_output)
 
 func _exit_tree():
 	# Clean-up of the plugin goes here.
@@ -63,4 +70,7 @@ func _exit_tree():
 	mpf_output.free()
 	# remove_control_from_container(CONTAINER_TOOLBAR, mpf_launch)
 	# mpf_launch.free()
-	# remove_debugger_plugin(mpf_debugger)
+	remove_debugger_plugin(mpf_debugger)
+	mpf_debugger.free()
+	remove_export_plugin(gmc_export)
+	gmc_export.free()

@@ -37,7 +37,7 @@ var true_variable_name: String
 var target
 
 func _enter_tree() -> void:
-	self.log = preload("res://addons/mpf-gmc/scripts/log.gd").new(self.name)
+	self.log = preload("res://addons/mpf-gmc/scripts/log.gd").new("Conditional<%s>" % self.name)
 
 func _ready() -> void:
 	if not Engine.is_editor_hint():

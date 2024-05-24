@@ -23,7 +23,7 @@ var log: GMCLogger
 
 func _enter_tree():
 	# Create a log
-	self.log = preload("res://addons/mpf-gmc/scripts/log.gd").new(self.name)
+	self.log = preload("res://addons/mpf-gmc/scripts/log.gd").new("EventHandler<%s>" % self.name)
 
 func _ready() -> void:
 	assert(event_name, "MPFEventHandler requires an event_name.")

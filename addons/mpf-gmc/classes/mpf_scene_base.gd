@@ -41,7 +41,7 @@ func initialize(n: String, settings: Dictionary, c: String, p: int = 0, kwargs: 
 	# The node name attribute is the name of the root node, which could be
 	# anything or case-sensitive. Set an explicit key instead, using the name.
 	self.key = settings["key"] if settings.get("key") else n
-	self.priority = settings['priority'] + p if settings['priority'] else p
+	self.priority = settings['priority'] + p if settings.get('priority') else p
 	self.context = settings["custom_context"] if settings.get('custom_context') else c
 	# Wait for the child variables to initialize themselves
 	await self.ready
@@ -52,7 +52,8 @@ func initialize(n: String, settings: Dictionary, c: String, p: int = 0, kwargs: 
 
 func _enter_tree():
 	# Create a log
-	self.log = preload("res://addons/mpf-gmc/scripts/log.gd").new(self.name)
+	var scene_type = "Slide" if self is MPFSlide else "Display" if self is MPFDisplay else "Widget" if self is MPFWidget else "MPFSceneBase"
+	self.log = preload("res://addons/mpf-gmc/scripts/log.gd").new("%s<%s>" % [scene_type, self.name])
 
 func _exit_tree() -> void:
 	for timer in self._expirations.values():
@@ -116,10 +117,12 @@ func remove(with_animation=true):
 	if with_animation:
 		if self._trigger_animation(CoreAnimation.REMOVED):
 			await self.animation_player.animation_finished
-			self.log.info("Removal animation complete, removing now")
 	# Immediately cancel any created/active animations
 	if self.current_animation in [CoreAnimation.CREATED, CoreAnimation.ACTIVE]:
 		self.animation_player.stop()
+	# If the removal animation is already playing, ignore this remove call
+	elif self.current_animation == CoreAnimation.REMOVED:
+		return
 	self.get_parent().remove_child(self)
 	self.queue_free()
 
@@ -134,7 +137,7 @@ func _trigger_animation(animation_name: String) -> bool:
 		return true
 	if self.animation_player.has_animation(animation_name):
 		self.animation_player.stop()
-		self.log.info("Playing animation %s" % animation_name)
+		self.log.info("Playing animation '%s'" % animation_name)
 		self.animation_player.play(animation_name)
 		return true
 	return false

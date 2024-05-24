@@ -11,27 +11,42 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_7ovm7")
 
-[node name="VBoxContainer" type="VBoxContainer" parent="."]
+[node name="main" type="VBoxContainer" parent="."]
 layout_mode = 1
 anchors_preset = 10
 anchor_right = 1.0
 offset_bottom = 58.0
 grow_horizontal = 2
 
-[node name="HBoxContainer" type="HBoxContainer" parent="VBoxContainer"]
+[node name="flags_top" type="GridContainer" parent="main"]
+layout_mode = 2
+columns = 2
+
+[node name="fullscreen-label" type="Label" parent="main/flags_top"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Fullscreen Mode"
+
+[node name="fullscreen" type="CheckButton" parent="main/flags_top"]
+layout_mode = 2
+
+[node name="HSeparator" type="HSeparator" parent="main"]
+layout_mode = 2
+
+[node name="global_logger" type="HBoxContainer" parent="main"]
 layout_mode = 2
 size_flags_vertical = 3
 
-[node name="LogLevelLabel" type="Label" parent="VBoxContainer/HBoxContainer"]
+[node name="LogLevelLabel" type="Label" parent="main/global_logger"]
 layout_mode = 2
 size_flags_horizontal = 3
-text = "Global Logging"
+text = "Global Logging Level"
 
-[node name="LogLevel" type="OptionButton" parent="VBoxContainer/HBoxContainer"]
+[node name="logging_global" type="OptionButton" parent="main/global_logger"]
 layout_mode = 2
 alignment = 2
 item_count = 5
-selected = 2
+selected = 1
 popup/item_0/text = "Verbose"
 popup/item_0/id = 1
 popup/item_1/text = "Debug"
@@ -42,3 +57,182 @@ popup/item_3/text = "Warning"
 popup/item_3/id = 30
 popup/item_4/text = "Error"
 popup/item_4/id = 40
+
+[node name="show_all_toggle" type="CheckButton" parent="main"]
+layout_mode = 2
+size_flags_horizontal = 0
+text = "Show All Loggers"
+
+[node name="loggers" type="VBoxContainer" parent="main"]
+visible = false
+layout_mode = 2
+
+[node name="HSeparator" type="HSeparator" parent="main/loggers"]
+layout_mode = 2
+
+[node name="loggers_margin" type="MarginContainer" parent="main/loggers"]
+layout_mode = 2
+theme_override_constants/margin_left = 28
+
+[node name="loggers_list" type="VBoxContainer" parent="main/loggers/loggers_margin"]
+layout_mode = 2
+
+[node name="server_logger" type="HBoxContainer" parent="main/loggers/loggers_margin/loggers_list"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="LogLevelLabel" type="Label" parent="main/loggers/loggers_margin/loggers_list/server_logger"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "BCP Server"
+
+[node name="logging_server" type="OptionButton" parent="main/loggers/loggers_margin/loggers_list/server_logger"]
+layout_mode = 2
+alignment = 2
+item_count = 6
+selected = 0
+popup/item_0/text = "Use Global"
+popup/item_0/id = 0
+popup/item_1/text = "Verbose"
+popup/item_1/id = 1
+popup/item_2/text = "Debug"
+popup/item_2/id = 10
+popup/item_3/text = "Info"
+popup/item_3/id = 20
+popup/item_4/text = "Warning"
+popup/item_4/id = 30
+popup/item_5/text = "Error"
+popup/item_5/id = 40
+
+[node name="game_logger" type="HBoxContainer" parent="main/loggers/loggers_margin/loggers_list"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="LogLevelLabel" type="Label" parent="main/loggers/loggers_margin/loggers_list/game_logger"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Game Data"
+
+[node name="logging_game" type="OptionButton" parent="main/loggers/loggers_margin/loggers_list/game_logger"]
+layout_mode = 2
+alignment = 2
+item_count = 6
+selected = 0
+popup/item_0/text = "Use Global"
+popup/item_0/id = 0
+popup/item_1/text = "Verbose"
+popup/item_1/id = 1
+popup/item_2/text = "Debug"
+popup/item_2/id = 10
+popup/item_3/text = "Info"
+popup/item_3/id = 20
+popup/item_4/text = "Warning"
+popup/item_4/id = 30
+popup/item_5/text = "Error"
+popup/item_5/id = 40
+
+[node name="media_logger" type="HBoxContainer" parent="main/loggers/loggers_margin/loggers_list"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="LogLevelLabel" type="Label" parent="main/loggers/loggers_margin/loggers_list/media_logger"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Media Loader"
+
+[node name="logging_media" type="OptionButton" parent="main/loggers/loggers_margin/loggers_list/media_logger"]
+layout_mode = 2
+alignment = 2
+item_count = 6
+selected = 0
+popup/item_0/text = "Use Global"
+popup/item_0/id = 0
+popup/item_1/text = "Verbose"
+popup/item_1/id = 1
+popup/item_2/text = "Debug"
+popup/item_2/id = 10
+popup/item_3/text = "Info"
+popup/item_3/id = 20
+popup/item_4/text = "Warning"
+popup/item_4/id = 30
+popup/item_5/text = "Error"
+popup/item_5/id = 40
+
+[node name="process_logger" type="HBoxContainer" parent="main/loggers/loggers_margin/loggers_list"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="LogLevelLabel" type="Label" parent="main/loggers/loggers_margin/loggers_list/process_logger"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Processes"
+
+[node name="logging_process" type="OptionButton" parent="main/loggers/loggers_margin/loggers_list/process_logger"]
+layout_mode = 2
+alignment = 2
+item_count = 6
+selected = 0
+popup/item_0/text = "Use Global"
+popup/item_0/id = 0
+popup/item_1/text = "Verbose"
+popup/item_1/id = 1
+popup/item_2/text = "Debug"
+popup/item_2/id = 10
+popup/item_3/text = "Info"
+popup/item_3/id = 20
+popup/item_4/text = "Warning"
+popup/item_4/id = 30
+popup/item_5/text = "Error"
+popup/item_5/id = 40
+
+[node name="sound_logger" type="HBoxContainer" parent="main/loggers/loggers_margin/loggers_list"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="LogLevelLabel" type="Label" parent="main/loggers/loggers_margin/loggers_list/sound_logger"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Sound Player"
+
+[node name="logging_sound_player" type="OptionButton" parent="main/loggers/loggers_margin/loggers_list/sound_logger"]
+layout_mode = 2
+alignment = 2
+item_count = 6
+selected = 0
+popup/item_0/text = "Use Global"
+popup/item_0/id = 0
+popup/item_1/text = "Verbose"
+popup/item_1/id = 1
+popup/item_2/text = "Debug"
+popup/item_2/id = 10
+popup/item_3/text = "Info"
+popup/item_3/id = 20
+popup/item_4/text = "Warning"
+popup/item_4/id = 30
+popup/item_5/text = "Error"
+popup/item_5/id = 40
+
+[node name="HSeparator2" type="HSeparator" parent="main/loggers"]
+layout_mode = 2
+
+[node name="flags_bottom" type="GridContainer" parent="main"]
+layout_mode = 2
+columns = 2
+
+[node name="escape-label" type="Label" parent="main/flags_bottom"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Exit Game on ESC"
+
+[node name="exit_on_esc" type="CheckButton" parent="main/flags_bottom"]
+layout_mode = 2
+
+[node name="fullscreen-label" type="Label" parent="main/flags_bottom"]
+visible = false
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Fullscreen Mode"
+
+[node name="fullscreen" type="CheckButton" parent="main/flags_bottom"]
+visible = false
+layout_mode = 2

@@ -1,8 +1,9 @@
 @tool
 extends LoggingNode
-class_name GMC
 
 const CONFIG_PATH = "res://gmc.cfg"
+const LOCAL_CONFIG_PATH = "user://gmc.local.cfg"
+const MPF_MIN_VERSION = "0.80.0"
 
 var game
 var media
@@ -12,14 +13,29 @@ var server
 var util
 var keyboard: = {}
 var config
+var local_config
 
 func _init():
-	self.config = ConfigFile.new()
-	var err = self.config.load(CONFIG_PATH)
-	if err != OK:
-		printerr("Error loading config file: %s" % err)
-	# Configure logging with the value from the config
-	var global_log_level = self.config.get_value("logging", "global", 30)
+	for cfg in [[CONFIG_PATH, "config"], [LOCAL_CONFIG_PATH, "local_config"]]:
+		self[cfg[1]] = ConfigFile.new()
+		var err = self[cfg[1]].load(cfg[0])
+		if err == OK:
+			if cfg[1] == "local_config":
+				print("Found local GMC config override file: %s" % ProjectSettings.globalize_path(cfg[0]))
+			else:
+				print("Found GMC configuration file %s." % ProjectSettings.globalize_path(cfg[0]))
+		if err != OK:
+			# Error 7 is file not found, that's okay
+			if err == ERR_FILE_NOT_FOUND:
+				pass
+			else:
+				printerr("Error loading config file '%s': %s" % [cfg[0],err])
+	# Configure logging with the value from the config, if provided.
+	# Otherwise will default to INFO for debug builds and LOG for production.
+	var default_log_level = 20 if OS.has_feature("debug") else 25
+	var global_log_level = self.get_config_value("gmc", "logging_global", default_log_level)
+	# Set the GMC level as global log level before instantiating other loggers
+	self.configure_logging("GMC", global_log_level, true)
 
 	# Any default script can be overridden with a custom one
 	# This is done explicitly line-by-line for optimized preload and relative paths
@@ -37,7 +53,7 @@ func _init():
 			# Media controller can come last
 			["media", preload("scripts/media.gd"), "GMCMedia"]
 	]:
-		var script = self.config.get_value("gmc", s[2], false)
+		var script = self.get_config_value("gmc", s[2], false)
 		# TODO: Add logging configuration as init parameters so logging
 		# is available in the _init() methods of all scripts
 		if script:
@@ -46,13 +62,8 @@ func _init():
 			self[s[0]] = s[1].new()
 		# If an explicit value is set for this log, use it
 		if self[s[0]] is LoggingNode:
-			var script_log_level = self.config.get_value("logging", s[0], -1)
-			if script_log_level == -1:
-				script_log_level = global_log_level
+			var script_log_level = self.get_config_value("gmc", "logging_%s" % s[0], -1)
 			self[s[0]].configure_logging(s[2], script_log_level)
-
-	self.configure_logging("GMC", global_log_level)
-
 
 func _enter_tree():
 	# self._process() is only called on children in the tree, so add the children
@@ -64,11 +75,42 @@ func _enter_tree():
 func _ready():
 	if self.config.has_section("keyboard"):
 		for key in self.config.get_section_keys("keyboard"):
-			keyboard[key.to_upper()] = self.config.get_value("keyboard", key)
-	self.media.sound.initialize(self.config)
+			keyboard[key.to_upper()] = self.get_config_value("keyboard", key)
+	# Sound Player can have its own log level
+	var sound_log_level = self.get_config_value("gmc", "logging_sound_player", self.log.getLevel())
+	self.media.sound.initialize(self.config, sound_log_level)
 
 func save_config():
 	self.config.save(CONFIG_PATH)
+
+func get_config_value(section: String, key: String, default = null) -> Variant:
+	if self.has_local_config_value(section, key):
+		return self.local_config.get_value(section, key)
+	return self.config.get_value(section, key, default)
+
+func get_config_keys(section: String) -> PackedStringArray:
+	var result = PackedStringArray()
+	if self.local_config.has_section(section):
+		result.append_array(self.local_config.get_section_keys(section))
+	if self.config.has_section(section):
+		result.append_array(self.config.get_section_keys(section))
+	return result
+
+func has_config_section(section: String) -> bool:
+	return self.local_config.has_section(section) or self.config.has_section(section)
+
+func has_local_config_value(section: String, key: String) -> bool:
+	return self.local_config.has_section_key(section, key)
+
+func validate_min_version(compare_version: String) -> bool:
+	return _explode_version_string(compare_version) >= _explode_version_string(MPF_MIN_VERSION)
+
+func _explode_version_string(version: String) -> int:
+	var bits = version.split(".")
+	while bits.size() < 4:
+		bits.append("0")
+	bits[3] = bits[3].trim_prefix("dev")
+	return int(bits[0]) * 1_000_000 + int(bits[1]) * 10_000 + int(bits[2]) * 100 + int(bits[3])
 
 func _unhandled_input(event: InputEvent) -> void:
 	if not event.is_class("InputEventKey"):
@@ -78,11 +120,13 @@ func _unhandled_input(event: InputEvent) -> void:
 		return
 	var keycode = OS.get_keycode_string(event.get_key_label_with_modifiers()).to_upper()
 	#print(keycode)
-	if keycode == "ESCAPE":
+	if keycode == "ESCAPE" and self.get_config_value("gmc", "exit_on_esc", false):
+		if not event.is_pressed():
+			return
 		# Cannot use quit() method because it won't cleanly shut down threads
 		# Instead, send a notification to the main thread to shut down
-		#get_tree().notification(NOTIFICATION_WM_CLOSE_REQUEST)
-		# get_tree().quit()
+		get_tree().notification(NOTIFICATION_WM_CLOSE_REQUEST)
+		get_tree().quit()
 		return
 
 	if keycode in keyboard:

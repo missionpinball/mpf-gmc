@@ -11,7 +11,7 @@ func _ready() -> void:
 	if Engine.is_editor_hint():
 		return
 	var args: PackedStringArray = OS.get_cmdline_args()
-	if OS.has_feature("spawn_mpf") or "--spawn_mpf" in args or MPF.config.get_value("mpf", "spawn_mpf", false):
+	if OS.has_feature("spawn_mpf") or "--spawn_mpf" in args or MPF.get_config_value("mpf", "spawn_mpf", false):
 		self._spawn_mpf()
 
 func launch_mpf():
@@ -23,24 +23,26 @@ func _spawn_mpf():
 	var launch_timer = Timer.new()
 	launch_timer.connect("timeout", self._check_mpf)
 	self.add_child(launch_timer)
-	var exec: String = MPF.config.get_value("mpf", "executable_path", "")
+	var exec: String = MPF.get_config_value("mpf", "executable_path", "")
 	if not exec:
 		self.log.error("No executable path defined, unable to spawn MPF.")
 		MPF.server.set_status(MPF.server.ServerStatus.ERROR)
 		return
 	var args: PackedStringArray = OS.get_cmdline_args()
-	var machine_path: String = MPF.config.get_value("mpf", "machine_path",
+	var machine_path: String = MPF.get_config_value("mpf", "machine_path",
 		ProjectSettings.globalize_path("res://") if OS.has_feature("editor") else OS.get_executable_path().get_base_dir())
 
 	var exec_args: PackedStringArray
-	if MPF.config.get_value("mpf", "executable_args", ""):
-		exec_args = PackedStringArray(MPF.config.get_value("mpf", "executable_args").split(" "))
+	if MPF.get_config_value("mpf", "executable_args", ""):
+		exec_args = PackedStringArray(MPF.get_config_value("mpf", "executable_args").split(" "))
 
 	var mpf_args = PackedStringArray([machine_path, "-t"])
-	if MPF.config.get_value("mpf", "mpf_args", ""):
-		mpf_args.append_array(MPF.config.get_value("mpf", "mpf_args").split(" "))
-	if MPF.config.get_value("mpf", "virtual", false):
+	if MPF.get_config_value("mpf", "mpf_args", ""):
+		mpf_args.append_array(MPF.get_config_value("mpf", "mpf_args").split(" "))
+	if MPF.get_config_value("mpf", "virtual", false):
 		mpf_args.append("-x")
+	if MPF.get_config_value("mpf", "verbose", false):
+		mpf_args.append("-vV")
 
 	# Generate a timestamped MPF log in the same place as the GMC log
 	# mpf_YYYY-MM-DD_HH.mm.ss.log

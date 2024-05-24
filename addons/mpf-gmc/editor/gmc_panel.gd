@@ -1,17 +1,23 @@
 @tool
-extends Control
+extends GMCPanelBase
 
-@onready var logLevelSelector = $VBoxContainer/HBoxContainer/LogLevel
 
 func _ready() -> void:
-	var initial_value = MPF.config.get_value("logging", "global", 20)
-	for i in range(0, logLevelSelector.item_count):
-		if logLevelSelector.get_item_id(i) == initial_value:
-			logLevelSelector.select(i)
-			break
-	logLevelSelector.item_selected.connect(self.set_log_level)
+	config_section = "gmc"
+	fields = [
+		$main/flags_top/fullscreen,
+		$main/flags_bottom/exit_on_esc,
+		$main/global_logger/logging_global,
+		$main/loggers/loggers_margin/loggers_list/server_logger/logging_server,
+		$main/loggers/loggers_margin/loggers_list/game_logger/logging_game,
+		$main/loggers/loggers_margin/loggers_list/media_logger/logging_media,
+		$main/loggers/loggers_margin/loggers_list/process_logger/logging_process,
+		$main/loggers/loggers_margin/loggers_list/sound_logger/logging_sound_player,
+	]
+	super()
+	$main/show_all_toggle.toggled.connect(self._toggle_loggers)
+	$main/show_all_toggle.button_pressed = false
+	self._toggle_loggers(false)
 
-func set_log_level(index: int) -> void:
-	var id = logLevelSelector.get_item_id(index)
-	MPF.config.set_value("logging", "global", id)
-	MPF.save_config()
+func _toggle_loggers(toggled_on: bool) -> void:
+	$main/loggers.visible = toggled_on
