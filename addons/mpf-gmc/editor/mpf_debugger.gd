@@ -4,15 +4,20 @@ class_name MPFDebuggerPlugin
 extends EditorDebuggerPlugin
 
 var output_panel: Control
+var editor_panel
 
 func _has_capture(prefix):
 	# Return true if you wish to handle message with this prefix.
+	# return false
 	return prefix == "mpf_log_created"
 
 func _capture(message, data, session_id):
 	print("Received message: %s" % message)
 	# MPF.process.mpf_log_created.emit(data[0])
 	output_panel._open_log(data[0])
+	if editor_panel:
+		print("Editor panel getting the log")
+		editor_panel._on_log_created(message, data)
 
 func _setup_session(session_id):
 	print("Setting up session")
@@ -39,3 +44,7 @@ func _setup_session(session_id):
 
 func _stop_session():
 	output_panel.stop()
+
+func attach_panel(panel: Object):
+	print("Registering editor panel")
+	editor_panel = panel
