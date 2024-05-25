@@ -70,7 +70,7 @@ func play_with_settings(settings: Dictionary) -> AudioStream:
 		self.finished.connect(callable)
 
 	# Check for markers
-	self.markers = settings.get("markers", [])
+	self.markers = settings.get("markers", [] as Array[SoundMarker])
 	if self.markers:
 		for m in self.markers:
 			m.reset()
