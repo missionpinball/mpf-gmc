@@ -23,7 +23,7 @@ var _level: LogLevel = LogLevel.INFO
 var _global_level: LogLevel = LogLevel.INFO
 var log_name: String = ""
 
-func _init(name: String = "", level: int = LogLevel.USE_GLOBAL_LEVEL, set_global: bool = false) -> void:
+func _init(name: String = "", level: LogLevel = LogLevel.USE_GLOBAL_LEVEL, set_global: bool = false) -> void:
 	self.log_name = "%s : " % name if name else ""
 	self.setLevel(level)
 	if set_global:

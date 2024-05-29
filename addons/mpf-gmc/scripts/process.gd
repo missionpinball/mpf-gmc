@@ -45,13 +45,13 @@ func _spawn_mpf():
 		mpf_args.append("-vV")
 
 	# Generate a timestamped MPF log in the same place as the GMC log
-	# mpf_YYYY-MM-DD_HH.mm.ss.log
-	var log_path_base = "%s/logs" % OS.get_user_data_dir()
-	var dt = Time.get_datetime_dict_from_system()
-	var log_file_name = "mpf_%04d-%02d-%02d_%02d.%02d.%02d.log" % [dt.year, dt.month, dt.day, dt.hour, dt.minute, dt.second]
-	var log_file_path = "%s/%s" % [log_path_base, log_file_name]
-	mpf_args.push_back("-l")
-	mpf_args.push_back(log_file_path)
+	# mpf_YYYY-MM-DD_HH.mm.ss.log, unless one is specified
+	if not "-l" in mpf_args:
+		var log_path_base = "%s/logs" % OS.get_user_data_dir()
+		var dt = Time.get_datetime_dict_from_system()
+		var log_file_name = "mpf_%04d-%02d-%02d_%02d.%02d.%02d.log" % [dt.year, dt.month, dt.day, dt.hour, dt.minute, dt.second]
+		mpf_args.push_back("-l")
+		mpf_args.push_back("%s/%s" % [log_path_base, log_file_name])
 
 	if "--v" in args or "--V" in args:
 		mpf_args.push_back("-v")

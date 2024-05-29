@@ -14,6 +14,7 @@ func initialize(n: String, settings: Dictionary, c: String, p: int = 0, kwargs: 
 func process_widget(widget_name: String, action: String, settings: Dictionary, c: String, p: int = 0, kwargs: Dictionary = {}) -> void:
 	if not self._widgets:
 		self._widgets = Node2D.new()
+		self._widgets.name = "_%s_widgets" % self.name
 		self.add_child(self._widgets)
 	self.process_action(widget_name, self._widgets.get_children(), action, settings, c, p, kwargs)
 
