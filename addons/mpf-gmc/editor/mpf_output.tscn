@@ -24,7 +24,7 @@ grow_vertical = 2
 layout_mode = 2
 size_flags_vertical = 3
 theme_override_font_sizes/font_size = 12
-text = "No MPF Log Data."
+text = "MPF log output will appear here after an MPF session is run."
 placeholder_text = "No MPF Log Available"
 editable = false
 context_menu_enabled = false
@@ -36,3 +36,4 @@ middle_mouse_paste_enabled = false
 
 [node name="LineEdit" type="LineEdit" parent="VBoxContainer"]
 layout_mode = 2
+placeholder_text = "Filter Messages"
