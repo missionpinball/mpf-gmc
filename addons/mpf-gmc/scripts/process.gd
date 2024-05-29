@@ -46,12 +46,16 @@ func _spawn_mpf():
 
 	# Generate a timestamped MPF log in the same place as the GMC log
 	# mpf_YYYY-MM-DD_HH.mm.ss.log, unless one is specified
-	if not "-l" in mpf_args:
+	var log_file_path
+	if "-l" in mpf_args:
+		log_file_path = mpf_args[mpf_args.find("-l") + 1]
+	else:
 		var log_path_base = "%s/logs" % OS.get_user_data_dir()
 		var dt = Time.get_datetime_dict_from_system()
 		var log_file_name = "mpf_%04d-%02d-%02d_%02d.%02d.%02d.log" % [dt.year, dt.month, dt.day, dt.hour, dt.minute, dt.second]
+		log_file_path = "%s/%s" % [log_path_base, log_file_name]
 		mpf_args.push_back("-l")
-		mpf_args.push_back("%s/%s" % [log_path_base, log_file_name])
+		mpf_args.push_back(log_file_path)
 
 	if "--v" in args or "--V" in args:
 		mpf_args.push_back("-v")

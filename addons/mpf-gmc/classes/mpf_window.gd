@@ -1,4 +1,3 @@
-@tool
 class_name MPFWindow extends Control
 
 ## Root node for the entire GMC display screen. Hosts one or more MPFDisplay child nodes for rendering slides.
