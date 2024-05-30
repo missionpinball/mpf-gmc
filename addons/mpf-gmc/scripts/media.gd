@@ -20,7 +20,7 @@ func _enter_tree() -> void:
 			for k in traversal[m]:
 				self[m][k] = traversal[m][k]
 	else:
-		self.log.info("Manually traversing tree for media.")
+		self.log.info("Traversing directory tree for media.")
 		self.generate_traversal()
 
 	self.log.debug("Generated slide lookups: %s", slides)

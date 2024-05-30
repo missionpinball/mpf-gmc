@@ -250,7 +250,7 @@ func on_stop() -> void:
 func _send(message: String) -> void:
 	if not _client:
 		return
-	self.log.verbose("Sending: %s" % message)
+	self.log.verbose("Sending: %s", message)
 	_client.put_data(("%s\n" % message).to_ascii_buffer())
 
 
@@ -364,7 +364,7 @@ func _thread_poll(_userdata=null) -> void:
 						call_deferred("deferred_mc", "play", message)
 					_:
 						if message.get("name") not in self.registered_handlers:
-							self.log.warning("No handler defined for BCP action %s" % message_raw)
+							self.log.warning("No handler defined for BCP action %s", message_raw)
 
 				# If any handlers are registered for this event, post them
 				if message.get("name") in self.registered_handlers:

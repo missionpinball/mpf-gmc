@@ -99,7 +99,8 @@ func update_machine(kwargs: Dictionary) -> void:
 	if var_name.begins_with("audit"):
 		audits[var_name] = value
 	elif var_name == "log_file_path":
-		print("BCP got us a log file at '%s'" % value)
+		# TODO: Hide this behind non-production flag
+		self.log.info("Opening MPF log file at '%s'", value)
 		EngineDebugger.send_message("mpf_log_created:server", [value])
 
 	else:

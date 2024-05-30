@@ -139,7 +139,7 @@ func _on_fade_complete(tween, action) -> void:
 	# If this is a stop_all action, finish all the channels that are stopping
 	# If this is a stop action, stop the channel
 	if action == "stop" or action == "clear":
-		self.log.debug("Fade out complete on channel %s" % self)
+		self.log.debug("Fade out complete on channel %s", self)
 		self.clear()
 	elif action == "play":
 		self.log.debug("Fade in to %0.2f complete on channel %s", [self.volume_db, self])

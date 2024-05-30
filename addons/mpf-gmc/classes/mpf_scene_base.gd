@@ -137,7 +137,7 @@ func _trigger_animation(animation_name: String) -> bool:
 		return true
 	if self.animation_player.has_animation(animation_name):
 		self.animation_player.stop()
-		self.log.info("Playing animation '%s'" % animation_name)
+		self.log.info("Playing animation '%s'", animation_name)
 		self.animation_player.play(animation_name)
 		return true
 	return false

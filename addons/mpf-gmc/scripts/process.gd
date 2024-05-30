@@ -72,14 +72,14 @@ func _spawn_mpf():
 
 func _check_mpf():
 	# Detect if the pid is still alive
-	self.log.debug("Checking MPF PID %s..." % mpf_pid)
+	self.log.debug("Checking MPF PID %s...", mpf_pid)
 	var output = []
 	OS.execute("ps", [mpf_pid, "-o", "state="], output, true, true)
 	self.log.debug(" ".join(output))
 	if output and output[0].strip_edges() == "Z":
 		mpf_attempts += 1
 		if mpf_attempts <= 5:
-			self.log.info("MPF Failed to Start, Retrying (%s/5)" % mpf_attempts)
+			self.log.info("MPF Failed to Start, Retrying (%s/5)", mpf_attempts)
 			self._spawn_mpf()
 		else:
 			MPF.server.set_status(MPF.server.ServerStatus.ERROR)

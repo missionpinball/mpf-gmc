@@ -57,7 +57,7 @@ func duck(settings) -> void:
 	# Track which duck we are timing
 	self._duck_release_timer.set_meta("ducking", settings)
 	self._duck_release_timer.start(settings.duration)
-	self.log.info("Ducking %s by %s over %ss, will last %s" % [self.name, settings.attenuation, settings.attack, settings.duration])
+	self.log.info("Ducking %s by %s over %ss, will last %s", [self.name, settings.attenuation, settings.attack, settings.duration])
 
 func duck_release() -> void:
 	# Remove this duck from the list of duckings
@@ -68,7 +68,7 @@ func duck_release() -> void:
 	# If there is another duck queued, process it with relative time
 	while not self.duckings.is_empty():
 		next_duck = self.duckings[0]
-		self.log.debug("Checking to next ducking: %s" % next_duck)
+		self.log.debug("Checking to next ducking: %s", next_duck)
 		# This ducking started a while ago, so find the new release time
 		time_remaining = (next_duck.release_time - Time.get_ticks_msec()) / 1000.0
 		# If this duck has expired (with a small margin of error), remove
@@ -85,7 +85,7 @@ func duck_release() -> void:
 	# If there is a next duck in the stack, use that as the release volume
 	var attenuation = next_duck.attenuation if next_duck else 0.0
 	self._active_duck = self._create_duck_tween(attenuation, last_duck.release)
-	self.log.info("Releasing duck on %s over %ss" % [self.name, last_duck.release])
+	self.log.info("Releasing duck on %s over %ss", [self.name, last_duck.release])
 
 	if next_duck:
 		self._duck_release_timer.set_meta("ducking", next_duck)
@@ -168,7 +168,7 @@ func play(filename: String, settings: Dictionary = {}) -> void:
 		duck_settings.bus.duck(duck_settings)
 
 func clear_context(context_name: String) -> void:
-	self.log.debug("Bus %s is clearing context %s" % [self.name, context_name])
+	self.log.debug("Bus %s is clearing context %s", [self.name, context_name])
 	for channel in self.channels:
 		if channel.stream and channel.stream.has_meta("context") and \
 		channel.stream.get_meta("context") == context_name and \
@@ -227,7 +227,7 @@ func _abort_ducking_check():
 	if self.get_current_sound():
 		self.log.debug(" - channel still playing, not going to abort ducking")
 		return
-	self.log.info("Bus %s is stopping, will kill active ducking." % self.name)
+	self.log.info("Bus %s is stopping, will kill active ducking.", self.name)
 	self._duck_release_timer.stop()
 	self.duckings.clear()
 	self.duck_release()
@@ -266,10 +266,10 @@ func _find_available_channel(filepath: String, settings: Dictionary, ignore_exis
 			available_channel = channel
 		elif not available_channel:
 			if not channel.stream:
-				self.log.debug("Channel %s has no stream, making it the available channel" % channel)
+				self.log.debug("Channel %s has no stream, making it the available channel", channel)
 				available_channel = channel
 			elif not channel.playing:
-				self.log.debug("Channel %s has a stream %s but it's not playing, making it available" % [channel, channel.stream])
+				self.log.debug("Channel %s has a stream %s but it's not playing, making it available", [channel, channel.stream])
 				available_channel = channel
 				available_channel.stream = null
 	return available_channel
