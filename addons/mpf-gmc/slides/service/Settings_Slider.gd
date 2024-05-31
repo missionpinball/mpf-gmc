@@ -1,6 +1,5 @@
 # Copyright 2022 Paradigm Tilt
 
-@tool
 extends Settings_Item
 class_name Settings_Slider
 
@@ -12,7 +11,14 @@ class_name Settings_Slider
 var value: float:
 	get = get_value
 
+func _ready():
+	# _ready() must be defined so parents wait for
+	# this node before proceeding with ready()
+	pass
+
 func ready() -> void:
+	print("Slider has these children:")
+	print(self.get_children())
 	# Shift from a saved float to a displayed int
 	selected_value = int(self.selected_value * 100)
 	$Setting.text = title

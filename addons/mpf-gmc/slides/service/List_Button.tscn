@@ -1,15 +1,11 @@
-[gd_scene load_steps=2 format=2]
-
+[gd_scene format=3 uid="uid://b0exigwv3clut"]
 
 [node name="List_Button" type="Button"]
-margin_right = 232.0
-margin_bottom = 40.0
 size_flags_horizontal = 3
 size_flags_vertical = 3
 size_flags_stretch_ratio = 3.0
 toggle_mode = true
-shortcut_in_tooltip = false
 action_mode = 0
 button_mask = 0
+shortcut_in_tooltip = false
 text = "List Button"
-align = 0
