@@ -1,7 +1,7 @@
 extends Control
 
 func _ready() -> void:
-  Server.connect("service", self, "_on_service")
+  MPF.server.service.connect(self._on_service)
   self._get_active_switches()
 
 func _on_service(payload: Dictionary) -> void:
@@ -41,7 +41,7 @@ func _on_service(payload: Dictionary) -> void:
     get_tree().input_event(e)
 
 func _get_active_switches() -> void:
-  Server.send_service("list_switches", ["label", "state"])
+  MPF.server.send_service("list_switches", ["label", "state"])
 
 func _update_active_switches(payload: Dictionary) -> void:
   # Remove the existing children. Used to exclude first, now all.

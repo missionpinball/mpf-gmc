@@ -20,7 +20,8 @@ func initialize(setting=null):
     self.variable = setting.variable
     self.title = setting.label
     self.default = setting.default
-    self.options = setting.get("options")
+	if setting.get("options"):
+      self.options = setting["options"]
     # Look for a custom value in machine vars
     if MPF.game.machine_vars.has(setting.variable):
       self.selected_value = MPF.game.machine_vars[setting.variable]

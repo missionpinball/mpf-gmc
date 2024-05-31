@@ -14,12 +14,12 @@ func _input(event):
 
   if event.is_action_pressed("ui_select"):
     # For direct children (not down the tree), send an event
-    var focused_name: String = get_focus_owner().name
-
-    if get_focus_owner() in List.get_children():
-      Server.send_event("service_trigger&action=%s&sort=false" % focused_name)
-      self._update_test_views(focused_name)
-      get_tree().set_input_as_handled()
+    for c in List.get_children():
+      if c.has_focus():
+        var focused_name: String = c.name
+        MPF.server.send_event("service_trigger&action=%s&sort=false" % focused_name)
+        self._update_test_views(focused_name)
+        get_tree().set_input_as_handled()
 
   elif focused_child:
     if event.is_action_pressed("ui_esc"):
@@ -30,7 +30,7 @@ func deselect_child():
   # Move focus from the child back to the selector
   List.get_node(focused_child).grab_focus()
   # Post to MPF, which is too busy listening to events
-  Server.send_event("sw_service_esc_active")
+  MPF.server.send_event("sw_service_esc_active")
   self._update_test_views()
 
 func _update_test_views(focused_name:String = ""):

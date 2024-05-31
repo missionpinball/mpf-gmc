@@ -1,15 +1,16 @@
 # Copyright 2022 Paradigm Tilt
 
-tool
+@tool
 extends Settings_Item
 class_name Settings_Slider
 
-export (int) var min_value = 0
-export (int) var max_value = 100
-export (int) var step = 5
-export (bool) var save_on_change = false
+@export var min_value: int = 0
+@export var max_value: int = 100
+@export var step: int = 5
+@export var save_on_change: bool = false
 # Expose the value of the underlying slider
-var value: float setget , get_value
+var value: float:
+  get = get_value
 
 func ready() -> void:
   # Shift from a saved float to a displayed int
@@ -33,7 +34,7 @@ func select_option(direction: int = 0) -> void:
 
 func save() -> void:
   var float_val: float = selected_value / 100
-  Server.set_machine_var(variable, float_val)
+  MPF.server.set_machine_var(variable, float_val)
 
 func get_value() -> float:
   return $HSlider.value

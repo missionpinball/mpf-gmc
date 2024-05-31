@@ -1,8 +1,7 @@
 [gd_scene load_steps=7 format=2]
 
-[ext_resource path="res://service/Settings_Slider.gd" type="Script" id=1]
-[ext_resource path="res://service/List_Button.tscn" type="PackedScene" id=2]
-[ext_resource path="res://fonts/body_sm_button.tres" type="DynamicFont" id=3]
+[ext_resource path="res://addons/mpf-gmc/slides/service/Settings_Slider.gd" type="Script" id=1]
+[ext_resource path="res://addons/mpf-gmc/slides/service/List_Button.tscn" type="PackedScene" id=2]
 
 [sub_resource type="StyleBoxEmpty" id=3]
 
@@ -25,7 +24,6 @@ __meta__ = {
 margin_right = 392.0
 margin_bottom = 43.0
 size_flags_stretch_ratio = 2.0
-custom_fonts/font = ExtResource( 3 )
 custom_styles/normal = SubResource( 3 )
 text = ""
 
@@ -44,7 +42,6 @@ margin_bottom = 43.0
 size_flags_horizontal = 3
 size_flags_vertical = 3
 size_flags_stretch_ratio = 2.0
-custom_fonts/font = ExtResource( 3 )
 custom_styles/focus = SubResource( 1 )
 custom_styles/normal = SubResource( 2 )
 text = "100"

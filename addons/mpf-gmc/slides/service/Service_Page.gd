@@ -26,17 +26,17 @@ func _exit_tree() -> void:
     List.remove_child(child)
     child.queue_free()
 
-func focus_child(direction: int, wrap=false):
+func focus_child(direction: int, wrap_around=false):
   var next = focused_index + direction
   if next >= 0:
     if next < List.get_child_count():
       focused_index = next
       List.get_child(focused_index).grab_focus()
-    elif wrap:
+    elif wrap_around:
       focused_index = 0
       List.get_child(focused_index).grab_focus()
   elif next == -1:
-    if wrap:
+    if wrap_around:
       focused_index = List.get_child_count() - 1
       List.get_child(focused_index).grab_focus()
     else:
@@ -48,7 +48,7 @@ func _input(event):
   if not is_focused:
     return
 
-  if event is InputEventKey and get_focus_owner() == List.get_child(focused_index):
+  if event is InputEventKey and List.get_child(focused_index).has_focus():
     if event.is_action_pressed("ui_left"):
       self.focus_child(-1)
       get_tree().set_input_as_handled()

@@ -1,8 +1,7 @@
 [gd_scene load_steps=4 format=2]
 
-[ext_resource path="res://service/Settings_Item.gd" type="Script" id=1]
-[ext_resource path="res://service/List_Button.tscn" type="PackedScene" id=2]
-[ext_resource path="res://materials/settings_menu.theme" type="Theme" id=4]
+[ext_resource path="res://addons/mpf-gmc/slides/service/Settings_Item.gd" type="Script" id=1]
+[ext_resource path="res://addons/mpf-gmc/slides/service/List_Button.tscn" type="PackedScene" id=2]
 
 [node name="HSplitContainer" type="HSplitContainer"]
 margin_right = 400.0
@@ -24,7 +23,6 @@ margin_bottom = 43.0
 size_flags_horizontal = 3
 size_flags_vertical = 3
 size_flags_stretch_ratio = 2.0
-theme = ExtResource( 4 )
 text = "3"
 __meta__ = {
 "_edit_use_anchors_": false
