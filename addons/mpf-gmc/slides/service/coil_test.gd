@@ -1,15 +1,15 @@
 extends Control
 
-export (String) var device_type
-onready var coil_map := []
+@export var device_type: String
+@onready var coil_map := []
 # Don't instantiate the List ref until it's ready to populate
 # because often the first test_start command arrives before the list
-onready var List: VBoxContainer
+@onready var List: VBoxContainer
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
-  Server.connect("service", self, "_on_service")
-  Server.send_service("list_%s" % device_type, ["name","label","number"])
+  MPF.server.service.connect(self._on_service)
+  MPF.server.send_service("list_%s" % device_type, ["name","label","number"])
 
 func _on_service(payload):
   # COILS
@@ -51,7 +51,7 @@ func _on_service(payload):
     get_parent().get_parent().deselect_child()
 
 func select_option(target: Button, category: String) -> void:
-  if target and target != get_focus_owner():
+  if target and not target.has_focus():
     target.grab_focus()
     $coil_label.text = "%s: %s" % [category, target.text]
     $coil_number.text = "Address: %s" % target.hint_tooltip

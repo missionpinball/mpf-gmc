@@ -5,7 +5,7 @@ class_name ServicePage
 
 var focused_index := 0
 var is_focused := false
-onready var List = $MarginContainer/VBoxContainer
+@onready var List = $MarginContainer/VBoxContainer
 
 func focus():
   is_focused = true

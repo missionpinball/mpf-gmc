@@ -1,15 +1,14 @@
 # Copyright 2021 Paradigm Tilt
 
-tool
 extends HSplitContainer
 class_name Settings_Item
 
-export (String) var title
-export (String) var variable
-export (Dictionary) var options
-export (bool) var loop = false
-export (int) var selected_value
-export (int) var default
+@export var title: String
+@export var variable: String
+@export var options: Dictionary
+@export var loop: bool = false
+@export var selected_value = 0
+@export var default: int
 
 var callback
 var is_focused := false
@@ -23,14 +22,14 @@ func initialize(setting=null):
     self.default = setting.default
     self.options = setting.get("options")
     # Look for a custom value in machine vars
-    if Game.machine_vars.has(setting.variable):
-      self.selected_value = Game.machine_vars[setting.variable]
+    if MPF.game.machine_vars.has(setting.variable):
+      self.selected_value = MPF.game.machine_vars[setting.variable]
     else:
       self.selected_value = self.default
 
 func _ready() -> void:
-  self.connect("focus_entered", self, "_focus_entered")
-  self.connect("focus_exited", self, "_focus_exited")
+  self.focus_entered.connect(self._focus_entered)
+  self.focus_exited.connect(self._focus_exited)
   self.ready()
 
 # Native methods like _ready() cannot be overridden in subclasses.
@@ -88,7 +87,7 @@ func _input(event) -> void:
         select_option(1)
 
 func save() -> void:
-  Server.send_event("service_trigger&action=setting&variable=%s&value=%s" % [variable, selected_value])
+  MPF.server.send_event("service_trigger&action=setting&variable=%s&value=%s" % [variable, selected_value])
 
 func select_option(direction: int = 0) -> void:
   var keys = options.keys()
