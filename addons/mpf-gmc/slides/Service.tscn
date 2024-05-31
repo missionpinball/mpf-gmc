@@ -1,11 +1,11 @@
-[gd_scene load_steps=7 format=2]
+[gd_scene load_steps=7 format=3]
 
-[ext_resource path="res://modes/Service.gd" type="Script" id=1]
-[ext_resource path="res://service/Settings_Page.tscn" type="PackedScene" id=2]
-[ext_resource path="res://service/Utilities_Page.tscn" type="PackedScene" id=3]
-[ext_resource path="res://service/Sound_Page.tscn" type="PackedScene" id=4]
-[ext_resource path="res://fonts/body_lg.tres" type="DynamicFont" id=6]
-[ext_resource path="res://materials/settings_menu.theme" type="Theme" id=7]
+[ext_resource type="Script" path="res://addons/mpf-gmc/slides/service.gd" id="1"]
+[ext_resource type="PackedScene" path="res://addons/mpf-gmc/slides/service/Settings_Page.tscn" id="2"]
+[ext_resource type="PackedScene" path="res://addons/mpf-gmc/slides/service/Utilities_Page.tscn" id="3"]
+[ext_resource type="PackedScene" path="res://addons/mpf-gmc/slides/service/Sound_Page.tscn" id="4"]
+[ext_resource type="DynamicFont" path="res://fonts/body_lg.tres" id="6"]
+[ext_resource type="Theme" path="res://materials/settings_menu.theme" id="7"]
 
 [node name="Service" type="Node2D"]
 script = ExtResource( 1 )

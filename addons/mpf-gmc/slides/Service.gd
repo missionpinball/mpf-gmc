@@ -1,8 +1,8 @@
 # Copyright 2021 Paradigm Tilt
 
-extends Node2D
+extends MPFSlide
 
-export (Color) var highlight_color
+@export var highlight_color: Color
 
 
 const triggers = ["service_button",
@@ -12,14 +12,14 @@ const triggers = ["service_button",
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
-  Server.connect("service", self, "_on_service")
+  MPF.server.service.connect(self._on_service)
   for trigger in triggers:
-    Server._send("register_trigger?event=%s" % trigger)
+    MPF.server._send("register_trigger?event=%s" % trigger)
   focus()
 
 func _exit_tree() -> void:
   for trigger in triggers:
-    Server._send("remove_trigger?event=%s" % trigger)
+    MPF.server._send("remove_trigger?event=%s" % trigger)
 
 func focus():
   $TabContainer.grab_focus()
@@ -68,7 +68,7 @@ func select_tab(direction: int):
 func select_page():
   # Last tab is always exit
   if $TabContainer.current_tab == $TabContainer.get_tab_count() - 1:
-    Server.send_event("service_trigger&action=service_exit")
+    MPF.server.send_event("service_trigger&action=service_exit")
     return
   var target = $TabContainer.get_child($TabContainer.current_tab)
   target.focus()
