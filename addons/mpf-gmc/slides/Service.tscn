@@ -1,0 +1,102 @@
+[gd_scene load_steps=7 format=2]
+
+[ext_resource path="res://modes/Service.gd" type="Script" id=1]
+[ext_resource path="res://service/Settings_Page.tscn" type="PackedScene" id=2]
+[ext_resource path="res://service/Utilities_Page.tscn" type="PackedScene" id=3]
+[ext_resource path="res://service/Sound_Page.tscn" type="PackedScene" id=4]
+[ext_resource path="res://fonts/body_lg.tres" type="DynamicFont" id=6]
+[ext_resource path="res://materials/settings_menu.theme" type="Theme" id=7]
+
+[node name="Service" type="Node2D"]
+script = ExtResource( 1 )
+highlight_color = Color( 0, 0.882353, 0.054902, 1 )
+
+[node name="ColorRect" type="ColorRect" parent="."]
+margin_right = 1280.0
+margin_bottom = 480.0
+color = Color( 0.00392157, 0.811765, 1, 1 )
+
+[node name="TabContainer" type="TabContainer" parent="."]
+anchor_right = 1.0
+anchor_bottom = 1.0
+margin_top = 16.0
+margin_right = 1280.0
+margin_bottom = 480.0
+focus_mode = 2
+theme = ExtResource( 7 )
+custom_colors/font_color_fg = Color( 1, 0.607843, 0, 1 )
+custom_constants/hseparation = 10
+custom_constants/top_margin = 4
+custom_constants/side_margin = 4
+
+[node name="Standard" parent="TabContainer" instance=ExtResource( 2 )]
+margin_left = 0.0
+margin_top = 34.0
+margin_right = 0.0
+margin_bottom = 0.0
+
+[node name="Features" parent="TabContainer" instance=ExtResource( 2 )]
+visible = false
+margin_left = 0.0
+margin_top = 34.0
+margin_right = 0.0
+margin_bottom = 0.0
+settingType = "feature"
+
+[node name="Game" parent="TabContainer" instance=ExtResource( 2 )]
+visible = false
+margin_left = 0.0
+margin_top = 34.0
+margin_right = 0.0
+margin_bottom = 0.0
+settingType = "game"
+
+[node name="Coin" parent="TabContainer" instance=ExtResource( 2 )]
+visible = false
+margin_left = 0.0
+margin_top = 34.0
+margin_right = 0.0
+margin_bottom = 0.0
+settingType = "coin"
+
+[node name="Utilities" parent="TabContainer" instance=ExtResource( 3 )]
+visible = false
+margin_left = 4.0
+margin_top = 37.0
+margin_right = -4.0
+margin_bottom = -4.0
+
+[node name="Audits" parent="TabContainer" instance=ExtResource( 3 )]
+visible = false
+margin_left = 4.0
+margin_top = 37.0
+margin_right = -4.0
+margin_bottom = -4.0
+
+[node name="Sound" parent="TabContainer" instance=ExtResource( 4 )]
+visible = false
+margin_left = 4.0
+margin_top = 37.0
+margin_right = -4.0
+margin_bottom = -4.0
+
+[node name="Exit" type="Control" parent="TabContainer"]
+visible = false
+anchor_right = 1.0
+anchor_bottom = 1.0
+margin_left = 4.0
+margin_top = 37.0
+margin_right = -4.0
+margin_bottom = -4.0
+
+[node name="Label" type="Label" parent="TabContainer/Exit"]
+margin_top = 141.0
+margin_right = 1272.0
+margin_bottom = 185.0
+custom_colors/font_outline_modulate = Color( 0, 0, 0, 1 )
+custom_fonts/font = ExtResource( 6 )
+text = "Press Center Button to Exit"
+align = 1
+__meta__ = {
+"_edit_use_anchors_": false
+}

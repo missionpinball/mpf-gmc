@@ -1,0 +1,83 @@
+[gd_scene load_steps=5 format=2]
+
+[ext_resource path="res://service/switch_test.gd" type="Script" id=1]
+[ext_resource path="res://fonts/body_xs.tres" type="DynamicFont" id=2]
+[ext_resource path="res://fonts/body_sm.tres" type="DynamicFont" id=3]
+[ext_resource path="res://fonts/body_xxs.tres" type="DynamicFont" id=4]
+
+[node name="switch_test" type="Control"]
+margin_left = 440.0
+margin_top = 80.0
+margin_right = 1240.0
+margin_bottom = 480.0
+focus_mode = 2
+script = ExtResource( 1 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="last_switch_label" type="Label" parent="."]
+margin_right = 192.0
+margin_bottom = 32.0
+custom_colors/font_outline_modulate = Color( 0, 0, 0, 1 )
+custom_fonts/font = ExtResource( 3 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="last_switch_address" type="Label" parent="."]
+margin_top = 56.0
+margin_right = 192.0
+margin_bottom = 88.0
+custom_fonts/font = ExtResource( 2 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="last_switch_state" type="Label" parent="."]
+margin_top = 104.0
+margin_right = 192.0
+margin_bottom = 136.0
+custom_fonts/font = ExtResource( 2 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Label2" type="Label" parent="."]
+margin_left = 432.0
+margin_top = 10.0
+margin_right = 611.0
+margin_bottom = 40.0
+custom_fonts/font = ExtResource( 4 )
+text = "Recent Switches:"
+
+[node name="recent_switches" type="VBoxContainer" parent="."]
+margin_left = 432.0
+margin_top = 40.0
+margin_right = 611.0
+margin_bottom = 65.0
+alignment = 2
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Label" type="Label" parent="."]
+margin_left = -40.0
+margin_top = 200.0
+margin_right = 139.0
+margin_bottom = 230.0
+custom_fonts/font = ExtResource( 4 )
+text = "Active Switches:"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="active_switches" type="VBoxContainer" parent="."]
+margin_left = -40.0
+margin_top = 221.0
+margin_right = 139.0
+margin_bottom = 246.0
+alignment = 2
+__meta__ = {
+"_edit_use_anchors_": false
+}

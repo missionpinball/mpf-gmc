@@ -1,0 +1,53 @@
+[gd_scene load_steps=7 format=2]
+
+[ext_resource path="res://service/Settings_Slider.gd" type="Script" id=1]
+[ext_resource path="res://service/List_Button.tscn" type="PackedScene" id=2]
+[ext_resource path="res://fonts/body_sm_button.tres" type="DynamicFont" id=3]
+
+[sub_resource type="StyleBoxEmpty" id=3]
+
+[sub_resource type="StyleBoxFlat" id=1]
+bg_color = Color( 0.0392157, 0, 0.447059, 1 )
+
+[sub_resource type="StyleBoxEmpty" id=2]
+
+[node name="Settings_Slider" type="HSplitContainer"]
+margin_right = 800.0
+margin_bottom = 43.0
+focus_mode = 2
+custom_constants/separation = 0
+script = ExtResource( 1 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Setting" parent="." instance=ExtResource( 2 )]
+margin_right = 392.0
+margin_bottom = 43.0
+size_flags_stretch_ratio = 2.0
+custom_fonts/font = ExtResource( 3 )
+custom_styles/normal = SubResource( 3 )
+text = ""
+
+[node name="HSlider" type="HSlider" parent="."]
+margin_left = 408.0
+margin_right = 800.0
+margin_bottom = 43.0
+size_flags_horizontal = 3
+size_flags_vertical = 1
+size_flags_stretch_ratio = 2.0
+
+[node name="Option" type="Button" parent="."]
+margin_left = 248.0
+margin_right = 400.0
+margin_bottom = 43.0
+size_flags_horizontal = 3
+size_flags_vertical = 3
+size_flags_stretch_ratio = 2.0
+custom_fonts/font = ExtResource( 3 )
+custom_styles/focus = SubResource( 1 )
+custom_styles/normal = SubResource( 2 )
+text = "100"
+__meta__ = {
+"_edit_use_anchors_": false
+}

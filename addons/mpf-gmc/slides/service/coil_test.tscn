@@ -1,0 +1,76 @@
+[gd_scene load_steps=4 format=2]
+
+[ext_resource path="res://service/coil_test.gd" type="Script" id=1]
+[ext_resource path="res://fonts/body_sm.tres" type="DynamicFont" id=2]
+[ext_resource path="res://fonts/body_xxs.tres" type="DynamicFont" id=3]
+
+[node name="coil_test" type="Control"]
+margin_right = 40.0
+margin_bottom = 40.0
+focus_mode = 2
+script = ExtResource( 1 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+device_type = "coils"
+
+[node name="title" type="Label" parent="."]
+margin_left = 488.0
+margin_top = 96.0
+margin_right = 800.0
+margin_bottom = 121.0
+custom_colors/font_outline_modulate = Color( 1, 0, 0, 1 )
+custom_fonts/font = ExtResource( 2 )
+text = "Coil Test (DANGER!)"
+align = 1
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="coil_label" type="Label" parent="."]
+margin_left = 912.0
+margin_top = 160.0
+margin_right = 1104.0
+margin_bottom = 185.0
+custom_fonts/font = ExtResource( 3 )
+text = "Coil:"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="coil_number" type="Label" parent="."]
+margin_left = 912.0
+margin_top = 200.0
+margin_right = 1104.0
+margin_bottom = 225.0
+custom_fonts/font = ExtResource( 3 )
+text = "Address:"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="instructions" type="Label" parent="."]
+margin_left = 912.0
+margin_top = 320.0
+margin_right = 1104.0
+margin_bottom = 345.0
+custom_fonts/font = ExtResource( 3 )
+text = "Press the select button to pulse"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="ScrollContainer" type="ScrollContainer" parent="."]
+margin_left = 472.0
+margin_top = 152.0
+margin_right = 792.0
+margin_bottom = 464.0
+follow_focus = true
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="coil_list" type="VBoxContainer" parent="ScrollContainer"]
+__meta__ = {
+"_edit_use_anchors_": false
+}
