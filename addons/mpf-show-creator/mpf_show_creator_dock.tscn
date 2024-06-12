@@ -1,0 +1,37 @@
+[gd_scene load_steps=2 format=3 uid="uid://b4tyyjcjwxj7d"]
+
+[ext_resource type="Script" path="res://addons/mpf-show-creator/mpf_show_creator_dock.gd" id="1_ainif"]
+
+[node name="MPFShowCreatorDock" type="Control"]
+custom_minimum_size = Vector2(2.08165e-12, 300)
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+script = ExtResource("1_ainif")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="."]
+custom_minimum_size = Vector2(500, 2.08165e-12)
+layout_mode = 0
+offset_right = 278.0
+offset_bottom = 31.0
+
+[node name="container_mpf_config" type="HBoxContainer" parent="VBoxContainer"]
+layout_mode = 2
+
+[node name="label_mpf_config" type="Label" parent="VBoxContainer/container_mpf_config"]
+layout_mode = 2
+text = "MPF Config File"
+
+[node name="edit_mpf_config" type="LineEdit" parent="VBoxContainer/container_mpf_config"]
+layout_mode = 2
+size_flags_horizontal = 3
+placeholder_text = "No File Selected"
+
+[node name="button_mpf_config" type="Button" parent="VBoxContainer/container_mpf_config"]
+layout_mode = 2
+text = "Select File"
