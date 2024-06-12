@@ -96,3 +96,15 @@ When your animation is ready, select the `MPFShowCreator` root node and in the *
 Play the Scene in Godot. If you see a prompt that no main scene is defined, choose "Select Current".
 
 A window will appear with the animation rendering, and after it finishes a file browser window will appear with the show saved as a MPF YAML file. Copy this file to your MPF project's */shows* folder.
+
+## Using Groups to Filter
+
+You can put lights in groups and filter certain groups for certain animations.
+
+To add a light to a group, select the light node and in the *Node* panel (top right of the Godot Editor) select *Groups*, type in the name of the group, and press *Add*.
+
+You can also manage groups in bulk by clicking on the *Manage Groups* button.
+
+When you are ready to render your animation show, select the `MPFShowCreator` node and in the *Inspector* panel, add one or more group names (comma separated) to the *Light Groups* section.
+
+When the show renders, only lights that are in at least one of the listed groups will be included in the show. To include all lights, simply clear the text from the *Light Groups* property.

@@ -15,6 +15,8 @@ class_name MPFShowCreator
 @export var strip_empty_times: bool = true
 ## If checked, colors will be saved with an opacity channel.
 @export var use_alpha: bool = false
+## A list of group names (comma-separated) whose lights will be included
+@export var light_groups: String = ""
 
 var lights = []
 var time = 0.0
@@ -22,7 +24,15 @@ var cum_time = 0.0
 var spf: float
 var file: FileAccess
 var file_path: String
+var _groups: Array
 
+func _enter_tree():
+	# If there are groups, use those instead.
+	# This will be called before all the children register themselves.
+	if self.light_groups:
+		self._groups = []
+		for g in self.light_groups.split(","):
+			self._groups.append(g.strip_edges())
 
 func _ready():
 	ProjectSettings.set_setting("display/window/size/window_width_override", self.texture.get_width())
@@ -34,6 +44,11 @@ func _ready():
 	if not animation_player.has_animation(animation_name):
 		printerr("Animation player does not have an animation '%s'" % animation_name)
 		return
+	if not self.lights:
+		if self._groups:
+			printerr("No lights found matching the selected groups.")
+		else:
+			printerr("No lights found. Please add some MPFShowLight nodes.")
 	self.spf = 1.0 / self.fps
 	self.clip_children = CanvasItem.CLIP_CHILDREN_ONLY
 
@@ -56,6 +71,14 @@ func _process(delta):
 	self.snapshot()
 
 func register_light(light: MPFShowLight):
+	if self._groups:
+		var has_match = false
+		for g in self._groups:
+			if light.is_in_group(g):
+				has_match = true
+				break
+		if not has_match:
+			return
 	self.lights.append(light)
 
 func snapshot(is_initial=false):
