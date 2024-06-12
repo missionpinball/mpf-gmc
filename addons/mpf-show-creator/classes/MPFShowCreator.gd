@@ -6,8 +6,6 @@ class_name MPFShowCreator
 
 const CONFIG_PATH = "user://mpf_show_creator.cfg"
 
-## Frames per second: the number of show steps to generate per second of animation.
-@export var fps: int = 30
 ## An AnimationPlayer node containing the animations to render as shows.
 @export var animation_player: AnimationPlayer
 ## A list of group names (comma-separated) whose lights will be included
@@ -23,6 +21,7 @@ var animation_name
 var strip_unchanged_lights
 var strip_empty_times
 var use_alpha
+var fps
 
 func _enter_tree():
 	# If there are groups, use those instead.
@@ -50,6 +49,7 @@ func _ready():
 	assert(animation_player, "No AnimationPlayer node attached to the MPFShowGenerator root.")
 	assert(animation_player.has_animation(animation_name), "AnimationPlayer has no animation named '%s'" % animation_name)
 
+	fps = config.get_value("show_creator", "fps", 30)
 	strip_unchanged_lights = config.get_value("show_creator", "strip_lights", true)
 	strip_empty_times = config.get_value("show_creator", "strip_times", false)
 	use_alpha = config.get_value("show_creator", "use_alpha", false)
