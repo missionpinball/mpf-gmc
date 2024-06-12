@@ -91,7 +91,7 @@ Repeat this process for all shapes and properties you want to animate for the sh
 
 ## Render Your Show
 
-When your animation is ready, select the `MPFShowCreator` root node and in the *Inspector* panel, type in the name of the animation you want to render to a show.
+When your animation is ready, select the `MPFShowCreator` root node and in the *Inspector* panel under *Animation Name*, type in the name of the animation you want to render to a show.
 
 Play the Scene in Godot. If you see a prompt that no main scene is defined, choose "Select Current".
 

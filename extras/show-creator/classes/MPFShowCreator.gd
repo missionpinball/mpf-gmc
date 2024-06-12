@@ -1,11 +1,19 @@
 extends Sprite2D
 class_name MPFShowCreator
 
+## The root node for creating light shows for MPF.
+
+## Frames per second: the number of show steps to generate per second of animation.
 @export var fps: int = 30
+## An AnimationPlayer node containing the animations to render as shows.
 @export var animation_player: AnimationPlayer
+## The name of an animation show to render and save as YAML
 @export var animation_name: String
+## If checked, lights will not be added to each show stop if they don't change.
 @export var strip_unchanged_lights: bool = true
+## If checked, show steps will be excluded from the show if they don't contain changes.
 @export var strip_empty_times: bool = true
+## If checked, colors will be saved with an opacity channel.
 @export var use_alpha: bool = false
 
 var lights = []
