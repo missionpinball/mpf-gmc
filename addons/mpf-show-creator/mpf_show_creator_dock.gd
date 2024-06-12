@@ -32,10 +32,12 @@ func _ready():
 	if self.config.has_section("show_creator"):
 		if self.config.has_section_key("show_creator", "mpf_config"):
 			edit_mpf_config.text = self.config.get_value("show_creator", "mpf_config")
-			self.parse_mpf_config()
+			if edit_mpf_config.text:
+				self.parse_mpf_config()
 		if self.config.has_section_key("show_creator", "show_scene"):
 			edit_show_scene.text = self.config.get_value("show_creator", "show_scene")
-			self._get_animation_names()
+			if edit_show_scene.text:
+				self._get_animation_names()
 		if self.config.has_section_key("show_creator", "strip_lights"):
 			button_strip_lights.button_pressed = self.config.get_value("show_creator", "strip_lights")
 		if self.config.has_section_key("show_creator", "strip_times"):
@@ -162,41 +164,33 @@ func _select_mpf_config():
 	dialog.file_mode = FileDialog.FILE_MODE_OPEN_FILE
 	dialog.access = FileDialog.ACCESS_FILESYSTEM
 	self.add_child(dialog)
-	dialog.popup_centered(Vector2i(400, 400))
+	dialog.popup_centered(Vector2i(1100, 900))
 	var path = await dialog.file_selected
-
-	self.remove_child(dialog)
-	dialog.queue_free()
-
-	if not path:
-		return
 	self._save_mpf_config(path)
 
 func _save_mpf_config(path):
 	self.config.set_value("show_creator", "mpf_config", path)
 	edit_mpf_config.text = path
 	self.config.save(CONFIG_PATH)
-	self.parse_mpf_config()
+	if path:
+		self.parse_mpf_config()
+	self._render_generate_button()
 
 func _select_show_scene():
 	var dialog = FileDialog.new()
 	dialog.file_mode = FileDialog.FILE_MODE_OPEN_FILE
 	dialog.access = FileDialog.ACCESS_RESOURCES
 	self.add_child(dialog)
-	dialog.popup_centered(Vector2i(400, 400))
+	dialog.popup_centered(Vector2i(1100, 900))
 	var path = await dialog.file_selected
-	self.remove_child(dialog)
-	dialog.queue_free()
-	if not path:
-		return
 	self._save_show_scene(path)
 
 func _save_show_scene(path):
 	self.config.set_value("show_creator", "show_scene", path)
 	edit_show_scene.text = path
-	button_generate_scene.disabled = true
-	button_generate_scene.visible = false
 	self.config.save(CONFIG_PATH)
+	if path:
+		self._get_animation_names()
 	self._render_generate_button()
 
 func _render_generate_button():
@@ -206,6 +200,7 @@ func _render_generate_button():
 	else:
 		button_generate_lights.visible = false
 		button_generate_scene.visible = true
+	button_generate_scene.disabled = self.lights.is_empty()
 
 func _on_option(pressed, opt_name):
 	print("Got option pressed state %s and name %s" % [pressed, opt_name])

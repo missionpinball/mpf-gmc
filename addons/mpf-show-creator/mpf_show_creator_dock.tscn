@@ -42,7 +42,6 @@ text = "MPF Config File"
 [node name="edit_mpf_config" type="LineEdit" parent="HBoxContainer/LeftVContainer/container_mpf_config"]
 layout_mode = 2
 size_flags_horizontal = 3
-text = "/Users/anthony/git/swords-of-vengeance/machine/config/system11_lights.yaml"
 placeholder_text = "No File Selected"
 
 [node name="button_mpf_config" type="Button" parent="HBoxContainer/LeftVContainer/container_mpf_config"]
@@ -59,7 +58,6 @@ text = "Show Scene"
 [node name="edit_show_scene" type="LineEdit" parent="HBoxContainer/LeftVContainer/container_show_scene"]
 layout_mode = 2
 size_flags_horizontal = 3
-text = "res://show_creator.tscn"
 placeholder_text = "No Scene Selected"
 
 [node name="button_show_scene" type="Button" parent="HBoxContainer/LeftVContainer/container_show_scene"]
@@ -130,12 +128,11 @@ text = "Animation to Generate:"
 
 [node name="button_animation_names" type="OptionButton" parent="HBoxContainer/RightVContainer"]
 layout_mode = 2
-item_count = 2
 selected = 1
-popup/item_0/text = "another_one"
-popup/item_0/id = 0
-popup/item_1/text = "test_one"
-popup/item_1/id = 1
+
+[node name="Control" type="Control" parent="HBoxContainer/RightVContainer"]
+custom_minimum_size = Vector2(2.08165e-12, 20)
+layout_mode = 2
 
 [node name="button_generate_show" type="Button" parent="HBoxContainer/RightVContainer"]
 layout_mode = 2
