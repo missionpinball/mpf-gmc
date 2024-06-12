@@ -69,7 +69,7 @@ The animation will default to be 1 second long, which you can change by entering
 
 Set your shape(s) to their initial position and size, and create keyframes for those properties (i.e. if you are going to animate position, you will need position keyframes, and if you are animating size, you will also need size keyframes).
 
-For a nice tutorial on using animations in Godot, see the [https://docs.godotengine.org/en/stable/tutorials/animation/introduction.html](Introduction to Animation Features) walkthrough.
+For a nice tutorial on using animations in Godot, see the [Introduction to Animation Features](https://docs.godotengine.org/en/stable/tutorials/animation/introduction.html) walkthrough.
 
 Some properties that you may want to animate:
 
