@@ -10,12 +10,6 @@ const CONFIG_PATH = "user://mpf_show_creator.cfg"
 @export var fps: int = 30
 ## An AnimationPlayer node containing the animations to render as shows.
 @export var animation_player: AnimationPlayer
-## If checked, lights will not be added to each show stop if they don't change.
-@export var strip_unchanged_lights: bool = true
-## If checked, show steps will be excluded from the show if they don't contain changes.
-@export var strip_empty_times: bool = true
-## If checked, colors will be saved with an opacity channel.
-@export var use_alpha: bool = false
 ## A list of group names (comma-separated) whose lights will be included
 @export var light_groups: String = ""
 
@@ -24,7 +18,11 @@ var spf: float
 var file: FileAccess
 var file_path: String
 var _groups: Array
+
 var animation_name
+var strip_unchanged_lights
+var strip_empty_times
+var use_alpha
 
 func _enter_tree():
 	# If there are groups, use those instead.
@@ -43,7 +41,7 @@ func _ready():
 	var config = ConfigFile.new()
 	var err = config.load(CONFIG_PATH)
 	if err != OK and err != ERR_FILE_NOT_FOUND:
-		printerr("Error loading config file: %s" % err)
+		assert(false, "Error loading config file: %s" % err)
 		return
 	if config.has_section("show_creator") and config.has_section_key("show_creator", "animation"):
 			animation_name = config.get_value("show_creator", "animation")
@@ -51,6 +49,10 @@ func _ready():
 	assert(animation_name, "No animation name found in configuration.")
 	assert(animation_player, "No AnimationPlayer node attached to the MPFShowGenerator root.")
 	assert(animation_player.has_animation(animation_name), "AnimationPlayer has no animation named '%s'" % animation_name)
+
+	strip_unchanged_lights = config.get_value("show_creator", "strip_lights", true)
+	strip_empty_times = config.get_value("show_creator", "strip_times", false)
+	use_alpha = config.get_value("show_creator", "use_alpha", false)
 
 	if not self.lights:
 		if self._groups:

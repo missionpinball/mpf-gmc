@@ -28,7 +28,7 @@ offset_bottom = 117.0
 grow_horizontal = 2
 
 [node name="LeftVContainer" type="VBoxContainer" parent="HBoxContainer"]
-custom_minimum_size = Vector2(800, 2.08165e-12)
+custom_minimum_size = Vector2(2.08165e-12, 2.08165e-12)
 layout_mode = 2
 size_flags_horizontal = 3
 
@@ -69,20 +69,55 @@ text = "Select Scene"
 [node name="HSeparator" type="HSeparator" parent="HBoxContainer/LeftVContainer"]
 layout_mode = 2
 
-[node name="button_generate_lights" type="Button" parent="HBoxContainer/LeftVContainer"]
+[node name="container_generators" type="HBoxContainer" parent="HBoxContainer/LeftVContainer"]
 layout_mode = 2
-text = "Populate Missing Lights"
+
+[node name="button_generate_lights" type="Button" parent="HBoxContainer/LeftVContainer/container_generators"]
+layout_mode = 2
+text = "  Populate Missing Lights  "
+
+[node name="button_generate_scene" type="Button" parent="HBoxContainer/LeftVContainer/container_generators"]
+visible = false
+layout_mode = 2
+disabled = true
+text = "  Generate Show Creator Scene  "
 
 [node name="HSeparator2" type="HSeparator" parent="HBoxContainer/LeftVContainer"]
 layout_mode = 2
 
-[node name="button_generate_scene" type="Button" parent="HBoxContainer/LeftVContainer"]
-visible = false
-layout_mode = 2
-disabled = true
-text = "Generate Show Creator Scene"
-
 [node name="VSeparator" type="VSeparator" parent="HBoxContainer"]
+custom_minimum_size = Vector2(40, 2.08165e-12)
+layout_mode = 2
+
+[node name="CenterVContainer" type="VBoxContainer" parent="HBoxContainer"]
+layout_mode = 2
+
+[node name="container_fps" type="HBoxContainer" parent="HBoxContainer/CenterVContainer"]
+layout_mode = 2
+
+[node name="label_fps" type="Label" parent="HBoxContainer/CenterVContainer/container_fps"]
+layout_mode = 2
+text = "FPS:"
+
+[node name="edit_fps" type="LineEdit" parent="HBoxContainer/CenterVContainer/container_fps"]
+layout_mode = 2
+text = "30"
+
+[node name="button_strip_lights" type="CheckBox" parent="HBoxContainer/CenterVContainer"]
+layout_mode = 2
+button_pressed = true
+text = "Strip Unchanged Lights"
+
+[node name="button_strip_times" type="CheckBox" parent="HBoxContainer/CenterVContainer"]
+layout_mode = 2
+button_pressed = true
+text = "Strip Empty Times"
+
+[node name="button_use_alpha" type="CheckBox" parent="HBoxContainer/CenterVContainer"]
+layout_mode = 2
+text = "Use Alpha Channel"
+
+[node name="VSeparator2" type="VSeparator" parent="HBoxContainer"]
 custom_minimum_size = Vector2(40, 2.08165e-12)
 layout_mode = 2
 
@@ -104,6 +139,8 @@ popup/item_1/id = 1
 
 [node name="button_generate_show" type="Button" parent="HBoxContainer/RightVContainer"]
 layout_mode = 2
+size_flags_vertical = 3
 theme_override_styles/normal = SubResource("StyleBoxFlat_rfgoc")
 theme_override_styles/hover = SubResource("StyleBoxFlat_x17sv")
-text = "GENERATE SHOW"
+text = "GENERATE 
+SHOW"

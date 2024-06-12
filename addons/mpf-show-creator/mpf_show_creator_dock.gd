@@ -12,23 +12,18 @@ var lights: = {}
 @onready var button_show_scene = $HBoxContainer/LeftVContainer/container_show_scene/button_show_scene
 @onready var edit_show_scene = $HBoxContainer/LeftVContainer/container_show_scene/edit_show_scene
 
-@onready var button_generate_lights = $HBoxContainer/LeftVContainer/button_generate_lights
-@onready var button_generate_scene = $HBoxContainer/LeftVContainer/button_generate_scene
+@onready var edit_fps = $HBoxContainer/CenterVContainer/container_fps/edit_fps
+@onready var button_strip_lights = $HBoxContainer/CenterVContainer/button_strip_lights
+@onready var button_strip_times = $HBoxContainer/CenterVContainer/button_strip_times
+@onready var button_use_alpha = $HBoxContainer/CenterVContainer/button_use_alpha
+
+@onready var button_generate_lights = $HBoxContainer/LeftVContainer/container_generators/button_generate_lights
+@onready var button_generate_scene = $HBoxContainer/LeftVContainer/container_generators/button_generate_scene
 
 @onready var animation_dropdown = $HBoxContainer/RightVContainer/button_animation_names
 @onready var button_show_maker = $HBoxContainer/RightVContainer/button_generate_show
 
 func _ready():
-	button_mpf_config.pressed.connect(self._select_mpf_config)
-	button_show_scene.pressed.connect(self._select_show_scene)
-	button_generate_lights.pressed.connect(self._generate_lights)
-	button_generate_scene.pressed.connect(self._generate_scene)
-	edit_mpf_config.text_submitted.connect(self._save_mpf_config)
-	edit_show_scene.text_submitted.connect(self._save_show_scene)
-	button_show_maker.pressed.connect(self._generate_show)
-	animation_dropdown.item_selected.connect(self._select_animation)
-
-
 	self.config = ConfigFile.new()
 	var err = self.config.load(CONFIG_PATH)
 	if err != OK and err != ERR_FILE_NOT_FOUND:
@@ -41,6 +36,26 @@ func _ready():
 		if self.config.has_section_key("show_creator", "show_scene"):
 			edit_show_scene.text = self.config.get_value("show_creator", "show_scene")
 			self._get_animation_names()
+		if self.config.has_section_key("show_creator", "strip_lights"):
+			button_strip_lights.button_pressed = self.config.get_value("show_creator", "strip_lights")
+		if self.config.has_section_key("show_creator", "strip_times"):
+			button_strip_times.button_pressed = self.config.get_value("show_creator", "strip_times")
+		if self.config.has_section_key("show_creator", "use_alpha"):
+			button_use_alpha.button_pressed = self.config.get_value("show_creator", "use_alpha")
+
+	# Set the listeners *after* the initial values are set
+	button_mpf_config.pressed.connect(self._select_mpf_config)
+	button_show_scene.pressed.connect(self._select_show_scene)
+	button_generate_lights.pressed.connect(self._generate_lights)
+	button_generate_scene.pressed.connect(self._generate_scene)
+	edit_mpf_config.text_submitted.connect(self._save_mpf_config)
+	edit_show_scene.text_submitted.connect(self._save_show_scene)
+	button_show_maker.pressed.connect(self._generate_show)
+	animation_dropdown.item_selected.connect(self._select_animation)
+
+	button_strip_lights.toggled.connect(self._on_option.bind("strip_lights"))
+	button_strip_times.toggled.connect(self._on_option.bind("strip_times"))
+	button_use_alpha.toggled.connect(self._on_option.bind("use_alpha"))
 
 	self._render_generate_button()
 
@@ -186,11 +201,16 @@ func _save_show_scene(path):
 
 func _render_generate_button():
 	if edit_show_scene.text:
-		button_generate_scene.disabled = true
 		button_generate_scene.visible = false
+		button_generate_lights.visible = true
 	else:
-		button_generate_scene.disabled = false
+		button_generate_lights.visible = false
 		button_generate_scene.visible = true
+
+func _on_option(pressed, opt_name):
+	print("Got option pressed state %s and name %s" % [pressed, opt_name])
+	self.config.set_value("show_creator", opt_name, pressed)
+	self.config.save(CONFIG_PATH)
 
 func parse_mpf_config():
 	var mpf_config = FileAccess.open(edit_mpf_config.text, FileAccess.READ)
