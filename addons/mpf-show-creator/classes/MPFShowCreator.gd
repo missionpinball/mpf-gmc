@@ -3,12 +3,13 @@ class_name MPFShowCreator
 
 ## The root node for creating light shows for MPF.
 
+
+const CONFIG_PATH = "user://mpf_show_creator.cfg"
+
 ## Frames per second: the number of show steps to generate per second of animation.
 @export var fps: int = 30
 ## An AnimationPlayer node containing the animations to render as shows.
 @export var animation_player: AnimationPlayer
-## The name of an animation show to render and save as YAML
-@export var animation_name: String
 ## If checked, lights will not be added to each show stop if they don't change.
 @export var strip_unchanged_lights: bool = true
 ## If checked, show steps will be excluded from the show if they don't contain changes.
@@ -25,6 +26,7 @@ var spf: float
 var file: FileAccess
 var file_path: String
 var _groups: Array
+var animation_name
 
 func _enter_tree():
 	# If there are groups, use those instead.
@@ -35,15 +37,23 @@ func _enter_tree():
 			self._groups.append(g.strip_edges())
 
 func _ready():
+	assert(self.texture, "MPFShowCreator node requires a playfield image as a texture.")
 	ProjectSettings.set_setting("display/window/size/window_width_override", self.texture.get_width())
 	ProjectSettings.set_setting("display/window/size/window_height_override", self.texture.get_height())
 	set_process(false)
-	if not animation_player or not animation_name:
-		printerr("No animation player or name defined.")
+
+	var config = ConfigFile.new()
+	var err = config.load(CONFIG_PATH)
+	if err != OK and err != ERR_FILE_NOT_FOUND:
+		printerr("Error loading config file: %s" % err)
 		return
-	if not animation_player.has_animation(animation_name):
-		printerr("Animation player does not have an animation '%s'" % animation_name)
-		return
+	if config.has_section("show_creator") and config.has_section_key("show_creator", "animation"):
+			animation_name = config.get_value("show_creator", "animation")
+
+	assert(animation_name, "No animation name found in configuration.")
+	assert(animation_player, "No AnimationPlayer node attached to the MPFShowGenerator root.")
+	assert(animation_player.has_animation(animation_name), "AnimationPlayer has no animation named '%s'" % animation_name)
+
 	if not self.lights:
 		if self._groups:
 			printerr("No lights found matching the selected groups.")
@@ -71,6 +81,9 @@ func _process(delta):
 	self.snapshot()
 
 func register_light(light: MPFShowLight):
+	if light.position.x < 0 or light.position.y < 0 or light.position.x > self.texture.get_width() or light.position.y > self.texture.get_height():
+		printerr("Light %s is outside of the viewport and will not be included." % self.name)
+		return
 	if self._groups:
 		var has_match = false
 		for g in self._groups:

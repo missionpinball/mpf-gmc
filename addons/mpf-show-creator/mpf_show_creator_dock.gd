@@ -7,13 +7,16 @@ const DEFAULT_SHOW =  "res://show_creator.tscn"
 var config: ConfigFile
 var lights: = {}
 
-@onready var button_mpf_config = $VBoxContainer/container_mpf_config/button_mpf_config
-@onready var edit_mpf_config = $VBoxContainer/container_mpf_config/edit_mpf_config
-@onready var button_show_scene = $VBoxContainer/container_show_scene/button_show_scene
-@onready var edit_show_scene = $VBoxContainer/container_show_scene/edit_show_scene
+@onready var button_mpf_config = $HBoxContainer/LeftVContainer/container_mpf_config/button_mpf_config
+@onready var edit_mpf_config = $HBoxContainer/LeftVContainer/container_mpf_config/edit_mpf_config
+@onready var button_show_scene = $HBoxContainer/LeftVContainer/container_show_scene/button_show_scene
+@onready var edit_show_scene = $HBoxContainer/LeftVContainer/container_show_scene/edit_show_scene
 
-@onready var button_generate_lights = $VBoxContainer/button_generate_lights
-@onready var button_generate_scene = $VBoxContainer/button_generate_scene
+@onready var button_generate_lights = $HBoxContainer/LeftVContainer/button_generate_lights
+@onready var button_generate_scene = $HBoxContainer/LeftVContainer/button_generate_scene
+
+@onready var animation_dropdown = $HBoxContainer/RightVContainer/button_animation_names
+@onready var button_show_maker = $HBoxContainer/RightVContainer/button_generate_show
 
 func _ready():
 	button_mpf_config.pressed.connect(self._select_mpf_config)
@@ -22,6 +25,9 @@ func _ready():
 	button_generate_scene.pressed.connect(self._generate_scene)
 	edit_mpf_config.text_submitted.connect(self._save_mpf_config)
 	edit_show_scene.text_submitted.connect(self._save_show_scene)
+	button_show_maker.pressed.connect(self._generate_show)
+	animation_dropdown.item_selected.connect(self._select_animation)
+
 
 	self.config = ConfigFile.new()
 	var err = self.config.load(CONFIG_PATH)
@@ -34,6 +40,7 @@ func _ready():
 			self.parse_mpf_config()
 		if self.config.has_section_key("show_creator", "show_scene"):
 			edit_show_scene.text = self.config.get_value("show_creator", "show_scene")
+			self._get_animation_names()
 
 	self._render_generate_button()
 
@@ -55,10 +62,9 @@ func _generate_lights(lights_node: Node2D = null):
 		if not light_child:
 			light_child = MPFShowLight.new()
 			light_child.name = l
+			light_child.position = Vector2(-1, -1)
 			lights_node.add_child(light_child)
 			light_child.owner = scene
-		else:
-			print("Found light '%s' in scene!")
 		if not self.lights[l]["tags"]:
 			for t in self.lights[l].tags:
 				light_child.add_to_group(t, true)
@@ -73,9 +79,42 @@ func _generate_lights(lights_node: Node2D = null):
 		push_error("Error saving scene: %s" % err)
 		return
 
+func _generate_show():
+	EditorInterface.play_custom_scene(edit_show_scene.text)
+
+func _get_animation_names():
+	if not edit_show_scene.text:
+		return
+	var scene = load(edit_show_scene.text).instantiate()
+	var animp = scene.animation_player
+	var animations = animp.get_animation_list()
+
+	var selected_index = -1
+	if self.config.has_section_key("show_creator", "animation"):
+		selected_index = animations.find(self.config.get_value("show_creator", "animation"))
+
+	animation_dropdown.clear()
+	for a in animations:
+		if a == "RESET":
+			continue
+		animation_dropdown.add_item(a)
+
+	if selected_index != -1:
+		animation_dropdown.select(selected_index)
+
+func _select_animation(idx: int):
+	var animation_name = animation_dropdown.get_item_text(idx)
+
+	if self.config.has_section_key("show_creator", "animation") and animation_name == self.config.get_value("show_creator", "animation"):
+		return
+
+	self.config.set_value("show_creator", "animation", animation_name)
+	self.config.save(CONFIG_PATH)
+
 func _generate_scene():
 	var root = MPFShowCreator.new()
 	root.name = "MPFShowCreator"
+	root.centered = false
 	var animp = AnimationPlayer.new()
 	animp.name = "AnimationPlayer"
 	root.add_child(animp)
@@ -172,7 +211,6 @@ func parse_mpf_config():
 			var dedent = line.dedent()
 			delimiter_size = line.length() - dedent.length()
 			delimiter = line.substr(0, delimiter_size)
-			print("DELIMITER: '%s'" % delimiter)
 
 		if is_in_lights:
 			var line_data = line_stripped.split(":")
@@ -181,13 +219,11 @@ func parse_mpf_config():
 			if indent_check == 0:
 				current_light = line_data[0]
 				lights[current_light] = { "tags": []}
-				print("Found light %s" % current_light)
 			# If the check is larger, there is more than a delimiter and this is part of the light
 			elif indent_check > 0:
 				if line_data[0] == "tags":
 					for t in line_data[1].split(","):
 						lights[current_light]["tags"].append(t.strip_edges())
-					print(" - tags: %s" % " and ".join(lights[current_light]["tags"]))
 			# If the check is smaller, there is less than a delimiter and we are done with lights
 			else:
 				is_in_lights = false
