@@ -10,43 +10,38 @@ To use this tool, you will need an image of your playfield and the Godot 4 edito
 
 Create a new Godot project (do *not* use your main GMC project) and under Project Settings, turn on the *Advanced Settings* toggle. Configure the following options:
 
-**Display > Window**
+**Display > Window > Size**
 * Viewport Width: the width of your playfield image
 * Viewport Height: the height of your playfield image
 * Transparent: On
 
-**Display > Per Pixel Transparency**
+**Display > Window > Per Pixel Transparency**
 * Allowed: On
 
 **Rendering > Viewport**
 * Transparent Background: On
 
-Save and exit the project. Finally, copy this folder (*/show-creator*) into your project folder, and then re-open your project in Godot.
+Save the project and exit Godot. In your project folder create a new folder "*addons*" and copy this folder (*mpf-show-creator*) into your addons folder. To verify, your project root should have the file */addons/mpf-show-creator/plugin.gd*. Re-open your project in Godot.
 
-## Create your Scene
+In the Godot editor, go to the *Project Settings* menu and the *Plugins* tab. You should see the plugin for **MPF Show Creator**, click the checkbox to enable it.
 
-You should see an empty project and the *Scene* tab has buttons for Create Root Node. Select *+ Other Node* and search for `MPFShowCreator` and select that as your root node.
+## Initialize Your Scene
 
-In the *Scene* panel, add a new node of type `AnimationPlayer` and then select the `MPFShowCreator` root node.
+At the bottom panel of the Godot editor select the new tab called *MPF Show Creator*.
 
-In the *Inspector* panel, under *Sprite2D > Texture* select *Quick Load* and choose the image of your playfield. Under *Sprite2D > Offset* un-check the *Centered* option. Your playfield image should now be aligned top-left with the Godot axis.
+On the *MPF Show Creator* panel, go to *MPF Config File* and select the yaml file from your MPF project that includes the `lights:` definitions.
 
-At the top of the *Inspector* panel, under *Animation Player* click on *Assign* and select the `AnimationPlayer` node you added to the scene. Then set the following options to your preference:
+After loading the lights file, click on the "*Generate Show Creator Scene*" button to generate a scene file for building shows. The scene will be saved as "show_creator.tscn". Open this scene in the Godot editor.
 
-* FPS: The frame rate at which to render the show
-* Strip Unchanged Lights: If enabled, lights will only be added in show steps if they change. If disabled, every light will be defined on every step even if it doesn't change.
-* Strip Empty Times: If enabled, time codes will not be in the show if they have no light changes. If disabled, every time code will be defined even if it has no lights.
-* Use Alpha: If enabled, color values will include an alpha (opacity) value. If disabled, color values will only be RGB.
+The root node of the show creator scene is called `MPFShowCreator`. Select it and in the *Inspector* panel, under *Sprite2D > Texture* select *Quick Load* and choose the image of your playfield. Your playfield image should now be aligned top-left with the Godot axis.
 
-Save your scene as whatever name you'd like (it will be the only scene in the project).
+## Arrange Lights
 
-## Add Lights
+The Show Creator generated special light nodes for each light it found in the MPF YAML config. You will see them all in the *Scene* panel with a warning icon to indicate that they have not been positioned yet.
 
-With the `MPFShowCreator` node selected, add a new node to your scene of type `MPFShowLight`. Give this node the name of a light in your MPF config (e.g. `l_left_ramp`) and drag it to the appropriate position over your playfield image.
+At the top of the scene editor window, select the crosshair cursor for "Move Mode" (instead of the default "Select Mode"). Then select a light node from the *Scene* panel and drag it to its appropriate position over the playfield image.
 
-Right click on the light node and select *Duplicate* (or press Cmd+D/Ctrl+D). Give the duplicated node the name of another light and drag it to the appropriate position.
-
-Repeat this process for all of the lights on your playfield. It's tedious, so save often.
+Once a light has been moved, the warning icon will disappear. Proceed through all of the lights and position them across the playfield.
 
 ## Create Shapes for Animating
 
@@ -74,6 +69,8 @@ The animation will default to be 1 second long, which you can change by entering
 
 Set your shape(s) to their initial position and size, and create keyframes for those properties (i.e. if you are going to animate position, you will need position keyframes, and if you are animating size, you will also need size keyframes).
 
+For a nice tutorial on using animations in Godot, see the [https://docs.godotengine.org/en/stable/tutorials/animation/introduction.html](Introduction to Animation Features) walkthrough.
+
 Some properties that you may want to animate:
 
 * Transform > Position
@@ -91,20 +88,8 @@ Repeat this process for all shapes and properties you want to animate for the sh
 
 ## Render Your Show
 
-When your animation is ready, select the `MPFShowCreator` root node and in the *Inspector* panel under *Animation Name*, type in the name of the animation you want to render to a show.
+When your animation is ready, save your scene and return to the *MPF Show Creator* panel. Click on the *Refresh Animations* button to get the animations you just created (if the button doesn't work, make sure you've saved the scene).
 
-Play the Scene in Godot. If you see a prompt that no main scene is defined, choose "Select Current".
+On the right side of the *MPF Show Creator* panel, select the animation you wish to generate a show for and click on the orange *Generate Show* button.
 
 A window will appear with the animation rendering, and after it finishes a file browser window will appear with the show saved as a MPF YAML file. Copy this file to your MPF project's */shows* folder.
-
-## Using Groups to Filter
-
-You can put lights in groups and filter certain groups for certain animations.
-
-To add a light to a group, select the light node and in the *Node* panel (top right of the Godot Editor) select *Groups*, type in the name of the group, and press *Add*.
-
-You can also manage groups in bulk by clicking on the *Manage Groups* button.
-
-When you are ready to render your animation show, select the `MPFShowCreator` node and in the *Inspector* panel, add one or more group names (comma separated) to the *Light Groups* section.
-
-When the show renders, only lights that are in at least one of the listed groups will be included in the show. To include all lights, simply clear the text from the *Light Groups* property.
