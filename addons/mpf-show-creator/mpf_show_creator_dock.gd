@@ -19,6 +19,7 @@ var lights: = {}
 
 @onready var button_generate_lights = $HBoxContainer/LeftVContainer/container_generators/button_generate_lights
 @onready var button_generate_scene = $HBoxContainer/LeftVContainer/container_generators/button_generate_scene
+@onready var button_refresh_animations = $HBoxContainer/LeftVContainer/container_generators/button_refresh_animations
 
 @onready var animation_dropdown = $HBoxContainer/RightVContainer/button_animation_names
 @onready var button_show_maker = $HBoxContainer/RightVContainer/button_generate_show
@@ -36,8 +37,7 @@ func _ready():
 				self.parse_mpf_config()
 		if self.config.has_section_key("show_creator", "show_scene"):
 			edit_show_scene.text = self.config.get_value("show_creator", "show_scene")
-			if edit_show_scene.text:
-				self._get_animation_names()
+			self._get_animation_names()
 		if self.config.has_section_key("show_creator", "strip_lights"):
 			button_strip_lights.button_pressed = self.config.get_value("show_creator", "strip_lights")
 		if self.config.has_section_key("show_creator", "strip_times"):
@@ -54,6 +54,7 @@ func _ready():
 	edit_show_scene.text_submitted.connect(self._save_show_scene)
 	button_show_maker.pressed.connect(self._generate_show)
 	animation_dropdown.item_selected.connect(self._select_animation)
+	button_refresh_animations.pressed.connect(self._get_animation_names)
 
 	button_strip_lights.toggled.connect(self._on_option.bind("strip_lights"))
 	button_strip_times.toggled.connect(self._on_option.bind("strip_times"))
@@ -100,6 +101,7 @@ func _generate_show():
 	EditorInterface.play_custom_scene(edit_show_scene.text)
 
 func _get_animation_names():
+	animation_dropdown.clear()
 	if not edit_show_scene.text:
 		return
 	var scene = load(edit_show_scene.text).instantiate()
@@ -110,7 +112,6 @@ func _get_animation_names():
 	if self.config.has_section_key("show_creator", "animation"):
 		selected_index = animations.find(self.config.get_value("show_creator", "animation"))
 
-	animation_dropdown.clear()
 	for a in animations:
 		if a == "RESET":
 			continue
@@ -118,6 +119,9 @@ func _get_animation_names():
 
 	if selected_index != -1:
 		animation_dropdown.select(selected_index)
+	# If no selected index then none has been saved, so trigger a save
+	else:
+		self._select_animation(0)
 
 func _select_animation(idx: int):
 	var animation_name = animation_dropdown.get_item_text(idx)
