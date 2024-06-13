@@ -86,11 +86,11 @@ Some properties that you may want to animate:
 * Transform > Scale
 * Visibility > Modulate
 
-To create a keyframe, set the shape where you want it to be and in the *Inspector* panel, click on the lock icon next to any property you want to animate.
+To create a keyframe, set the shape where you want it to be and in the *Inspector* panel, click on the key icon next to any property you want to animate.
 
 *Note: The first time your add a keyframe to an animation, you will get a prompt. Select Bezier Curves if you want to do advanced easing between frames. Deselect* Create RESET Track(s) *as you won't need them for Show Creator.*
 
-In the *Animation* panel, drag the blue timeline handle to the time of the next keyframe you want to create. Move your shape(s) to the desired position, and click on the lock icon again.
+In the *Animation* panel, drag the blue timeline handle to the time of the next keyframe you want to create. Move your shape(s) to the desired position, and click on the key icon again.
 
 Repeat this process for all shapes and properties you want to animate for the show. You can preview the animation at any time by pressing the Play icon in the top left of the *Animation* panel.
 

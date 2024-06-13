@@ -72,7 +72,11 @@ layout_mode = 2
 
 [node name="button_generate_lights" type="Button" parent="HBoxContainer/LeftVContainer/container_generators"]
 layout_mode = 2
-text = "  Populate Missing Lights  "
+text = "  Refresh Lights  "
+
+[node name="button_save_light_positions" type="Button" parent="HBoxContainer/LeftVContainer/container_generators"]
+layout_mode = 2
+text = "  Save Light Positions  "
 
 [node name="button_generate_scene" type="Button" parent="HBoxContainer/LeftVContainer/container_generators"]
 visible = false

@@ -22,6 +22,7 @@ var verbose: bool = false
 
 @onready var button_generate_lights = $HBoxContainer/LeftVContainer/container_generators/button_generate_lights
 @onready var button_generate_scene = $HBoxContainer/LeftVContainer/container_generators/button_generate_scene
+@onready var button_save_light_positions = $HBoxContainer/LeftVContainer/container_generators/button_save_light_positions
 @onready var button_refresh_animations = $HBoxContainer/LeftVContainer/container_generators/button_refresh_animations
 
 @onready var animation_dropdown = $HBoxContainer/RightVContainer/button_animation_names
@@ -62,6 +63,7 @@ func _ready():
 	button_show_scene.pressed.connect(self._select_show_scene)
 	button_generate_lights.pressed.connect(self._generate_lights)
 	button_generate_scene.pressed.connect(self._generate_scene)
+	button_save_light_positions.pressed.connect(self._save_light_positions)
 	edit_mpf_config.text_submitted.connect(self._save_mpf_config)
 	edit_show_scene.text_submitted.connect(self._save_show_scene)
 	button_show_maker.pressed.connect(self._generate_show)
@@ -81,6 +83,9 @@ func _generate_lights(lights_node: Node2D = null):
 	if self.lights.is_empty():
 		printerr("No light configuration found.")
 		return
+	var global_space = Vector2(
+		ProjectSettings.get_setting("display/window/size/viewport_width"),
+		ProjectSettings.get_setting("display/window/size/viewport_height"))
 	var scene = load(edit_show_scene.text).instantiate()
 	# Look for a lights child node
 	if not lights_node:
@@ -95,14 +100,17 @@ func _generate_lights(lights_node: Node2D = null):
 		if not light_child:
 			light_child = MPFShowLight.new()
 			light_child.name = l
-			light_child.position = Vector2(-1, -1)
+			if self.config.has_section_key("lights", l):
+				light_child.global_position = self.config.get_value("lights", l) * global_space
+			else:
+				light_child.global_position = Vector2(-1, -1)
 			lights_node.add_child(light_child)
 			light_child.owner = scene
 		if not self.lights[l]["tags"]:
 			for t in self.lights[l].tags:
 				light_child.add_to_group(t, true)
 
-	debug_log("Added %s lights to the scene %s" % [lights_node.get_child_count()])
+	debug_log("Added %s lights to the scene %s" % [lights_node.get_child_count(), edit_show_scene.text])
 	var pckscene = PackedScene.new()
 	var result = pckscene.pack(scene)
 	if result != OK:
@@ -114,6 +122,28 @@ func _generate_lights(lights_node: Node2D = null):
 		return
 
 	EditorInterface.reload_scene_from_path(edit_show_scene.text)
+
+func _save_light_positions():
+	var global_space = Vector2(
+		ProjectSettings.get_setting("display/window/size/viewport_width"),
+		ProjectSettings.get_setting("display/window/size/viewport_height"))
+	debug_log("Setting light positions on a %s x %s plane" % [global_space.x, global_space.y])
+
+	var scene = load(edit_show_scene.text).instantiate()
+	for l in self.lights.keys():
+		var light = scene.find_child(l)
+		debug_log("Checking light %s with node %s" % [l, light])
+		if not light:
+			push_warning("Light '%s' not found in scene" % l)
+			continue
+		if light.global_position == Vector2(-1, -1):
+			debug_log("Light '%s' has not been positioned." % l)
+			if self.config.has_section("lights") and self.config.has_section_key("lights", l):
+				self.config.erase_section_key("lights", l)
+			continue
+		self.config.set_value("lights", l, light.global_position / global_space)
+	self.config.save(CONFIG_PATH)
+
 
 func _generate_show():
 	EditorInterface.play_custom_scene(edit_show_scene.text)
