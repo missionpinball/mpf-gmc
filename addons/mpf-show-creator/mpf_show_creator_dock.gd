@@ -36,8 +36,12 @@ func _ready():
 			if edit_mpf_config.text:
 				self.parse_mpf_config()
 		if self.config.has_section_key("show_creator", "show_scene"):
-			edit_show_scene.text = self.config.get_value("show_creator", "show_scene")
-			self._get_animation_names()
+			var scene_path = self.config.get_value("show_creator", "show_scene")
+			if FileAccess.file_exists(scene_path):
+				edit_show_scene.text = scene_path
+				self._get_animation_names()
+			else:
+				self._save_show_scene("")
 		if self.config.has_section_key("show_creator", "strip_lights"):
 			button_strip_lights.button_pressed = self.config.get_value("show_creator", "strip_lights")
 		if self.config.has_section_key("show_creator", "strip_times"):
