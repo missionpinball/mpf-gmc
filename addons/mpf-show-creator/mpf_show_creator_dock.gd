@@ -103,6 +103,8 @@ func _generate_lights(lights_node: Node2D = null):
 		push_error("Error saving scene: %s" % err)
 		return
 
+	EditorInterface.reload_scene_from_path(edit_show_scene.text)
+
 func _generate_show():
 	EditorInterface.play_custom_scene(edit_show_scene.text)
 
@@ -168,6 +170,7 @@ func _generate_scene():
 	self.config.set_value("show_creator", "show_scene", DEFAULT_SHOW)
 	self.config.save(CONFIG_PATH)
 	edit_show_scene.text = DEFAULT_SHOW
+	EditorInterface.reload_scene_from_path(DEFAULT_SHOW)
 
 	if not self.lights.is_empty():
 		self._generate_lights()
@@ -223,6 +226,7 @@ func _on_option(pressed, opt_name):
 	self.config.save(CONFIG_PATH)
 
 func parse_mpf_config():
+	print("Parsing MPF config at %s" % edit_mpf_config.text)
 	var mpf_config = FileAccess.open(edit_mpf_config.text, FileAccess.READ)
 	var line = mpf_config.get_line()
 	var is_in_lights = false
@@ -235,6 +239,7 @@ func parse_mpf_config():
 			line = mpf_config.get_line()
 			continue
 		if line_stripped == "lights:":
+			print(" - Found 'lights:' section!")
 			is_in_lights = true
 			# The next line will give us our delimiter
 			line = mpf_config.get_line()
@@ -251,6 +256,7 @@ func parse_mpf_config():
 			# If the check is zero, there is one delimiter and this is a new light
 			if indent_check == 0:
 				current_light = line_data[0]
+				print(" - Found a light '%s'" % current_light)
 				lights[current_light] = { "tags": []}
 			# If the check is larger, there is more than a delimiter and this is part of the light
 			elif indent_check > 0:
