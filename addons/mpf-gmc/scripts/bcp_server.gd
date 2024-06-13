@@ -61,7 +61,7 @@ func _process(_delta: float) -> void:
 		_client = _server.take_connection()
 		var err = _thread.start(self._thread_poll, Thread.Priority.PRIORITY_LOW)
 		if err != OK:
-			self.log.error("Error spawning BCP poll thread: %s", err)
+			self.log.error("Error spawning BCP poll thread: %s", error_string(err))
 			self.status = ServerStatus.ERROR
 		else:
 			self.log.log("Client connected from %s:%s", [_client.get_connected_host(), _client.get_connected_port()])
@@ -118,7 +118,7 @@ func listen() -> void:
 	_thread = Thread.new()
 	var err = _server.listen(port)
 	if err != OK:
-		self.log.error("Unable to start GMC: %s", err)
+		self.log.error("Unable to start GMC: %s", error_string(err))
 		# The _process() method polls for client connections. If the server
 		# isn't listening, there's no reason to poll for clients.
 		set_process(false)

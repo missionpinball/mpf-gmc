@@ -96,11 +96,11 @@ func _generate_lights(lights_node: Node2D = null):
 	var pckscene = PackedScene.new()
 	var result = pckscene.pack(scene)
 	if result != OK:
-		push_error("Error packing scene: %s" % result)
+		push_error("Error packing scene: %s" % error_string(result))
 		return
 	var err = ResourceSaver.save(pckscene, edit_show_scene.text)
 	if err != OK:
-		push_error("Error saving scene: %s" % err)
+		push_error("Error saving scene: %s" % error_string(err))
 		return
 
 	EditorInterface.reload_scene_from_path(edit_show_scene.text)
@@ -160,11 +160,11 @@ func _generate_scene():
 	var scene = PackedScene.new()
 	var result = scene.pack(root)
 	if result != OK:
-		push_error("Error packing scene: %s" % result)
+		push_error("Error packing scene: %s" % error_string(result))
 		return
 	var err = ResourceSaver.save(scene, DEFAULT_SHOW)
 	if err != OK:
-		push_error("Error saving scene: %s" % err)
+		push_error("Error saving scene: %s" % error_string(err))
 		return
 
 	self.config.set_value("show_creator", "show_scene", DEFAULT_SHOW)
