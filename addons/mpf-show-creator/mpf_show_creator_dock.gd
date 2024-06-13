@@ -120,12 +120,11 @@ func _get_animation_names():
 	if selected_index != -1:
 		animation_dropdown.select(selected_index)
 	# If no selected index then none has been saved, so trigger a save
-	else:
+	elif animations.size():
 		self._select_animation(0)
 
 func _select_animation(idx: int):
 	var animation_name = animation_dropdown.get_item_text(idx)
-
 	if self.config.has_section_key("show_creator", "animation") and animation_name == self.config.get_value("show_creator", "animation"):
 		return
 
