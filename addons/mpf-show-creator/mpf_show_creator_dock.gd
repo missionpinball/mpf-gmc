@@ -66,6 +66,8 @@ func _ready():
 
 	self._render_generate_button()
 
+	button_show_maker.disabled = animation_dropdown.item_count == 0
+
 func _generate_lights(lights_node: Node2D = null):
 	if self.lights.is_empty():
 		printerr("No light configuration found.")
@@ -113,19 +115,19 @@ func _get_animation_names():
 	var animations = animp.get_animation_list()
 
 	var selected_index = -1
-	if self.config.has_section_key("show_creator", "animation"):
+	if self.config.has_section_key("show_creator", "animation") and self.config.get_value("show_creator", "animation", false):
 		selected_index = animations.find(self.config.get_value("show_creator", "animation"))
 
 	for a in animations:
 		if a == "RESET":
 			continue
 		animation_dropdown.add_item(a)
-
 	if selected_index != -1:
 		animation_dropdown.select(selected_index)
 	# If no selected index then none has been saved, so trigger a save
 	elif animations.size():
 		self._select_animation(0)
+	button_show_maker.disabled = animations.size() == 0
 
 func _select_animation(idx: int):
 	var animation_name = animation_dropdown.get_item_text(idx)
@@ -169,6 +171,8 @@ func _generate_scene():
 
 	if not self.lights.is_empty():
 		self._generate_lights()
+
+	self._render_generate_button()
 
 func _select_mpf_config():
 	var dialog = FileDialog.new()

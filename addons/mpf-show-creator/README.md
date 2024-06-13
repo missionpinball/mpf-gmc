@@ -96,7 +96,7 @@ Repeat this process for all shapes and properties you want to animate for the sh
 
 ## Render Your Show
 
-When your animation is ready, save your scene and return to the *MPF Show Creator* panel. Click on the *Refresh Animations* button to get the animations you just created (if the button doesn't work, make sure you've saved the scene).
+When your animation is ready, **save your scene** and return to the *MPF Show Creator* panel. Click on the *Refresh Animations* button to get the animations you just created (if the button doesn't work, make sure you've saved the scene).
 
 On the right side of the *MPF Show Creator* panel, select the animation you wish to generate a show for and click on the orange *Generate Show* button.
 
