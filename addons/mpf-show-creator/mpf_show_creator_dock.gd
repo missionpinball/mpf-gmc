@@ -234,6 +234,9 @@ func parse_mpf_config():
 			is_in_lights = true
 			# The next line will give us our delimiter
 			line = mpf_config.get_line()
+			# ...unless the next line is blank or a comment
+			while not line.strip_edges() or line.strip_edges().begins_with("#"):
+				line = mpf_config.get_line()
 			var dedent = line.dedent()
 			delimiter_size = line.length() - dedent.length()
 			delimiter = line.substr(0, delimiter_size)
