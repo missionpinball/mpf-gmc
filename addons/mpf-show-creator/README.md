@@ -4,7 +4,7 @@ The Godot MPF Show Creator is a tool for generating pinball light shows on machi
 
 # Installation and Setup
 
-To use this tool, you will need an image of your playfield and the Godot 4 editor.
+To use this tool, you will need an image of your playfield and the Godot editor version 4.2 or later (download from [godotengine.org](https://godotengine.org))
 
 ## Create your Project
 
@@ -21,7 +21,15 @@ Create a new Godot project (do *not* use your main GMC project) and under Projec
 **Rendering > Viewport**
 * Transparent Background: On
 
-Save the project and exit Godot. In your project folder create a new folder "*addons*" and copy this folder (*mpf-show-creator*) into your addons folder. To verify, your project root should have the file */addons/mpf-show-creator/plugin.gd*. Re-open your project in Godot.
+Save the project and exit Godot.
+
+## Add Necessary Files
+
+Copy your playfield image to your project folder (where your *project.godot* file is).
+
+**Tip:** If your playfield image is named *playfield.png* or *playfield.jpg* (case-sensitive) then the Show Creator will automatically find it.
+
+Also in the project folder, create a new folder "*addons*" and copy this folder (*mpf-show-creator*) into your addons folder. To verify, your project root should have the file */addons/mpf-show-creator/plugin.cfg*. Re-open your project in Godot.
 
 In the Godot editor, go to the *Project Settings* menu and the *Plugins* tab. You should see the plugin for **MPF Show Creator**, click the checkbox to enable it.
 
@@ -31,9 +39,9 @@ At the bottom panel of the Godot editor select the new tab called *MPF Show Crea
 
 On the *MPF Show Creator* panel, go to *MPF Config File* and select the yaml file from your MPF project that includes the `lights:` definitions.
 
-After loading the lights file, click on the "*Generate Show Creator Scene*" button to generate a scene file for building shows. The scene will be saved as "show_creator.tscn". Open this scene in the Godot editor.
+After loading the lights file, click on the "*Generate Show Creator Scene*" button to generate a scene file for building shows. The scene will be saved as "show_creator.tscn". Find this file in the *FileSystem* panel and double-click to open the scene in the main Godot editor window.
 
-The root node of the show creator scene is called `MPFShowCreator`. Select it and in the *Inspector* panel, under *Sprite2D > Texture* select *Quick Load* and choose the image of your playfield. Your playfield image should now be aligned top-left with the Godot axis.
+If you do not see your playfield image in the scene, you will need to manually attach it. The root node of the show creator scene is called `MPFShowCreator`, which you can see at the top of the *Scene* panel. Select it and in the *Inspector* panel, under *Sprite2D > Texture* select *Quick Load* and choose the image of your playfield. Your playfield image should now be aligned top-left with the Godot axis.
 
 ## Arrange Lights
 
