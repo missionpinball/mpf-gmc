@@ -6,6 +6,7 @@ const DEFAULT_SHOW =  "res://show_creator.tscn"
 
 var config: ConfigFile
 var lights: = {}
+var verbose: bool = false
 
 @onready var button_mpf_config = $HBoxContainer/LeftVContainer/container_mpf_config/button_mpf_config
 @onready var edit_mpf_config = $HBoxContainer/LeftVContainer/container_mpf_config/edit_mpf_config
@@ -16,6 +17,8 @@ var lights: = {}
 @onready var button_strip_lights = $HBoxContainer/CenterVContainer/button_strip_lights
 @onready var button_strip_times = $HBoxContainer/CenterVContainer/button_strip_times
 @onready var button_use_alpha = $HBoxContainer/CenterVContainer/button_use_alpha
+@onready var button_verbose = $HBoxContainer/CenterVContainer/button_verbose
+
 
 @onready var button_generate_lights = $HBoxContainer/LeftVContainer/container_generators/button_generate_lights
 @onready var button_generate_scene = $HBoxContainer/LeftVContainer/container_generators/button_generate_scene
@@ -31,14 +34,19 @@ func _ready():
 		printerr("Error loading config file: %s" % err)
 
 	if self.config.has_section("show_creator"):
+		if self.config.has_section_key("show_creator", "verbose"):
+			button_verbose.button_pressed = self.config.get_value("show_creator", "verbose")
+			verbose = button_verbose.button_pressed
 		if self.config.has_section_key("show_creator", "mpf_config"):
 			edit_mpf_config.text = self.config.get_value("show_creator", "mpf_config")
 			if edit_mpf_config.text:
+				debug_log("Found MPF config file '%s'" % edit_mpf_config.text)
 				self.parse_mpf_config()
 		if self.config.has_section_key("show_creator", "show_scene"):
 			var scene_path = self.config.get_value("show_creator", "show_scene")
 			if FileAccess.file_exists(scene_path):
 				edit_show_scene.text = scene_path
+				debug_log("Found Show Scene '%s'" % edit_show_scene.text)
 				self._get_animation_names()
 			else:
 				self._save_show_scene("")
@@ -63,6 +71,7 @@ func _ready():
 	button_strip_lights.toggled.connect(self._on_option.bind("strip_lights"))
 	button_strip_times.toggled.connect(self._on_option.bind("strip_times"))
 	button_use_alpha.toggled.connect(self._on_option.bind("use_alpha"))
+	button_verbose.toggled.connect(self._on_option.bind("verbose"))
 
 	self._render_generate_button()
 
@@ -93,6 +102,7 @@ func _generate_lights(lights_node: Node2D = null):
 			for t in self.lights[l].tags:
 				light_child.add_to_group(t, true)
 
+	debug_log("Added %s lights to the scene %s" % [lights_node.get_child_count()])
 	var pckscene = PackedScene.new()
 	var result = pckscene.pack(scene)
 	if result != OK:
@@ -111,6 +121,7 @@ func _generate_show():
 func _get_animation_names():
 	animation_dropdown.clear()
 	if not edit_show_scene.text:
+		debug_log("No show scene selected, cannot find animations.")
 		return
 	var scene = load(edit_show_scene.text).instantiate()
 	var animp = scene.animation_player
@@ -129,6 +140,7 @@ func _get_animation_names():
 	# If no selected index then none has been saved, so trigger a save
 	elif animations.size():
 		self._select_animation(0)
+	debug_log("Found %s animations: %s" % [animations.size(), animations])
 	button_show_maker.disabled = animations.size() == 0
 
 func _select_animation(idx: int):
@@ -221,12 +233,13 @@ func _render_generate_button():
 	button_generate_scene.disabled = self.lights.is_empty()
 
 func _on_option(pressed, opt_name):
-	print("Got option pressed state %s and name %s" % [pressed, opt_name])
 	self.config.set_value("show_creator", opt_name, pressed)
 	self.config.save(CONFIG_PATH)
+	if opt_name == "verbose":
+		verbose = pressed
 
 func parse_mpf_config():
-	print("Parsing MPF config at %s" % edit_mpf_config.text)
+	debug_log("Parsing MPF config at %s" % edit_mpf_config.text)
 	var mpf_config = FileAccess.open(edit_mpf_config.text, FileAccess.READ)
 	var line = mpf_config.get_line()
 	var is_in_lights = false
@@ -239,7 +252,7 @@ func parse_mpf_config():
 			line = mpf_config.get_line()
 			continue
 		if line_stripped == "lights:":
-			print(" - Found 'lights:' section!")
+			debug_log(" - Found 'lights:' section!")
 			is_in_lights = true
 			# The next line will give us our delimiter
 			line = mpf_config.get_line()
@@ -256,7 +269,7 @@ func parse_mpf_config():
 			# If the check is zero, there is one delimiter and this is a new light
 			if indent_check == 0:
 				current_light = line_data[0]
-				print(" - Found a light '%s'" % current_light)
+				debug_log(" - Found a light '%s'" % current_light)
 				lights[current_light] = { "tags": []}
 			# If the check is larger, there is more than a delimiter and this is part of the light
 			elif indent_check > 0:
@@ -267,3 +280,7 @@ func parse_mpf_config():
 			else:
 				is_in_lights = false
 		line = mpf_config.get_line()
+
+func debug_log(message: String):
+	if verbose:
+		print_debug(message)

@@ -122,6 +122,10 @@ text = "Strip Empty Times"
 layout_mode = 2
 text = "Use Alpha Channel"
 
+[node name="button_verbose" type="CheckBox" parent="HBoxContainer/CenterVContainer"]
+layout_mode = 2
+text = "Debugging"
+
 [node name="VSeparator2" type="VSeparator" parent="HBoxContainer"]
 custom_minimum_size = Vector2(40, 2.08165e-12)
 layout_mode = 2
