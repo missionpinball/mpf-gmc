@@ -136,6 +136,10 @@ func _generate_scene():
 	var root = MPFShowCreator.new()
 	root.name = "MPFShowCreator"
 	root.centered = false
+	# Look for a playfield file
+	for f in ["res://playfield.png", "res://playfield.jpg"]:
+		if FileAccess.file_exists(f):
+			root.texture = load(f)
 	var animp = AnimationPlayer.new()
 	animp.name = "AnimationPlayer"
 	root.add_child(animp)
