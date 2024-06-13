@@ -83,9 +83,6 @@ func _generate_lights(lights_node: Node2D = null):
 	if self.lights.is_empty():
 		printerr("No light configuration found.")
 		return
-	var global_space = Vector2(
-		ProjectSettings.get_setting("display/window/size/viewport_width"),
-		ProjectSettings.get_setting("display/window/size/viewport_height"))
 	var scene = load(edit_show_scene.text).instantiate()
 	# Look for a lights child node
 	if not lights_node:
@@ -101,7 +98,7 @@ func _generate_lights(lights_node: Node2D = null):
 			light_child = MPFShowLight.new()
 			light_child.name = l
 			if self.config.has_section_key("lights", l):
-				light_child.global_position = self.config.get_value("lights", l) * global_space
+				light_child.restore(self.config.get_value("lights", l))
 			else:
 				light_child.global_position = Vector2(-1, -1)
 			lights_node.add_child(light_child)
@@ -141,7 +138,13 @@ func _save_light_positions():
 			if self.config.has_section("lights") and self.config.has_section_key("lights", l):
 				self.config.erase_section_key("lights", l)
 			continue
-		self.config.set_value("lights", l, light.global_position / global_space)
+		var settings = {
+			"position": light.global_position / global_space,
+			"shape": light.shape,
+			"scale": light.scale,
+			"rotation": light.rotation
+		}
+		self.config.set_value("lights", l, settings)
 	self.config.save(CONFIG_PATH)
 
 
@@ -286,9 +289,11 @@ func parse_mpf_config():
 			is_in_lights = true
 			# The next line will give us our delimiter
 			line = mpf_config.get_line()
+			line_stripped = line.strip_edges()
 			# ...unless the next line is blank or a comment
-			while not line.strip_edges() or line.strip_edges().begins_with("#"):
+			while not line_stripped or line_stripped.begins_with("#"):
 				line = mpf_config.get_line()
+				line_stripped = line.strip_edges()
 			var dedent = line.dedent()
 			delimiter_size = line.length() - dedent.length()
 			delimiter = line.substr(0, delimiter_size)
