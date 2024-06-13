@@ -4,6 +4,10 @@ extends EditorPlugin
 var show_creator_dock
 
 func _enter_tree():
+	var version = Engine.get_version_info()
+	if version.major < 4 or version.minor < 2:
+		push_error("MPF Show Creator requires Godot version 4.2 or later, you have %s.%s.%s. Please visit godotengine.org to update." % [version.major, version.minor, version.patch])
+		return
 	add_custom_type("MPFShowCreator", "Sprite2D", preload("classes/MPFShowCreator.gd"), null)
 	add_custom_type("MPFShowLight", "Node2D", preload("classes/MPFShowLight.gd"), null)
 	show_creator_dock = preload("res://addons/mpf-show-creator/mpf_show_creator_dock.tscn").instantiate()
