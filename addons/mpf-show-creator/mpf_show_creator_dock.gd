@@ -168,10 +168,10 @@ func _get_animation_names():
 		if a == "RESET":
 			continue
 		animation_dropdown.add_item(a)
-	if selected_index != -1:
+	if selected_index != -1 and selected_index < animation_dropdown.item_count:
 		animation_dropdown.select(selected_index)
 	# If no selected index then none has been saved, so trigger a save
-	elif animations.size():
+	elif animations.size() and animation_dropdown.item_count:
 		self._select_animation(0)
 	debug_log("Found %s animations: %s" % [animations.size(), animations])
 	button_show_maker.disabled = animations.size() == 0
