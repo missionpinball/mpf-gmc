@@ -142,7 +142,7 @@ func _save_light_positions():
 			"position": light.global_position / global_space,
 			"shape": light.shape,
 			"scale": light.scale,
-			"rotation": light.rotation
+			"rotation_degrees": light.rotation_degrees
 		}
 		self.config.set_value("lights", l, settings)
 	self.config.save(CONFIG_PATH)

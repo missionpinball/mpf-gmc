@@ -4,7 +4,7 @@ class_name MPFShowLight
 
 const PLAYFIELD_WIDTH_INCHES = 22.0
 const INSERT_DPI = 150
-enum InsertShapes { CIRCLE }
+enum InsertShapes { CIRCLE, SQUARE, LONG_TRIANGLE }
 
 @export var shape: InsertShapes = InsertShapes.CIRCLE:
 	set(value):
@@ -42,8 +42,8 @@ func restore(props):
 		self.global_position = props["position"] * global_space
 	if props.has("scale"):
 		self.scale = props["scale"]
-	if props.has("rotation"):
-		self.rotation = props["rotation"]
+	if props.has("rotation_degrees"):
+		self.rotation_degrees = props["rotation_degrees"]
 	if props.has("shape"):
 		self.shape = props["shape"]
 		self.scale_to_inches()
@@ -72,6 +72,10 @@ func scale_to_inches():
 	match self.shape:
 		InsertShapes.CIRCLE:
 			path = "res://addons/mpf-show-creator/inserts/circle-insert.svg"
+		InsertShapes.SQUARE:
+			path = "res://addons/mpf-show-creator/inserts/square-insert.svg"
+		InsertShapes.LONG_TRIANGLE:
+			path = "res://addons/mpf-show-creator/inserts/long-triangle-insert.svg"
 		_:
 			push_error("No texture for selected shape.")
 	self.texture = load(path)
