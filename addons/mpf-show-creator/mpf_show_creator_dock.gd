@@ -6,27 +6,33 @@ const DEFAULT_SHOW =  "res://show_creator.tscn"
 
 var config: ConfigFile
 var lights: = {}
+var tags: = {}
 var verbose: bool = false
 
-@onready var button_mpf_config = $HBoxContainer/LeftVContainer/container_mpf_config/button_mpf_config
-@onready var edit_mpf_config = $HBoxContainer/LeftVContainer/container_mpf_config/edit_mpf_config
-@onready var button_show_scene = $HBoxContainer/LeftVContainer/container_show_scene/button_show_scene
-@onready var edit_show_scene = $HBoxContainer/LeftVContainer/container_show_scene/edit_show_scene
+@onready var button_mpf_config = $MainVContainer/TopHContainer/LeftVContainer/container_mpf_config/button_mpf_config
+@onready var edit_mpf_config = $MainVContainer/TopHContainer/LeftVContainer/container_mpf_config/edit_mpf_config
+@onready var button_show_scene = $MainVContainer/TopHContainer/LeftVContainer/container_show_scene/button_show_scene
+@onready var edit_show_scene = $MainVContainer/TopHContainer/LeftVContainer/container_show_scene/edit_show_scene
 
-@onready var edit_fps = $HBoxContainer/CenterVContainer/container_fps/edit_fps
-@onready var button_strip_lights = $HBoxContainer/CenterVContainer/button_strip_lights
-@onready var button_strip_times = $HBoxContainer/CenterVContainer/button_strip_times
-@onready var button_use_alpha = $HBoxContainer/CenterVContainer/button_use_alpha
-@onready var button_verbose = $HBoxContainer/CenterVContainer/button_verbose
+@onready var edit_fps = $MainVContainer/TopHContainer/RightVContainer/container_fps/edit_fps
+@onready var button_strip_lights = $MainVContainer/TopHContainer/LeftVContainer/BottomFContainer/button_strip_lights
+@onready var button_strip_times = $MainVContainer/TopHContainer/LeftVContainer/BottomFContainer/button_strip_times
+@onready var button_use_alpha = $MainVContainer/TopHContainer/LeftVContainer/BottomFContainer/button_use_alpha
+@onready var button_verbose = $MainVContainer/TopHContainer/LeftVContainer/BottomFContainer/button_verbose
 
 
-@onready var button_generate_lights = $HBoxContainer/LeftVContainer/container_generators/button_generate_lights
-@onready var button_generate_scene = $HBoxContainer/LeftVContainer/container_generators/button_generate_scene
-@onready var button_save_light_positions = $HBoxContainer/LeftVContainer/container_generators/button_save_light_positions
-@onready var button_refresh_animations = $HBoxContainer/LeftVContainer/container_generators/button_refresh_animations
+@onready var button_generate_lights = $MainVContainer/TopHContainer/LeftVContainer/container_generators/button_generate_lights
+@onready var button_generate_scene = $MainVContainer/TopHContainer/LeftVContainer/container_generators/button_generate_scene
+@onready var button_save_light_positions = $MainVContainer/TopHContainer/LeftVContainer/container_generators/button_save_light_positions
+@onready var button_refresh_animations = $MainVContainer/TopHContainer/LeftVContainer/container_generators/button_refresh_animations
 
-@onready var animation_dropdown = $HBoxContainer/RightVContainer/button_animation_names
-@onready var button_show_maker = $HBoxContainer/RightVContainer/button_generate_show
+
+@onready var tags_container = $MainVContainer/TopHContainer/CenterVContainer/ScrollContainer/tag_checks
+@onready var button_tags_select_all = $MainVContainer/TopHContainer/CenterVContainer/TagsHContainer/button_tags_select_all
+@onready var button_tags_deselect_all = $MainVContainer/TopHContainer/CenterVContainer/TagsHContainer/button_tags_deselect_all
+
+@onready var animation_dropdown = $MainVContainer/TopHContainer/RightVContainer/button_animation_names
+@onready var button_show_maker = $MainVContainer/TopHContainer/RightVContainer/button_generate_show
 
 func _ready():
 	self.config = ConfigFile.new()
@@ -70,6 +76,11 @@ func _ready():
 	animation_dropdown.item_selected.connect(self._select_animation)
 	button_refresh_animations.pressed.connect(self._get_animation_names)
 
+	# Tags
+	button_tags_select_all.pressed.connect(self._select_all_tags)
+	button_tags_deselect_all.pressed.connect(self._deselect_all_tags)
+
+	# Configuration buttons
 	button_strip_lights.toggled.connect(self._on_option.bind("strip_lights"))
 	button_strip_times.toggled.connect(self._on_option.bind("strip_times"))
 	button_use_alpha.toggled.connect(self._on_option.bind("use_alpha"))
@@ -103,9 +114,8 @@ func _generate_lights(lights_node: Node2D = null):
 				light_child.global_position = Vector2(-1, -1)
 			lights_node.add_child(light_child)
 			light_child.owner = scene
-		if not self.lights[l]["tags"]:
-			for t in self.lights[l].tags:
-				light_child.add_to_group(t, true)
+		# Tags may have changed, so set that even on existing lights
+		light_child.tags = self.lights[l].tags
 
 	debug_log("Added %s lights to the scene %s" % [lights_node.get_child_count(), edit_show_scene.text])
 	var pckscene = PackedScene.new()
@@ -143,7 +153,8 @@ func _save_light_positions():
 			"position": light.global_position / global_space,
 			"shape": light.shape,
 			"scale": light.scale,
-			"rotation_degrees": light.rotation_degrees
+			"rotation_degrees": light.rotation_degrees,
+			"tags": self.lights[l]["tags"]
 		}
 		self.config.set_value("lights", l, settings)
 	self.config.save(CONFIG_PATH)
@@ -161,29 +172,67 @@ func _get_animation_names():
 	var scene = load(edit_show_scene.text).instantiate()
 	var animp = scene.animation_player
 	var animations = animp.get_animation_list()
+	if animations.has("RESET"):
+		animations.remove_at(animations.find("RESET"))
 
 	var selected_index = -1
 	if self.config.has_section_key("show_creator", "animation") and self.config.get_value("show_creator", "animation", false):
 		selected_index = animations.find(self.config.get_value("show_creator", "animation"))
 
 	for a in animations:
-		if a == "RESET":
-			continue
 		animation_dropdown.add_item(a)
 	if selected_index != -1 and selected_index < animation_dropdown.item_count:
 		animation_dropdown.select(selected_index)
+		self._select_animation(selected_index)
 	# If no selected index then none has been saved, so trigger a save
-	elif animations.size() and animation_dropdown.item_count:
+	elif animation_dropdown.item_count:
 		self._select_animation(0)
-	debug_log("Found %s animations: %s" % [animations.size(), animations])
-	button_show_maker.disabled = animations.size() == 0
+	debug_log("Found %s animations: %s" % [animation_dropdown.item_count, animations])
+	button_show_maker.disabled = animation_dropdown.item_count == 0
 
 func _select_animation(idx: int):
 	var animation_name = animation_dropdown.get_item_text(idx)
+
+	# Update the tags list based on this animation
+	if self.config.has_section_key("tags", animation_name):
+		var include_tags = self.config.get_value("tags", animation_name)
+		for tag_box in tags_container.get_children():
+			tag_box.button_pressed = tag_box.text in include_tags
+	else:
+		self._select_all_tags()
+
+	# If this is already the saved animation, no more to do
 	if self.config.has_section_key("show_creator", "animation") and animation_name == self.config.get_value("show_creator", "animation"):
 		return
 
 	self.config.set_value("show_creator", "animation", animation_name)
+	self.config.save(CONFIG_PATH)
+
+func _select_all_tags():
+	for tag_box in tags_container.get_children():
+		tag_box.button_pressed = true
+	self._save_tags()
+
+func _deselect_all_tags():
+	for tag_box in tags_container.get_children():
+		tag_box.button_pressed = false
+	self._save_tags()
+
+func _save_tags(_toggle_state=false):
+	# Check for tags to attach to this show
+	var animation_name = animation_dropdown.get_item_text(animation_dropdown.selected)
+	var included_tags = []
+	var excluded_tags = []
+	for tag in tags_container.get_children():
+		if tag.button_pressed:
+			included_tags.append(tag.text)
+		else:
+			excluded_tags.append(tag.text)
+	# If any tags are excluded, store the included ones
+	if excluded_tags:
+		self.config.set_value("tags", animation_name, included_tags)
+	elif self.config.has_section_key("tags", animation_name):
+		self.config.erase_section_key("tags", animation_name)
 	self.config.save(CONFIG_PATH)
 
 func _generate_scene():
@@ -282,8 +331,8 @@ func parse_mpf_config():
 	var delimiter: String
 	var delimiter_size: int
 	while mpf_config.get_position() < mpf_config.get_length():
-		var line_stripped = line.strip_edges()
-		if not line_stripped or line_stripped.begins_with("#"):
+		var line_stripped = line.get_slice("#", 0).strip_edges()
+		if not line_stripped:
 			line = mpf_config.get_line()
 			continue
 		if line_stripped == "lights:":
@@ -291,11 +340,11 @@ func parse_mpf_config():
 			is_in_lights = true
 			# The next line will give us our delimiter
 			line = mpf_config.get_line()
-			line_stripped = line.strip_edges()
+			line_stripped = line.get_slice("#", 0).strip_edges()
 			# ...unless the next line is blank or a comment
-			while not line_stripped or line_stripped.begins_with("#"):
+			while not line_stripped:
 				line = mpf_config.get_line()
-				line_stripped = line.strip_edges()
+				line_stripped = line.get_slice("#", 0).strip_edges()
 			var dedent = line.dedent()
 			delimiter_size = line.length() - dedent.length()
 			delimiter = line.substr(0, delimiter_size)
@@ -310,13 +359,31 @@ func parse_mpf_config():
 				lights[current_light] = { "tags": []}
 			# If the check is larger, there is more than a delimiter and this is part of the light
 			elif indent_check > 0:
+				# Clear out any inline comments and extra whitespace
 				if line_data[0] == "tags":
 					for t in line_data[1].split(","):
-						lights[current_light]["tags"].append(t.strip_edges())
+						var tag = t.strip_edges()
+						if not self.tags.has(tag):
+							self.tags[tag] = []
+						self.tags[tag].append(current_light)
+						lights[current_light]["tags"].append(tag)
 			# If the check is smaller, there is less than a delimiter and we are done with lights
 			else:
 				is_in_lights = false
 		line = mpf_config.get_line()
+
+	for n in tags_container.get_children():
+		tags_container.remove_child(n)
+		n.queue_free()
+	if not self.tags.is_empty():
+		debug_log("Found the following tags: %s" % ", ".join(self.tags.keys()))
+		for tag in self.tags.keys():
+			var tag_box = CheckBox.new()
+			tag_box.text = tag
+			tag_box.button_pressed = true
+			tag_box.toggled.connect(self._save_tags)
+			tags_container.add_child(tag_box)
+
 
 func debug_log(message: String):
 	if verbose:
