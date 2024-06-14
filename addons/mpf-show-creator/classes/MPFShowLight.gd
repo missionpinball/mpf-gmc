@@ -26,6 +26,9 @@ func _ready():
 		parent = parent.get_parent()
 	if Engine.is_editor_hint():
 		self.set_notify_transform(true)
+	# If not in editor, make it invisible
+	else:
+		self.visible = false
 
 func restore(props):
 	var global_space = Vector2(
