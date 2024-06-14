@@ -3,25 +3,29 @@ extends Sprite2D
 class_name MPFShowLight
 
 const PLAYFIELD_WIDTH_INCHES = 22.0
+const INSERT_DPI = 150
 enum InsertShapes { CIRCLE }
 
 @export var shape: InsertShapes = InsertShapes.CIRCLE:
 	set(value):
 		shape = value
 		self.scale_to_inches()
+@export var width_inches: float = 0.5:
+	set(value):
+		width_inches = value
+		self.scale_to_inches()
 
 var current_color
 
 func _ready():
 	self.scale_to_inches()
-	if Engine.is_editor_hint():
-		self.set_notify_transform(true)
-		return
 	var parent = self.get_parent()
 	while parent:
 		if parent is MPFShowCreator:
 			parent.register_light(self)
 		parent = parent.get_parent()
+	if Engine.is_editor_hint():
+		self.set_notify_transform(true)
 
 func restore(props):
 	var global_space = Vector2(
@@ -41,6 +45,9 @@ func restore(props):
 		self.shape = props["shape"]
 		self.scale_to_inches()
 
+func set_color(color: Color):
+	self.modulate = color
+
 func get_color(data: Image, suppress_unchanged: bool = false):
 	var color = data.get_pixelv(self.global_position)
 	if color == current_color and suppress_unchanged:
@@ -50,7 +57,6 @@ func get_color(data: Image, suppress_unchanged: bool = false):
 
 func _get_configuration_warnings():
 	if self.global_position == Vector2(-1, -1):
-	# if self.position.x == 0 and self.position.y == 0:
 		return ["Light has not been positioned."]
 	return []
 
@@ -60,22 +66,27 @@ func _notification(what):
 
 func scale_to_inches():
 	var path: String
-	var width: float
 	match self.shape:
 		InsertShapes.CIRCLE:
 			path = "res://addons/mpf-show-creator/inserts/circle-insert.svg"
-			width = 0.5
 		_:
 			push_error("No texture for selected shape.")
-	# Lots of extra steps here because Godot warns against direct loading
-	var base_texture = load(path)
-	var image: Image = base_texture.get_image()
+	self.texture = load(path)
+	var image: Image = self.texture.get_image()
 	var mapped_texture = ImageTexture.create_from_image(image)
-	var playfield_ppi = ProjectSettings.get_setting("display/window/size/viewport_width") / PLAYFIELD_WIDTH_INCHES
-	var image_size = mapped_texture.get_size()
-	var image_aspect_ratio = image_size.x / image_size.y
-	print("Light has dimensions %s x %s, aspect ratio %s" % [image_size.x, image_size.y, image_aspect_ratio])
-	var scaled_size = Vector2(width * playfield_ppi, width * playfield_ppi * image_aspect_ratio)
-	print(" - calculated a scaled size of %s" % scaled_size)
-	mapped_texture.set_size_override(scaled_size)
-	self.texture = mapped_texture
+	var playfield_dpi = ProjectSettings.get_setting("display/window/size/viewport_width") / PLAYFIELD_WIDTH_INCHES
+
+	# Find out how wide the image is naturally
+	var image_width_inches = mapped_texture.get_width() / INSERT_DPI
+	# Scale the image from natural width to desired width
+	var image_width_scale = self.width_inches / image_width_inches
+	# Scale the image from INSERT_DPI to PF_DPI so it's relatively to-scale
+	var image_dpi_scale = playfield_dpi / INSERT_DPI
+	# Combine the two scale levels
+	var scale_factor = image_width_scale * image_dpi_scale
+	self.scale = Vector2(scale_factor, scale_factor)
+	# print("Scaling to %s because texture is %s px wide at %s DPI (aka %s inches) and playfield ppi is %s" %
+	# 	[scale_factor, mapped_texture.get_width(), INSERT_DPI, image_width_inches, playfield_dpi])
+	# print(" - that means scale by %s to convert image from %sin to %sin, and scale by %s to convert from %s DPI to %s DPI" %
+	# 	[image_width_scale, image_width_inches, self.width_inches, image_dpi_scale, INSERT_DPI, playfield_dpi]
+	# )
