@@ -62,11 +62,13 @@ If you do not see your playfield image in the scene, you will need to manually a
 
 The Show Creator generated special light nodes for each light it found in the MPF YAML config. You will see them all in the *Scene* panel (upper left) with a warning icon to indicate that they have not been positioned yet.
 
-At the top of the scene editor window, select the crosshair cursor for the "Move Mode" tool (instead of the default "Select Mode"). Then select a light node from the *Scene* panel and drag it to its appropriate position over the playfield image.
+At the top of the scene editor window, select the crosshair cursor for the "Move Mode" tool (instead of the default "Select Mode"). Click on a light node in the *Scene* panel. In the main view you'll see an orange box with crosshairs highlighting the light. Drag the box to its appropriate position over the playfield image.
 
 ![Move Mode Tool](docs/move-icon.png)
 
 Once a light has been moved, the warning icon will disappear. Proceed through all of the lights and position them across the playfield.
+
+When all lights are positioned, save your project.
 
 ## Create Shapes for Animating
 
