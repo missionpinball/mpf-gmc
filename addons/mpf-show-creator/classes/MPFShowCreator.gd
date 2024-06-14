@@ -1,3 +1,4 @@
+@tool
 extends Sprite2D
 class_name MPFShowCreator
 
@@ -6,8 +7,18 @@ class_name MPFShowCreator
 
 const CONFIG_PATH = "user://mpf_show_creator.cfg"
 
+var _light_color: Color
+
 ## An AnimationPlayer node containing the animations to render as shows.
 @export var animation_player: AnimationPlayer
+## Color to modulate the light icons
+@export var lights_color: Color = Color(0.3, 0.3, 0.3, 1.0):
+	set(value):
+		_light_color = value
+		for l in lights:
+			l.set_color(value)
+	get:
+		return _light_color
 ## A list of group names (comma-separated) whose lights will be included
 @export var light_groups: String = ""
 
@@ -32,6 +43,9 @@ func _enter_tree():
 			self._groups.append(g.strip_edges())
 
 func _ready():
+	if Engine.is_editor_hint():
+		return
+
 	assert(self.texture, "MPFShowCreator node requires a playfield image as a texture.")
 	ProjectSettings.set_setting("display/window/size/window_width_override", self.texture.get_width())
 	ProjectSettings.set_setting("display/window/size/window_height_override", self.texture.get_height())
@@ -84,8 +98,10 @@ func _run_animation():
 
 func register_light(light: MPFShowLight):
 	if light.position.x < 0 or light.position.y < 0 or light.position.x > self.texture.get_width() or light.position.y > self.texture.get_height():
-		push_warning("Light %s is outside of the viewport and will not be included." % light.name)
-		return
+		# In the editor, include all lights
+		if not Engine.is_editor_hint():
+			push_warning("Light %s is outside of the viewport and will not be included." % light.name)
+			return
 	if self._groups:
 		var has_match = false
 		for g in self._groups:
@@ -96,7 +112,7 @@ func register_light(light: MPFShowLight):
 			return
 	self.lights.append(light)
 
-func snapshot(is_initial=false):
+func snapshot():
 	var tex := get_viewport().get_texture().get_image()
 	var timestamp = self.animation_player.current_animation_position
 	var light_lines := []
