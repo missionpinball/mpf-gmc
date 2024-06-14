@@ -53,7 +53,9 @@ At the bottom panel of the Godot editor select the new tab called *MPF Show Crea
 
 Find the input box for *MPF Config File* and select the yaml file from your MPF project that includes the `lights:` definition for the lights in your machine.
 
-After loading the yaml file, click on the "*Generate Show Creator Scene*" button to generate a scene file for building shows. The scene will be saved as "show_creator.tscn". Find this file in the *FileSystem* panel (lower left) and double-click it to open the scene in the main Godot editor window.
+After loading the yaml file, click on the "*Generate Show Creator Scene*" button to generate a scene file for building shows. The scene will be saved as "show_creator.tscn".
+
+Your new scene should automatically open in the main editor view. If the scene *show_creator.tscn* does not open automatically, find the file in the *FileSystem* panel (lower left) and double-click it to open the scene in the main Godot editor window.
 
 > **Note**
 If you do not see your playfield image in the scene, you will need to manually attach it. The root node of the show creator scene is called `MPFShowCreator`, which you can see at the top of the *Scene* panel. Select it and in the *Inspector* panel, under *Sprite2D > Texture* select *Quick Load* and choose the image of your playfield. Your playfield image should now be aligned top-left with the Godot axis.

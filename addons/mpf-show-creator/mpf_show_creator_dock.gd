@@ -266,12 +266,16 @@ func _generate_scene():
 	self.config.set_value("show_creator", "show_scene", DEFAULT_SHOW)
 	self.config.save(CONFIG_PATH)
 	edit_show_scene.text = DEFAULT_SHOW
-	EditorInterface.reload_scene_from_path(DEFAULT_SHOW)
 
 	if not self.lights.is_empty():
 		self._generate_lights()
-
 	self._render_generate_button()
+
+	if DEFAULT_SHOW in EditorInterface.get_open_scenes():
+		EditorInterface.reload_scene_from_path(DEFAULT_SHOW)
+	else:
+		EditorInterface.open_scene_from_path(DEFAULT_SHOW)
+
 
 func _select_mpf_config():
 	var dialog = FileDialog.new()
