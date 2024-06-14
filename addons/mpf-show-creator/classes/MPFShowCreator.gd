@@ -18,15 +18,14 @@ var _light_color: Color
 			l.set_color(value)
 	get:
 		return _light_color
-## A list of group names (comma-separated) whose lights will be included
-@export var light_groups: String = ""
 
 var lights = []
 var spf: float
 var file: FileAccess
 var file_path: String
-var _groups: Array
+var tags := []
 
+var config
 var animation_name
 var strip_unchanged_lights
 var strip_empty_times
@@ -34,23 +33,11 @@ var use_alpha
 var fps
 
 func _enter_tree():
-	# If there are groups, use those instead.
-	# This will be called before all the children register themselves.
-	if self.light_groups:
-		self._groups = []
-		for g in self.light_groups.split(","):
-			self._groups.append(g.strip_edges())
-
-func _ready():
 	if Engine.is_editor_hint():
 		return
 
-	assert(self.texture, "MPFShowCreator node requires a playfield image as a texture.")
-	ProjectSettings.set_setting("display/window/size/window_width_override", self.texture.get_width())
-	ProjectSettings.set_setting("display/window/size/window_height_override", self.texture.get_height())
-	set_process(false)
-
-	var config = ConfigFile.new()
+	# Need to get the tags before ready state so we know whether to include lights
+	config = ConfigFile.new()
 	var err = config.load(CONFIG_PATH)
 	if err != OK and err != ERR_FILE_NOT_FOUND:
 		assert(false, "Error loading config file: %s" % err)
@@ -58,20 +45,32 @@ func _ready():
 	if config.has_section("show_creator") and config.has_section_key("show_creator", "animation"):
 			animation_name = config.get_value("show_creator", "animation")
 
-	assert(animation_name, "No animation name found in configuration.")
-	assert(animation_player, "No AnimationPlayer node attached to the MPFShowGenerator root.")
-	assert(animation_player.has_animation(animation_name), "AnimationPlayer has no animation named '%s'" % animation_name)
-
 	fps = config.get_value("show_creator", "fps", 30)
 	strip_unchanged_lights = config.get_value("show_creator", "strip_lights", true)
 	strip_empty_times = config.get_value("show_creator", "strip_times", false)
 	use_alpha = config.get_value("show_creator", "use_alpha", false)
+	tags = config.get_value("tags", animation_name, [])
+
+
+func _ready():
+	if Engine.is_editor_hint():
+		return
+
+	assert(self.texture, "MPFShowCreator node requires a playfield image as a texture.")
+	assert(animation_name, "No animation name found in configuration.")
+	assert(animation_player, "No AnimationPlayer node attached to the MPFShowGenerator root.")
+	assert(animation_player.has_animation(animation_name), "AnimationPlayer has no animation named '%s'" % animation_name)
+
+	ProjectSettings.set_setting("display/window/size/window_width_override", self.texture.get_width())
+	ProjectSettings.set_setting("display/window/size/window_height_override", self.texture.get_height())
+	set_process(false)
 
 	if not self.lights:
-		if self._groups:
+		if self.tags:
 			assert(false, "No lights found matching the selected groups.")
 		else:
 			assert(false, "No lights found. Please add some MPFShowLight nodes.")
+
 	self.spf = 1.0 / self.fps
 	self.clip_children = CanvasItem.CLIP_CHILDREN_ONLY
 
@@ -89,6 +88,10 @@ func _ready():
 
 func _run_animation():
 	print("Generating animation show %s.yaml: duration %ss with frames every %0.5fs" % [self.animation_player.current_animation, self.animation_player.current_animation_length, self.spf])
+	if self.tags:
+		print("Show will include %s lights with tags: %s" % [self.lights.size(), ", ".join(self.tags)])
+	else:
+		print("Show will include all %s lights." % self.lights.size())
 	var duration = self.animation_player.current_animation_length
 	while self.animation_player.current_animation_position <= duration:
 		await RenderingServer.frame_post_draw
@@ -101,10 +104,10 @@ func register_light(light: MPFShowLight):
 		if not Engine.is_editor_hint():
 			push_warning("Light %s is outside of the viewport and will not be included." % light.name)
 			return
-	if self._groups:
+	if self.tags and light.tags:
 		var has_match = false
-		for g in self._groups:
-			if light.is_in_group(g):
+		for t in self.tags:
+			if light.tags.find(t) != -1:
 				has_match = true
 				break
 		if not has_match:

@@ -25,6 +25,7 @@ enum InsertShapes {
 	set(value):
 		width_inches = value
 		self.scale_to_inches()
+@export var tags: Array
 
 var current_color
 
