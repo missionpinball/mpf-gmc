@@ -121,6 +121,7 @@ func _generate_lights(lights_node: Node2D = null):
 	EditorInterface.reload_scene_from_path(edit_show_scene.text)
 
 func _save_light_positions():
+	EditorInterface.save_scene()
 	var global_space = Vector2(
 		ProjectSettings.get_setting("display/window/size/viewport_width"),
 		ProjectSettings.get_setting("display/window/size/viewport_height"))
@@ -152,6 +153,7 @@ func _generate_show():
 	EditorInterface.play_custom_scene(edit_show_scene.text)
 
 func _get_animation_names():
+	EditorInterface.save_scene()
 	animation_dropdown.clear()
 	if not edit_show_scene.text:
 		debug_log("No show scene selected, cannot find animations.")
