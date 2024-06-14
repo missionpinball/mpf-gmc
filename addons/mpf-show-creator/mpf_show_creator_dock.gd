@@ -52,11 +52,11 @@ func _ready():
 			else:
 				self._save_show_scene("")
 		if self.config.has_section_key("show_creator", "strip_lights"):
-			button_strip_lights.button_pressed = self.config.get_value("show_creator", "strip_lights")
+			button_strip_lights.button_pressed = self.config.get_value("show_creator", "strip_lights", true)
 		if self.config.has_section_key("show_creator", "strip_times"):
-			button_strip_times.button_pressed = self.config.get_value("show_creator", "strip_times")
+			button_strip_times.button_pressed = self.config.get_value("show_creator", "strip_times", true)
 		if self.config.has_section_key("show_creator", "use_alpha"):
-			button_use_alpha.button_pressed = self.config.get_value("show_creator", "use_alpha")
+			button_use_alpha.button_pressed = self.config.get_value("show_creator", "use_alpha", false)
 
 	# Set the listeners *after* the initial values are set
 	button_mpf_config.pressed.connect(self._select_mpf_config)
