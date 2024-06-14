@@ -4,7 +4,6 @@ class_name MPFShowCreator
 
 ## The root node for creating light shows for MPF.
 
-
 const CONFIG_PATH = "user://mpf_show_creator.cfg"
 
 var _light_color: Color

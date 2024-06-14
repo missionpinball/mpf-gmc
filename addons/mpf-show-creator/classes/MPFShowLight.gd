@@ -2,14 +2,25 @@
 extends Sprite2D
 class_name MPFShowLight
 
-const PLAYFIELD_WIDTH_INCHES = 22.0
+const PLAYFIELD_WIDTH_INCHES = 20.25
 const INSERT_DPI = 150
-enum InsertShapes { CIRCLE, SQUARE, LONG_TRIANGLE }
+enum InsertShapes {
+	## A basic circle
+	CIRCLE,
+	## A square with rounded corners
+	SQUARE,
+	## An elongated (2:1) triangle
+	LONG_TRIANGLE,
+	## Attach your own Texture of choice
+	CUSTOM }
 
+## The shape of the insert, for visual fidelity. Has no impact on the rendered show.
 @export var shape: InsertShapes = InsertShapes.CIRCLE:
 	set(value):
 		shape = value
 		self.scale_to_inches()
+## The width (in inches) of the insert's smallest dimension. Will scale inserts based on a
+## standard 20.25" playfield width. Has no effect on CUSTOM shapes.
 @export var width_inches: float = 0.5:
 	set(value):
 		width_inches = value
@@ -76,6 +87,8 @@ func scale_to_inches():
 			path = "res://addons/mpf-show-creator/inserts/square-insert.svg"
 		InsertShapes.LONG_TRIANGLE:
 			path = "res://addons/mpf-show-creator/inserts/long-triangle-insert.svg"
+		InsertShapes.CUSTOM:
+			return
 		_:
 			push_error("No texture for selected shape.")
 	self.texture = load(path)
