@@ -33,9 +33,12 @@ var use_alpha
 var fps
 
 var preview: Dictionary
+var render_animation: bool = true
 
 func _enter_tree():
-	if Engine.is_editor_hint():
+	if Engine.is_editor_hint() or self.get_parent() is MPFShowPreview::
+		render_animation = false
+	if not render_animation:
 		return
 
 	# Need to get the tags before ready state so we know whether to include lights
@@ -55,7 +58,8 @@ func _enter_tree():
 
 
 func _ready():
-	if Engine.is_editor_hint():
+	set_process(false)
+	if not render_animation:
 		return
 
 	assert(self.texture, "MPFShowCreator node requires a playfield image as a texture.")
@@ -65,7 +69,7 @@ func _ready():
 
 	ProjectSettings.set_setting("display/window/size/window_width_override", self.texture.get_width())
 	ProjectSettings.set_setting("display/window/size/window_height_override", self.texture.get_height())
-	set_process(false)
+
 
 	if not self.lights:
 		if self.tags:
