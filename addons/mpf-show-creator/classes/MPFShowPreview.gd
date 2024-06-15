@@ -56,6 +56,18 @@ func _process(delta):
 
 func populate_step(idx: int):
 	var step_lights = light_steps[idx]
-	print("Populating step %s with lights %s" % [idx, step_lights])
 	for light_name in step_lights.keys():
 		self.lights[light_name].set_color(step_lights[light_name])
+
+func _unhandled_input(event: InputEvent) -> void:
+	if not event.is_class("InputEventKey"):
+		return
+	# Don't support holding down a key
+	if event.is_echo():
+		return
+	var keycode = OS.get_keycode_string(event.get_key_label_with_modifiers()).to_upper()
+	if keycode == "ESCAPE":
+		if not event.is_pressed():
+			return
+		get_tree().notification(NOTIFICATION_WM_CLOSE_REQUEST)
+		get_tree().quit()
