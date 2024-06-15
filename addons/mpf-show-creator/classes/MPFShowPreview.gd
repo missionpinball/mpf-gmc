@@ -38,6 +38,9 @@ func _ready():
 	# Create a dictionary to quickly look up lights
 	for l in scene.lights:
 		self.lights[l.name] = l
+		l.visible = true
+		# Even lights not used in this show should be cleared
+		l.set_color(Color(0,0,0,0))
 
 func _process(delta):
 	time = time + delta
