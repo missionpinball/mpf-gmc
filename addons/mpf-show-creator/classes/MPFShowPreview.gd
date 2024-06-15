@@ -2,12 +2,14 @@ extends Node2D
 class_name MPFShowPreview
 
 const CONFIG_PATH = "user://mpf_show_creator.cfg"
+const LOOP_SHOW_DELAY_SECS = 1.0
 
 var config: ConfigFile
 var animation_name: String
 var scene: MPFShowCreator
 var time := 0.0
 
+var duration: float
 var timestamps: Array
 var light_steps: Array
 var lights: Dictionary = {}
@@ -26,7 +28,8 @@ func _enter_tree():
 
 	timestamps = config.get_value("preview", "timestamps")
 	light_steps = config.get_value("preview", "light_steps")
-	animation_name = config.get_value("show_creator", "animation")
+	duration = config.get_value("preview", "duration")
+	animation_name = config.get_value("preview", "show")
 	var scene_path = config.get_value("show_creator", "show_scene")
 	scene = load(scene_path).instantiate()
 	self.add_child(scene)
@@ -49,9 +52,11 @@ func _process(delta):
 
 	self.populate_step(step_idx)
 	step_idx += 1
+	# If we've finished all the timestamps
 	if step_idx >= timestamps.size():
 		step_idx = 0
-		time = -1.0
+		# Delay for a moment before looping
+		time = time - duration - LOOP_SHOW_DELAY_SECS
 	next_timestamp = timestamps[step_idx]
 
 func populate_step(idx: int):
