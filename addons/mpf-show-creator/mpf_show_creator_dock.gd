@@ -14,7 +14,7 @@ var verbose: bool = false
 @onready var button_show_scene = $MainVContainer/TopHContainer/LeftVContainer/container_show_scene/button_show_scene
 @onready var edit_show_scene = $MainVContainer/TopHContainer/LeftVContainer/container_show_scene/edit_show_scene
 
-@onready var edit_fps = $MainVContainer/TopHContainer/RightVContainer/container_fps/edit_fps
+@onready var edit_fps = $MainVContainer/TopHContainer/LeftVContainer/BottomFContainer/container_fps/edit_fps
 @onready var button_strip_lights = $MainVContainer/TopHContainer/LeftVContainer/BottomFContainer/button_strip_lights
 @onready var button_strip_times = $MainVContainer/TopHContainer/LeftVContainer/BottomFContainer/button_strip_times
 @onready var button_use_alpha = $MainVContainer/TopHContainer/LeftVContainer/BottomFContainer/button_use_alpha
@@ -33,6 +33,7 @@ var verbose: bool = false
 
 @onready var animation_dropdown = $MainVContainer/TopHContainer/RightVContainer/button_animation_names
 @onready var button_show_maker = $MainVContainer/TopHContainer/RightVContainer/button_generate_show
+@onready var button_preview_show = $MainVContainer/TopHContainer/RightVContainer/button_preview_show
 
 func _ready():
 	self.config = ConfigFile.new()
@@ -73,6 +74,7 @@ func _ready():
 	edit_mpf_config.text_submitted.connect(self._save_mpf_config)
 	edit_show_scene.text_submitted.connect(self._save_show_scene)
 	button_show_maker.pressed.connect(self._generate_show)
+	button_preview_show.pressed.connect(self._preview_show)
 	animation_dropdown.item_selected.connect(self._select_animation)
 	button_refresh_animations.pressed.connect(self._get_animation_names)
 
@@ -162,6 +164,9 @@ func _save_light_positions():
 
 func _generate_show():
 	EditorInterface.play_custom_scene(edit_show_scene.text)
+
+func _preview_show():
+	EditorInterface.play_custom_scene("res://addons/mpf-show-creator/mpf_show_preview.tscn")
 
 func _get_animation_names():
 	EditorInterface.save_scene()

@@ -36,7 +36,7 @@ var preview: Dictionary
 var render_animation: bool = true
 
 func _enter_tree():
-	if Engine.is_editor_hint() or self.get_parent() is MPFShowPreview::
+	if Engine.is_editor_hint() or (self.get_parent() is MPFShowPreview):
 		render_animation = false
 	if not render_animation:
 		return
@@ -84,7 +84,7 @@ func _ready():
 	self.file = FileAccess.open(self.file_path, FileAccess.WRITE)
 	self.file.store_line("#show_version=6")
 
-	self.preview = { "show": animation_name, "timestamps": [], "lights": [] }
+	self.preview = { "show": animation_name, "timestamps": [], "light_steps": [] }
 
 	await RenderingServer.frame_post_draw
 	self.animation_player.assigned_animation = animation_name
@@ -142,7 +142,7 @@ func snapshot():
 				file.store_line(line)
 			# Only store preview on changes
 			self.preview["timestamps"].append(timestamp)
-			self.preview["lights"].append(preview_dict)
+			self.preview["light_steps"].append(preview_dict)
 
 func on_animation_finished(_animation_name=null):
 	self.finish()

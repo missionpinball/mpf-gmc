@@ -109,6 +109,17 @@ layout_mode = 2
 [node name="BottomFContainer" type="HFlowContainer" parent="MainVContainer/TopHContainer/LeftVContainer"]
 layout_mode = 2
 
+[node name="container_fps" type="HBoxContainer" parent="MainVContainer/TopHContainer/LeftVContainer/BottomFContainer"]
+layout_mode = 2
+
+[node name="label_fps" type="Label" parent="MainVContainer/TopHContainer/LeftVContainer/BottomFContainer/container_fps"]
+layout_mode = 2
+text = "FPS:"
+
+[node name="edit_fps" type="LineEdit" parent="MainVContainer/TopHContainer/LeftVContainer/BottomFContainer/container_fps"]
+layout_mode = 2
+text = "30"
+
 [node name="button_strip_lights" type="CheckBox" parent="MainVContainer/TopHContainer/LeftVContainer/BottomFContainer"]
 layout_mode = 2
 button_pressed = true
@@ -195,16 +206,13 @@ SHOW"
 custom_minimum_size = Vector2(2.08165e-12, 20)
 layout_mode = 2
 
-[node name="container_fps" type="HBoxContainer" parent="MainVContainer/TopHContainer/RightVContainer"]
+[node name="button_preview_show" type="Button" parent="MainVContainer/TopHContainer/RightVContainer"]
 layout_mode = 2
+text = "Preview Last Show"
 
-[node name="label_fps" type="Label" parent="MainVContainer/TopHContainer/RightVContainer/container_fps"]
+[node name="Control3" type="Control" parent="MainVContainer/TopHContainer/RightVContainer"]
+custom_minimum_size = Vector2(2.08165e-12, 20)
 layout_mode = 2
-text = "FPS:"
-
-[node name="edit_fps" type="LineEdit" parent="MainVContainer/TopHContainer/RightVContainer/container_fps"]
-layout_mode = 2
-text = "30"
 
 [node name="Control" type="Control" parent="MainVContainer/TopHContainer"]
 custom_minimum_size = Vector2(20, 2.08165e-12)
