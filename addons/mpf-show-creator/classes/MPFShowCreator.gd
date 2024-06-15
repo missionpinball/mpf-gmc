@@ -32,6 +32,8 @@ var strip_empty_times
 var use_alpha
 var fps
 
+var preview: Dictionary
+
 func _enter_tree():
 	if Engine.is_editor_hint():
 		return
@@ -78,12 +80,15 @@ func _ready():
 	self.file = FileAccess.open(self.file_path, FileAccess.WRITE)
 	self.file.store_line("#show_version=6")
 
+	self.preview = { "show": animation_name, "timestamps": [], "lights": [] }
+
 	await RenderingServer.frame_post_draw
 	self.animation_player.assigned_animation = animation_name
 	self.animation_player.callback_mode_process = AnimationPlayer.ANIMATION_CALLBACK_MODE_PROCESS_MANUAL
 	self.animation_player.play(animation_name)
 	self.animation_player.advance(0)
 	self.animation_player.animation_finished.connect(self.on_animation_finished)
+
 	self._run_animation()
 
 func _run_animation():
@@ -93,6 +98,7 @@ func _run_animation():
 	else:
 		print("Show will include all %s lights." % self.lights.size())
 	var duration = self.animation_player.current_animation_length
+	self.preview["duration"] = duration
 	while self.animation_player.current_animation_position <= duration:
 		await RenderingServer.frame_post_draw
 		self.snapshot()
@@ -118,16 +124,21 @@ func snapshot():
 	var tex := get_viewport().get_texture().get_image()
 	var timestamp = self.animation_player.current_animation_position
 	var light_lines := []
+	var preview_dict = {}
 	for l in lights:
 		var c = l.get_color(tex, strip_unchanged_lights)
 		if c != null:
 			light_lines.append("    %s: \"%s\"" % [l.name, c.to_html(use_alpha)])
+			preview_dict[l.name] = c
 	if light_lines or not strip_empty_times:
 		file.store_line("- time: %0.5f" % timestamp)
 		if light_lines:
 			file.store_line("  lights:")
 			for line in light_lines:
 				file.store_line(line)
+			# Only store preview on changes
+			self.preview["timestamps"].append(timestamp)
+			self.preview["lights"].append(preview_dict)
 
 func on_animation_finished(_animation_name=null):
 	self.finish()
@@ -135,5 +146,8 @@ func on_animation_finished(_animation_name=null):
 func finish():
 	set_process(false)
 	file.close()
+	for key in self.preview.keys():
+		self.config.set_value("preview", key, self.preview[key])
+	self.config.save(CONFIG_PATH)
 	OS.shell_show_in_file_manager(self.file_path)
 	get_tree().quit()
