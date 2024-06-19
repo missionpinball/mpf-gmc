@@ -134,8 +134,6 @@ func update_player(kwargs: Dictionary) -> void:
 			emit_signal("player_update", kwargs.name, kwargs.value)
 
 func update_settings(result: Dictionary) -> void:
-	# TODO: Determine if settings changes are individual or the whole package
-	settings = {}
 	var _settingType
 	for option in result.get("settings", []):
 		var s := {}
