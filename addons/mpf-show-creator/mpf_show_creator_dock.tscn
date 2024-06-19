@@ -1,0 +1,222 @@
+[gd_scene load_steps=5 format=3 uid="uid://b4tyyjcjwxj7d"]
+
+[ext_resource type="Script" path="res://addons/mpf-show-creator/mpf_show_creator_dock.gd" id="1_ainif"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ln2sr"]
+bg_color = Color(0.188235, 0.188235, 0.188235, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_rfgoc"]
+bg_color = Color(0.913725, 0.352941, 0, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_x17sv"]
+bg_color = Color(1, 0.462745, 0.219608, 1)
+
+[node name="MPFShowCreatorDock" type="Control"]
+custom_minimum_size = Vector2(2.08165e-12, 200)
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+script = ExtResource("1_ainif")
+
+[node name="MainVContainer" type="VBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="TopHContainer" type="HBoxContainer" parent="MainVContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="Control2" type="Control" parent="MainVContainer/TopHContainer"]
+custom_minimum_size = Vector2(20, 2.08165e-12)
+layout_mode = 2
+
+[node name="LeftVContainer" type="VBoxContainer" parent="MainVContainer/TopHContainer"]
+custom_minimum_size = Vector2(2.08165e-12, 2.08165e-12)
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="container_mpf_config" type="HBoxContainer" parent="MainVContainer/TopHContainer/LeftVContainer"]
+layout_mode = 2
+
+[node name="label_mpf_config" type="Label" parent="MainVContainer/TopHContainer/LeftVContainer/container_mpf_config"]
+layout_mode = 2
+text = "MPF Config File"
+
+[node name="edit_mpf_config" type="LineEdit" parent="MainVContainer/TopHContainer/LeftVContainer/container_mpf_config"]
+layout_mode = 2
+size_flags_horizontal = 3
+placeholder_text = "No File Selected"
+
+[node name="button_mpf_config" type="Button" parent="MainVContainer/TopHContainer/LeftVContainer/container_mpf_config"]
+layout_mode = 2
+text = "Select File"
+
+[node name="container_show_scene" type="HBoxContainer" parent="MainVContainer/TopHContainer/LeftVContainer"]
+layout_mode = 2
+
+[node name="label_show_scene" type="Label" parent="MainVContainer/TopHContainer/LeftVContainer/container_show_scene"]
+layout_mode = 2
+text = "Show Scene"
+
+[node name="edit_show_scene" type="LineEdit" parent="MainVContainer/TopHContainer/LeftVContainer/container_show_scene"]
+layout_mode = 2
+size_flags_horizontal = 3
+placeholder_text = "No Scene Selected"
+
+[node name="button_show_scene" type="Button" parent="MainVContainer/TopHContainer/LeftVContainer/container_show_scene"]
+layout_mode = 2
+text = "Select Scene"
+
+[node name="HSeparator" type="HSeparator" parent="MainVContainer/TopHContainer/LeftVContainer"]
+layout_mode = 2
+
+[node name="container_generators" type="HBoxContainer" parent="MainVContainer/TopHContainer/LeftVContainer"]
+layout_mode = 2
+
+[node name="button_generate_lights" type="Button" parent="MainVContainer/TopHContainer/LeftVContainer/container_generators"]
+layout_mode = 2
+text = "  Refresh Lights  "
+
+[node name="button_save_light_positions" type="Button" parent="MainVContainer/TopHContainer/LeftVContainer/container_generators"]
+layout_mode = 2
+text = "  Save Light Positions  "
+
+[node name="button_generate_scene" type="Button" parent="MainVContainer/TopHContainer/LeftVContainer/container_generators"]
+visible = false
+layout_mode = 2
+text = "  Generate Show Creator Scene  "
+
+[node name="Control" type="Control" parent="MainVContainer/TopHContainer/LeftVContainer/container_generators"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="button_refresh_animations" type="Button" parent="MainVContainer/TopHContainer/LeftVContainer/container_generators"]
+layout_mode = 2
+text = "Refresh Animations"
+
+[node name="HSeparator2" type="HSeparator" parent="MainVContainer/TopHContainer/LeftVContainer"]
+layout_mode = 2
+
+[node name="BottomFContainer" type="HFlowContainer" parent="MainVContainer/TopHContainer/LeftVContainer"]
+layout_mode = 2
+
+[node name="container_fps" type="HBoxContainer" parent="MainVContainer/TopHContainer/LeftVContainer/BottomFContainer"]
+layout_mode = 2
+
+[node name="label_fps" type="Label" parent="MainVContainer/TopHContainer/LeftVContainer/BottomFContainer/container_fps"]
+layout_mode = 2
+text = "FPS:"
+
+[node name="edit_fps" type="LineEdit" parent="MainVContainer/TopHContainer/LeftVContainer/BottomFContainer/container_fps"]
+layout_mode = 2
+text = "30"
+
+[node name="button_strip_lights" type="CheckBox" parent="MainVContainer/TopHContainer/LeftVContainer/BottomFContainer"]
+layout_mode = 2
+button_pressed = true
+text = "Strip Unchanged Lights"
+
+[node name="button_strip_times" type="CheckBox" parent="MainVContainer/TopHContainer/LeftVContainer/BottomFContainer"]
+layout_mode = 2
+button_pressed = true
+text = "Strip Empty Times"
+
+[node name="button_use_alpha" type="CheckBox" parent="MainVContainer/TopHContainer/LeftVContainer/BottomFContainer"]
+layout_mode = 2
+text = "Use Alpha Channel"
+
+[node name="button_verbose" type="CheckBox" parent="MainVContainer/TopHContainer/LeftVContainer/BottomFContainer"]
+layout_mode = 2
+button_pressed = true
+text = "Debugging"
+
+[node name="VSeparator" type="VSeparator" parent="MainVContainer/TopHContainer"]
+custom_minimum_size = Vector2(40, 2.08165e-12)
+layout_mode = 2
+
+[node name="CenterVContainer" type="VBoxContainer" parent="MainVContainer/TopHContainer"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="MainVContainer/TopHContainer/CenterVContainer"]
+layout_mode = 2
+text = "Tags:"
+
+[node name="ScrollContainer" type="ScrollContainer" parent="MainVContainer/TopHContainer/CenterVContainer"]
+custom_minimum_size = Vector2(200, 2.08165e-12)
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_styles/panel = SubResource("StyleBoxFlat_ln2sr")
+
+[node name="tag_checks" type="VBoxContainer" parent="MainVContainer/TopHContainer/CenterVContainer/ScrollContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="TagsHContainer" type="HBoxContainer" parent="MainVContainer/TopHContainer/CenterVContainer"]
+layout_mode = 2
+
+[node name="button_tags_select_all" type="Button" parent="MainVContainer/TopHContainer/CenterVContainer/TagsHContainer"]
+layout_mode = 2
+text = "Select All"
+
+[node name="Control" type="Control" parent="MainVContainer/TopHContainer/CenterVContainer/TagsHContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="button_tags_deselect_all" type="Button" parent="MainVContainer/TopHContainer/CenterVContainer/TagsHContainer"]
+layout_mode = 2
+text = "Deselect All"
+
+[node name="VSeparator2" type="VSeparator" parent="MainVContainer/TopHContainer"]
+custom_minimum_size = Vector2(40, 2.08165e-12)
+layout_mode = 2
+
+[node name="RightVContainer" type="VBoxContainer" parent="MainVContainer/TopHContainer"]
+layout_mode = 2
+
+[node name="label_animation_names" type="Label" parent="MainVContainer/TopHContainer/RightVContainer"]
+layout_mode = 2
+text = "Animation to Generate:"
+
+[node name="button_animation_names" type="OptionButton" parent="MainVContainer/TopHContainer/RightVContainer"]
+layout_mode = 2
+selected = 1
+
+[node name="Control" type="Control" parent="MainVContainer/TopHContainer/RightVContainer"]
+custom_minimum_size = Vector2(2.08165e-12, 20)
+layout_mode = 2
+
+[node name="button_generate_show" type="Button" parent="MainVContainer/TopHContainer/RightVContainer"]
+layout_mode = 2
+theme_override_styles/normal = SubResource("StyleBoxFlat_rfgoc")
+theme_override_styles/hover = SubResource("StyleBoxFlat_x17sv")
+text = "GENERATE 
+SHOW"
+
+[node name="Control2" type="Control" parent="MainVContainer/TopHContainer/RightVContainer"]
+custom_minimum_size = Vector2(2.08165e-12, 20)
+layout_mode = 2
+
+[node name="button_preview_show" type="Button" parent="MainVContainer/TopHContainer/RightVContainer"]
+layout_mode = 2
+text = "Preview Last Show"
+
+[node name="Control3" type="Control" parent="MainVContainer/TopHContainer/RightVContainer"]
+custom_minimum_size = Vector2(2.08165e-12, 20)
+layout_mode = 2
+
+[node name="Control" type="Control" parent="MainVContainer/TopHContainer"]
+custom_minimum_size = Vector2(20, 2.08165e-12)
+layout_mode = 2
+
+[node name="HSeparator" type="HSeparator" parent="MainVContainer"]
+layout_mode = 2

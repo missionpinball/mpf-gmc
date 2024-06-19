@@ -1,0 +1,6 @@
+[gd_scene load_steps=2 format=3 uid="uid://db0848l5xi4r4"]
+
+[ext_resource type="Script" path="res://addons/mpf-show-creator/classes/MPFShowPreview.gd" id="1_dljax"]
+
+[node name="MPFShowPreview" type="Node2D"]
+script = ExtResource("1_dljax")
