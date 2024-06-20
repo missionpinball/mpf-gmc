@@ -8,6 +8,7 @@ var is_focused := false
 @onready var List = $MarginContainer/VBoxContainer
 
 func focus():
+	print("%s taking focus" % self)
 	is_focused = true
 	List.get_child(0).grab_focus()
 
@@ -44,17 +45,16 @@ func focus_child(direction: int, wrap_around=false):
 			# Moving the Settings into Base, the parent is now first child of scene
 			get_tree().get_current_scene().get_node("Scene").get_child(0).focus()
 
-func _input(event):
+func _unhandled_key_input(event):
 	if not is_focused:
 		return
-
-	if event is InputEventKey and List.get_child(focused_index).has_focus():
-		if event.is_action_pressed("ui_left"):
+	if event.key_label == -1 and List.get_child(focused_index).has_focus():
+		if event.keycode == KEY_UP:
 			self.focus_child(-1)
-			get_tree().set_input_as_handled()
-		elif event.is_action_pressed("ui_right"):
+			get_window().set_input_as_handled()
+		elif event.keycode == KEY_DOWN:
 			self.focus_child(1)
-			get_tree().set_input_as_handled()
+			get_window().set_input_as_handled()
 
 func _to_string() -> String:
 	return "<ServicePage:%s>" % self.name

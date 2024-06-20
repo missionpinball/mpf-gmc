@@ -36,6 +36,8 @@ func _on_button(payload):
 
 	var inputEvent = InputEventKey.new()
 	inputEvent.pressed = true
+	# Set a special key label to prevent keyboards during development
+	inputEvent.key_label = -1
 	inputEvent.keycode = {
 		"DOWN": KEY_DOWN,
 		"UP": KEY_UP,
@@ -45,25 +47,26 @@ func _on_button(payload):
 		"PAGE_RIGHT": KEY_PAGEDOWN,
 		"START": KEY_BACKSPACE,
 	}[payload.button]
-	print("Triggering %s INPUT EVENT: %s" % [payload.button, inputEvent])
 	Input.parse_input_event(inputEvent)
 
-func _input(event):
-	if event is InputEventKey:
-		print("service.gd handling input event")
+func _unhandled_key_input(event):
+	if event.key_label == -1:
 		if $TabContainer.has_focus():
-			print("Tab container has focus!")
 			if event.keycode == KEY_ESCAPE:
 				$TabContainer.select_previous_available()
+				get_window().set_input_as_handled()
 			elif event.keycode == KEY_ENTER:
 				$TabContainer.select_next_available()
+				get_window().set_input_as_handled()
 			elif event.keycode == KEY_DOWN:
 				self.select_page()
+				get_window().set_input_as_handled()
 		elif event.keycode == KEY_BACKSPACE:
 			self.focus()
 			# Reset the focus settings of the child page
 			var page = $TabContainer.get_child($TabContainer.current_tab)
 			page.unfocus()
+			get_window().set_input_as_handled()
 
 func select_page():
 	# Last tab is always exit
