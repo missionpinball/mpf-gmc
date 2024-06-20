@@ -1,6 +1,6 @@
 # Copyright 2022 Paradigm Tilt
 
-extends Settings_Item
+extends SettingsItem
 class_name Settings_Slider
 
 @export var min_value: int = 0

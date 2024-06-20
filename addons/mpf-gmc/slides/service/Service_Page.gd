@@ -15,10 +15,10 @@ func unfocus():
 	is_focused = false
 	focused_index = 0
 
-func add_setting(item: Settings_Item) -> void:
+func add_setting(item: SettingsItem) -> void:
 	List.add_child(item)
 
-func get_focused_setting() -> Settings_Item:
+func get_focused_setting() -> SettingsItem:
 	return List.get_child(focused_index)
 
 func _exit_tree() -> void:

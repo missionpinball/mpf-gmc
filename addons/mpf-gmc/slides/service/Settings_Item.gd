@@ -1,7 +1,7 @@
 # Copyright 2021 Paradigm Tilt
 
 extends HSplitContainer
-class_name Settings_Item
+class_name SettingsItem
 
 @export var title: String
 @export var variable: String
@@ -14,7 +14,7 @@ var callback
 var is_focused := false
 var is_option_focused := false
 
-func initialize(setting=null):
+func populate(setting=null):
 	# Accept a setting object from Game.settings as init values
 	if setting:
 		self.variable = setting.variable
@@ -105,7 +105,7 @@ func select_option(direction: int = 0) -> void:
 
 func set_option_text_color() -> void:
 	var color := Color(1,1,1,1) if selected_value == default else Color(0.98,0.34,0,1)
-	$Option.add_color_override("font_color", color)
+	$Option.set("theme_override_colors/font_color", color)
 
 func set_setting_background_color(is_invoked: bool) -> void:
 	if not is_invoked:
@@ -113,3 +113,6 @@ func set_setting_background_color(is_invoked: bool) -> void:
 		return
 	# Steal the "hover" stylebox, for convenience
 	$Setting.add_stylebox_override("pressed", $Setting.get_stylebox("hover"))
+
+func _to_string() -> String:
+	return "<SettingsItem:%s>" % variable

@@ -5,16 +5,14 @@ extends ServicePage
 @export var settingType: String = "standard"
 
 func _ready():
-	#var Settings_Item = load("res://service/Settings_Item.tscn")
-	var settings = []
-	# Godot 3 does not support Array.filter(), so do it manually
-	for i in MPF.game.settings.values():
-		if i.type == settingType:
-			settings.append(i)
+	var SettingsItemScene = preload("res://addons/mpf-gmc/slides/service/Settings_item.tscn")
+	var settings = MPF.game.settings.values().filter(
+		func (s): return s.type == settingType
+	)
 	settings.sort_custom(self.sort_settings)
 	for setting in settings:
-		var item = Settings_Item.new()
-		item.initialize(setting)
+		var item = SettingsItemScene.instantiate()
+		item.populate(setting)
 		self.add_setting(item)
 
 func sort_settings(a: Dictionary, b: Dictionary) -> bool:

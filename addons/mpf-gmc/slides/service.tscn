@@ -1,7 +1,7 @@
 [gd_scene load_steps=5 format=3 uid="uid://dhy8ilap4a45x"]
 
 [ext_resource type="Script" path="res://addons/mpf-gmc/slides/service.gd" id="1"]
-[ext_resource type="PackedScene" path="res://addons/mpf-gmc/slides/service/Settings_Page.tscn" id="2"]
+[ext_resource type="PackedScene" uid="uid://devjc6glsblde" path="res://addons/mpf-gmc/slides/service/Settings_Page.tscn" id="2"]
 [ext_resource type="PackedScene" path="res://addons/mpf-gmc/slides/service/Utilities_Page.tscn" id="3"]
 [ext_resource type="PackedScene" path="res://addons/mpf-gmc/slides/service/Sound_Page.tscn" id="4"]
 
