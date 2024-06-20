@@ -17,14 +17,12 @@ var _slides: Control
 var _current_slide: MPFSlide
 # The queue of slides waiting to be played
 var _queue: Array = []
+# An overlay slide for slide-less widgets
+var _overlay_slide: MPFSlide
 
 func _ready() -> void:
 	self._register_display_in_window()
-	self._slides = Control.new()
-	self._slides.name = "_%s_slides" % self.name
-	self._slides.set_anchors_preset(PRESET_FULL_RECT)
-	self._slides.size_flags_horizontal = SIZE_EXPAND
-	self._slides.size_flags_vertical = SIZE_EXPAND
+	self._slides = self._build_slide_container("_%s_slides" % self.name)
 	self.add_child(self._slides)
 	if not self.initial_slide:
 		return
@@ -91,6 +89,8 @@ func action_remove(slide) -> void:
 func get_slide(slide_name):
 	if not slide_name:
 		return self._current_slide
+	elif slide_name == "_overlay":
+		return self._get_overlay_slide()
 	for s in self._slide_stack:
 		if s.key == slide_name:
 			return s
@@ -190,6 +190,24 @@ func _on_clear(context_name) -> void:
 	# For the remaining slides, clear out any widgets from that context
 	for s in self._slide_stack:
 		s.clear(context_name)
+
+func _build_slide_container(name: String):
+	var container = Control.new()
+	container.name = name
+	container.set_anchors_preset(PRESET_FULL_RECT)
+	container.size_flags_horizontal = SIZE_EXPAND
+	container.size_flags_vertical = SIZE_EXPAND
+	return container
+
+func _get_overlay_slide() -> MPFSlide:
+	if self._overlay_slide:
+		return self._overlay_slide
+	var overlay_container = self._build_slide_container("%s_overlay" % self.name)
+	self._overlay_slide = MPFSlide.new()
+	self._overlay_slide.name = "%s_overlay_slide" % self.name
+	overlay_container.add_child(self._overlay_slide)
+	self.add_child(overlay_container)
+	return self._overlay_slide
 
 func _register_display_in_window() -> void:
 	var window = MPF.util.find_parent_window(self)
