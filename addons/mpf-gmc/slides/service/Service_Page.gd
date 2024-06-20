@@ -42,8 +42,13 @@ func focus_child(direction: int, wrap_around=false):
 			List.get_child(focused_index).grab_focus()
 		else:
 			is_focused = false
-			# Moving the Settings into Base, the parent is now first child of scene
-			get_tree().get_current_scene().get_node("Scene").get_child(0).focus()
+			# Find the main slide and restore focus to it
+			var parent = self.get_parent()
+			while parent:
+				if parent is MPFSlide:
+					parent.focus()
+					return
+				parent = parent.get_parent()
 
 func _unhandled_key_input(event):
 	if not is_focused:
