@@ -1,3 +1,4 @@
+@tool
 class_name MPFDisplay
 extends MPFSceneBase
 
@@ -20,7 +21,11 @@ var _queue: Array = []
 # An overlay slide for slide-less widgets
 var _overlay_slide: MPFSlide
 
+
 func _ready() -> void:
+	if Engine.is_editor_hint():
+		self._render_preview()
+		return
 	self._register_display_in_window()
 	self._slides = self._build_slide_container("_%s_slides" % self.name)
 	self.add_child(self._slides)
@@ -213,6 +218,32 @@ func _register_display_in_window() -> void:
 	var window = MPF.util.find_parent_window(self)
 	if window:
 		window.register_display(self)
+
+
+func _render_preview():
+	var preview_colors = ["ff002e", "004eff", "ff7d00", "00ff9a", "9900ff", "ffc500"]
+	var display_index = self.get_parent().get_children().find(self)
+	var color_box = ColorRect.new()
+	color_box.color = preview_colors[display_index]
+	color_box.set_anchors_preset(PRESET_FULL_RECT)
+	color_box.size_flags_horizontal = SIZE_EXPAND
+	color_box.size_flags_vertical = SIZE_EXPAND
+	var label = Label.new()
+	label.text = self.name
+	label.set("theme_override_font_sizes/font_size", 80)
+	label.horizontal_alignment = HorizontalAlignment.HORIZONTAL_ALIGNMENT_CENTER
+	label.vertical_alignment = VerticalAlignment.VERTICAL_ALIGNMENT_CENTER
+	label.set_anchors_preset(PRESET_FULL_RECT)
+	label.size_flags_horizontal = SIZE_EXPAND
+	label.size_flags_vertical = SIZE_EXPAND
+	color_box.add_child(label)
+	self.add_child(color_box)
+
+func set_name(value):
+	name = value
+	if Engine.is_editor_hint():
+		# Hard-code the path to the label
+		self.get_child(0).get_child(0).text = self.name
 
 func _to_string() -> String:
 	return "MPFDisplay<%s>" % self.name
