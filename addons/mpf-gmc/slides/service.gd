@@ -35,7 +35,7 @@ func _on_button(payload):
 
 	var inputEvent = InputEventKey.new()
 	inputEvent.pressed = true
-	inputEvent.scancode = {
+	inputEvent.keycode = {
 		"DOWN": KEY_HOME,
 		"UP": KEY_END,
 		"ENTER": KEY_DELETE,
@@ -43,7 +43,7 @@ func _on_button(payload):
 		"PAGE_LEFT": KEY_PAGEUP,
 		"PAGE_RIGHT": KEY_PAGEDOWN
 	}[payload.button]
-	get_tree().input_event(inputEvent)
+	Input.parse_input_event(inputEvent)
 
 func _input(event):
 	if event is InputEventKey:
