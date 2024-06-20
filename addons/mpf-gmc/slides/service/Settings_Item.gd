@@ -55,13 +55,13 @@ func ready():
 
 func _focus_entered() -> void:
 	self.is_focused = true
-	$Setting.pressed = true
+	$Setting.button_pressed = true
 
 func _focus_exited() -> void:
 	# If focus is moving to this item's option, preserve focus
 	if not is_option_focused:
 		self.is_focused = false
-		$Setting.pressed = false
+		$Setting.button_pressed = false
 
 func _input(event) -> void:
 	if event is InputEventKey and self.is_focused:

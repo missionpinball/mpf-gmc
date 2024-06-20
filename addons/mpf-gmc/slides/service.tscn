@@ -29,6 +29,7 @@ layout_mode = 0
 anchor_right = 1.0
 anchor_bottom = 1.0
 focus_mode = 2
+theme_override_colors/font_selected_color = Color(0, 1, 0.145098, 1)
 
 [node name="Standard" parent="TabContainer" instance=ExtResource("2")]
 layout_mode = 2

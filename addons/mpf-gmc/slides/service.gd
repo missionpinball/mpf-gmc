@@ -22,7 +22,8 @@ func _exit_tree() -> void:
 		MPF.server._send("remove_trigger?event=%s" % trigger)
 
 func focus():
-	$TabContainer.grab_focus()
+	# Use call_deferred to grab focus to ensure tree stability
+	$TabContainer.grab_focus.call_deferred()
 	$TabContainer.set("custom_colors/font_color_fg", highlight_color)
 
 func _on_service(payload):
@@ -36,34 +37,33 @@ func _on_button(payload):
 	var inputEvent = InputEventKey.new()
 	inputEvent.pressed = true
 	inputEvent.keycode = {
-		"DOWN": KEY_HOME,
-		"UP": KEY_END,
-		"ENTER": KEY_DELETE,
-		"ESC": KEY_ENTER,
+		"DOWN": KEY_DOWN,
+		"UP": KEY_UP,
+		"ENTER": KEY_ENTER,
+		"ESC": KEY_ESCAPE,
 		"PAGE_LEFT": KEY_PAGEUP,
-		"PAGE_RIGHT": KEY_PAGEDOWN
+		"PAGE_RIGHT": KEY_PAGEDOWN,
+		"START": KEY_BACKSPACE,
 	}[payload.button]
+	print("Triggering %s INPUT EVENT: %s" % [payload.button, inputEvent])
 	Input.parse_input_event(inputEvent)
 
 func _input(event):
 	if event is InputEventKey:
+		print("service.gd handling input event")
 		if $TabContainer.has_focus():
-			if event.is_action_pressed("ui_left"):
-				self.select_tab(-1)
-			elif event.is_action_pressed("ui_right"):
-				self.select_tab(1)
-			elif event.is_action_pressed("ui_select"):
+			print("Tab container has focus!")
+			if event.keycode == KEY_ESCAPE:
+				$TabContainer.select_previous_available()
+			elif event.keycode == KEY_ENTER:
+				$TabContainer.select_next_available()
+			elif event.keycode == KEY_DOWN:
 				self.select_page()
-		elif event.is_action_pressed("ui_accept"):
+		elif event.keycode == KEY_BACKSPACE:
 			self.focus()
 			# Reset the focus settings of the child page
 			var page = $TabContainer.get_child($TabContainer.current_tab)
 			page.unfocus()
-
-func select_tab(direction: int):
-	var next = $TabContainer.current_tab + direction
-	if next >= 0 and next < $TabContainer.get_tab_count():
-		$TabContainer.current_tab = next
 
 func select_page():
 	# Last tab is always exit

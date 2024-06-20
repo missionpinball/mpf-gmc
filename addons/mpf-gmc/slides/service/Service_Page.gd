@@ -55,3 +55,6 @@ func _input(event):
 		elif event.is_action_pressed("ui_right"):
 			self.focus_child(1)
 			get_tree().set_input_as_handled()
+
+func _to_string() -> String:
+	return "<ServicePage:%s>" % self.name
