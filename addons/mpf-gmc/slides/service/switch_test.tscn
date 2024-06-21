@@ -48,7 +48,6 @@ layout_mode = 2
 
 [node name="recent_test" type="VBoxContainer" parent="."]
 layout_mode = 2
-alignment = 2
 
 [node name="Label3" type="Label" parent="recent_test"]
 layout_mode = 2
@@ -56,5 +55,4 @@ text = "Recent Switches:"
 
 [node name="recent_switches" type="VBoxContainer" parent="recent_test"]
 layout_mode = 2
-size_flags_vertical = 3
 alignment = 2

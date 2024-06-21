@@ -13,6 +13,10 @@ func _on_service(payload: Dictionary) -> void:
 		return
 	self._get_active_switches()
 
+	# The initial call has empty values, ignore it
+	if payload.switch_state == "":
+		return
+
 	var label: String = payload.switch_label.uri_decode()
 	# If user-friendly labels are not provided, use the key name
 	if not label:
@@ -45,7 +49,7 @@ func _on_service(payload: Dictionary) -> void:
 
 func _get_active_switches() -> void:
 	# TODO: Get switches that don't have labels
-	MPF.server.send_service("list_switches", ["label", "state"])
+	MPF.server.send_service("list_switches", ["name", "label", "state"])
 
 func _update_active_switches(payload: Dictionary) -> void:
 	# Remove the existing children. Used to exclude first, now all.
@@ -55,7 +59,8 @@ func _update_active_switches(payload: Dictionary) -> void:
 		child_to_remove.queue_free()
 
 	for switch in payload.switches:
-		if switch[1]:
+		if switch[2]:
 			var child = Label.new()
-			child.text = switch[0]
+			# Use the label if available, otherwise the name
+			child.text = switch[1] if switch[1] != "%" else switch[0]
 			$active_test/active_switches.add_child(child)
