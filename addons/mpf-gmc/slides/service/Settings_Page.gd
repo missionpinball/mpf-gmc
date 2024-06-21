@@ -5,6 +5,7 @@ extends ServicePage
 @export var settingType: String = "standard"
 
 func _ready():
+	List = $MarginContainer/VBoxContainer
 	var SettingsItemScene = preload("res://addons/mpf-gmc/slides/service/Settings_item.tscn")
 	var settings = MPF.game.settings.values().filter(
 		func (s): return s.type == settingType

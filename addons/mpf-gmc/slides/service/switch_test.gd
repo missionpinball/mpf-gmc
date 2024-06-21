@@ -1,4 +1,4 @@
-extends Control
+extends VBoxContainer
 
 func _ready() -> void:
 	MPF.server.service.connect(self._on_service)
@@ -13,9 +13,9 @@ func _on_service(payload: Dictionary) -> void:
 		return
 	self._get_active_switches()
 
-	var label: String = payload.switch_label.http_unescape()
+	var label: String = payload.switch_label.uri_decode()
 	$last_switch_label.text = label
-	$last_switch_address.text = payload.switch_num.http_unescape()
+	$last_switch_address.text = payload.switch_num.uri_decode()
 
 	var recency = Label.new()
 	var prefix: String

@@ -2,6 +2,8 @@
 extends ServicePage
 
 func _ready():
+
+	List = $MarginContainer/VBoxContainer
 	var SettingsSliderScene = preload("res://addons/mpf-gmc/slides/service/Settings_Slider.tscn")
 	for setting in [
 		{ "label": "Master Volume", "variable": "master_volume"},

@@ -4,8 +4,11 @@ extends ServicePage
 
 var focused_child
 
+@onready var TestViews = $MarginContainer/HBoxContainer/TestViews
+
 func _ready():
-	for child in $TestViews.get_children():
+	List = $MarginContainer/HBoxContainer/VBoxContainer
+	for child in TestViews.get_children():
 		child.visible = false
 
 func _unhandled_key_input(event):
@@ -35,8 +38,8 @@ func deselect_child():
 
 func _update_test_views(focused_name:String = ""):
 	focused_child = false
-	for child in $TestViews.get_children():
-		$TestViews.remove_child(child)
+	for child in TestViews.get_children():
+		TestViews.remove_child(child)
 		child.queue_free()
 	for menu in List.get_children():
 		menu.button_pressed = menu.name == focused_name
@@ -44,5 +47,5 @@ func _update_test_views(focused_name:String = ""):
 	if focused_name:
 		focused_child = focused_name
 		var child_node = load("res://addons/mpf-gmc/slides/service/%s.tscn" % focused_name).instantiate()
-		$TestViews.add_child(child_node)
+		TestViews.add_child(child_node)
 		child_node.grab_focus()

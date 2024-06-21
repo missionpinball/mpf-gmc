@@ -1,11 +1,21 @@
-[gd_scene format=3 uid="uid://b0exigwv3clut"]
+[gd_scene load_steps=3 format=3 uid="uid://b0exigwv3clut"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_ra36i"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_y4uns"]
+bg_color = Color(1, 1, 1, 0.501961)
 
 [node name="List_Button" type="Button"]
 size_flags_horizontal = 3
 size_flags_vertical = 3
 size_flags_stretch_ratio = 3.0
+theme_override_colors/font_pressed_color = Color(0, 0.929412, 0, 1)
+theme_override_font_sizes/font_size = 24
+theme_override_styles/normal = SubResource("StyleBoxEmpty_ra36i")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_y4uns")
 toggle_mode = true
 action_mode = 0
 button_mask = 0
 shortcut_in_tooltip = false
 text = "List Button"
+alignment = 0

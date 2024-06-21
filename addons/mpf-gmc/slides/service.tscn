@@ -2,8 +2,8 @@
 
 [ext_resource type="Script" path="res://addons/mpf-gmc/slides/service.gd" id="1"]
 [ext_resource type="PackedScene" uid="uid://devjc6glsblde" path="res://addons/mpf-gmc/slides/service/Settings_Page.tscn" id="2"]
-[ext_resource type="PackedScene" path="res://addons/mpf-gmc/slides/service/Utilities_Page.tscn" id="3"]
-[ext_resource type="PackedScene" path="res://addons/mpf-gmc/slides/service/Sound_Page.tscn" id="4"]
+[ext_resource type="PackedScene" uid="uid://b6hafueawwvxw" path="res://addons/mpf-gmc/slides/service/Utilities_Page.tscn" id="3"]
+[ext_resource type="PackedScene" uid="uid://3kclu455k7h4" path="res://addons/mpf-gmc/slides/service/Sound_Page.tscn" id="4"]
 
 [node name="Service" type="Control"]
 layout_mode = 3
