@@ -1,4 +1,3 @@
-@tool
 class_name MPFVideoPlayer
 extends VideoStreamPlayer
 ## Renders a VideoStreamPlayer with options for end behavior and events.
