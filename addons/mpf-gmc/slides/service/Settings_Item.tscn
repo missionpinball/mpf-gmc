@@ -17,3 +17,4 @@ size_flags_horizontal = 1
 
 [node name="Option" type="Button" parent="."]
 layout_mode = 2
+alignment = 2
