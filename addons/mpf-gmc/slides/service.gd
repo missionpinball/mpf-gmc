@@ -56,23 +56,25 @@ func _on_button(payload):
 	Input.parse_input_event(inputEvent)
 
 func _unhandled_key_input(event):
-	if event.key_label == -1:
-		if $TabContainer.has_focus():
-			if event.keycode == KEY_ESCAPE:
-				$TabContainer.select_previous_available()
-				get_window().set_input_as_handled()
-			elif event.keycode == KEY_ENTER:
-				$TabContainer.select_next_available()
-				get_window().set_input_as_handled()
-			elif event.keycode == KEY_DOWN:
-				self.select_page()
-				get_window().set_input_as_handled()
-		elif event.keycode == KEY_BACKSPACE:
-			self.focus()
-			# Reset the focus settings of the child page
-			var page = $TabContainer.get_child($TabContainer.current_tab)
-			page.unfocus()
+	if event.key_label != -1:
+		return
+
+	if $TabContainer.has_focus():
+		if event.keycode == KEY_ESCAPE:
+			$TabContainer.select_previous_available()
 			get_window().set_input_as_handled()
+		elif event.keycode == KEY_ENTER:
+			$TabContainer.select_next_available()
+			get_window().set_input_as_handled()
+		elif event.keycode == KEY_DOWN:
+			self.select_page()
+			get_window().set_input_as_handled()
+	elif event.keycode == KEY_BACKSPACE:
+		self.focus()
+		# Reset the focus settings of the child page
+		var page = $TabContainer.get_child($TabContainer.current_tab)
+		page.unfocus()
+		get_window().set_input_as_handled()
 
 func select_page():
 	# Last tab is always exit
