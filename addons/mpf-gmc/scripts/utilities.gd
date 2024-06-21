@@ -1,4 +1,3 @@
-@tool
 class_name GMCUtil
 
 ## Traverse a node and find all MPFVariable nodes within it

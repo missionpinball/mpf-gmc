@@ -1,4 +1,3 @@
-@tool
 class_name MPFChildPool
 extends Node2D
 ## Chooses one child to display when entering the scene tree.

@@ -1,4 +1,3 @@
-@tool
 extends LoggingNode
 class_name GMCProcess
 
@@ -8,8 +7,6 @@ var mpf_pid: int
 var mpf_attempts := 0
 
 func _ready() -> void:
-	if Engine.is_editor_hint():
-		return
 	var args: PackedStringArray = OS.get_cmdline_args()
 	if OS.has_feature("spawn_mpf") or "--spawn_mpf" in args or MPF.get_config_value("mpf", "spawn_mpf", false):
 		self._spawn_mpf()

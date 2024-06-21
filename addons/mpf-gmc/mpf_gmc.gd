@@ -1,4 +1,3 @@
-@tool
 extends LoggingNode
 
 const CONFIG_PATH = "res://gmc.cfg"
@@ -30,6 +29,7 @@ func _init():
 				pass
 			else:
 				printerr("Error loading config file '%s': %s" % [cfg[0],err])
+
 	# Configure logging with the value from the config, if provided.
 	# Otherwise will default to INFO for debug builds and LOG for production.
 	var default_log_level = 20 if OS.has_feature("debug") else 25

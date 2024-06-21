@@ -1,4 +1,3 @@
-@tool
 class_name MPFEventHandler
 extends Node2D
 ## A node that creates a BCP event handler and calls a method on parent or children.

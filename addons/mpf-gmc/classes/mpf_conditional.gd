@@ -1,4 +1,3 @@
-@tool
 class_name MPFConditional
 extends Node2D
 ## A node that conditionally appears or hides based on a condition.

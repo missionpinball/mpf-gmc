@@ -1,4 +1,3 @@
-@tool
 class_name MPFConditionalChildren
 extends MPFConditional
 ## A node that conditionally shows or hides its children based on a condition.

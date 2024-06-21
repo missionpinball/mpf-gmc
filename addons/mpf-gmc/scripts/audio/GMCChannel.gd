@@ -1,4 +1,3 @@
-@tool
 extends AudioStreamPlayer
 class_name GMCChannel
 

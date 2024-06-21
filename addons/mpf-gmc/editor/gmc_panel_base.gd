@@ -2,15 +2,24 @@
 extends Control
 class_name GMCPanelBase
 
+const CONFIG_PATH = "res://gmc.cfg"
+
+var config: ConfigFile
 var config_section = null
 @onready var fields := []
+
+func _init():
+	self.config = ConfigFile.new()
+	var err = self.config.load(CONFIG_PATH)
+	if err != OK and err != ERR_FILE_NOT_FOUND:
+		printerr("Error loading config file '%s': %s" % [CONFIG_PATH, error_string(err)])
 
 func _ready() -> void:
 	for child in fields:
 		# Find an initial value
 		var value
-		if MPF.config.has_section_key(config_section, child.name):
-			value = MPF.config.get_value(config_section, child.name)
+		if self.config.has_section_key(config_section, child.name):
+			value = self.config.get_value(config_section, child.name)
 		if child is TextEdit:
 			if value != null:
 				child.text = value
@@ -36,16 +45,19 @@ func _set_dirty(_param = null) -> void:
 	self._save()
 
 func _save() -> void:
+	# Until we have a singleton in the editor, re-load the config
+	# in case another panel has modified it
+	var err = self.config.load(CONFIG_PATH)
 	for child in fields:
 		if child is TextEdit:
 			if child.text:
-				MPF.config.set_value(config_section, child.name, child.text)
-			elif MPF.config.has_section_key(config_section, child.name):
-				MPF.config.erase_section_key(config_section, child.name)
+				self.config.set_value(config_section, child.name, child.text)
+			elif self.config.has_section_key(config_section, child.name):
+				self.config.erase_section_key(config_section, child.name)
 		elif child is CheckButton:
-			MPF.config.set_value(config_section, child.name, child.button_pressed)
+			self.config.set_value(config_section, child.name, child.button_pressed)
 		elif child is OptionButton:
-			MPF.config.set_value(config_section, child.name,
+			self.config.set_value(config_section, child.name,
 				child.get_item_id(child.selected)
 			)
-	MPF.save_config()
+	self.config.save(CONFIG_PATH)

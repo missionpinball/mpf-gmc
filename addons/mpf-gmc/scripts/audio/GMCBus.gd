@@ -1,4 +1,3 @@
-@tool
 extends LoggingNode
 class_name GMCBus
 
