@@ -25,6 +25,7 @@ var _overlay_slide: MPFSlide
 func _ready() -> void:
 	if Engine.is_editor_hint():
 		self._render_preview()
+		self.renamed.connect(self._on_renamed)
 		return
 	self._register_display_in_window()
 	self._slides = self._build_slide_container("_%s_slides" % self.name)
@@ -239,11 +240,9 @@ func _render_preview():
 	color_box.add_child(label)
 	self.add_child(color_box)
 
-func set_name(value):
-	name = value
-	if Engine.is_editor_hint():
-		# Hard-code the path to the label
-		self.get_child(0).get_child(0).text = self.name
+func _on_renamed():
+	# Hard-code the path to the label
+	self.get_child(0).get_child(0).text = self.name
 
 func _to_string() -> String:
 	return "MPFDisplay<%s>" % self.name

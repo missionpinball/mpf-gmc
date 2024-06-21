@@ -1,6 +1,5 @@
 # Base singleton for managing all MC-related references,
 # including windows, displays, slides, and widgets
-@tool
 extends LoggingNode
 class_name GMCMedia
 
