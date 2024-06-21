@@ -46,6 +46,7 @@ func _on_button(payload):
 		"PAGE_LEFT": KEY_PAGEUP,
 		"PAGE_RIGHT": KEY_PAGEDOWN,
 		"START": KEY_BACKSPACE,
+		"TOGGLE": KEY_CAPSLOCK,
 	}[payload.button]
 	Input.parse_input_event(inputEvent)
 

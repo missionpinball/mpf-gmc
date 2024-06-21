@@ -14,6 +14,9 @@ var callback
 var is_focused := false
 var is_option_focused := false
 
+# TODO: Find a better way to make programattic for different service arrangements
+const IS_TOGGLE_STYLE: bool = false
+
 func populate(setting=null):
 	# Accept a setting object from Game.settings as init values
 	if setting:
@@ -63,28 +66,38 @@ func _focus_exited() -> void:
 		self.is_focused = false
 		$Setting.button_pressed = false
 
-func _input(event) -> void:
-	if event is InputEventKey and self.is_focused:
-		if event.is_action_pressed("ui_select"):
-			get_tree().set_input_as_handled()
-			if self.has_focus():
-				is_option_focused = true
-				if callback:
-					callback.call_func()
+func _unhandled_key_input(event: InputEvent) -> void:
+	if self.is_focused and event.key_label == -1:
+		# If this is a toggle event, move focus in/out of the option
+		if IS_TOGGLE_STYLE:
+			if event.keycode == KEY_CAPSLOCK:
+				get_window().set_input_as_handled()
+				if self.has_focus():
+					is_option_focused = true
+					if callback:
+						callback.call_func()
+					else:
+						$Option.grab_focus()
+						self.set_setting_background_color(true)
 				else:
-					$Option.grab_focus()
-					self.set_setting_background_color(true)
-			else:
-				self.grab_focus()
-				self.set_setting_background_color(false)
-				is_option_focused = false
-				self.save()
-		elif is_option_focused:
-			if event.is_action_pressed("ui_left"):
-				get_tree().set_input_as_handled()
+					self.grab_focus()
+					self.set_setting_background_color(false)
+					is_option_focused = false
+					self.save()
+			elif is_option_focused:
+				if event.keycode == KEY_ESCAPE:
+					get_window().set_input_as_handled()
+					select_option(-1)
+				elif event.keycode == KEY_ENTER:
+					get_window().set_input_as_handled()
+					select_option(1)
+		# If this is not toggle style, left and right hit the options directly
+		else:
+			if event.keycode == KEY_ESCAPE:
+				get_window().set_input_as_handled()
 				select_option(-1)
-			elif event.is_action_pressed("ui_right"):
-				get_tree().set_input_as_handled()
+			elif event.keycode == KEY_ENTER:
+				get_window().set_input_as_handled()
 				select_option(1)
 
 func save() -> void:
