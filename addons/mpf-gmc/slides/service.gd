@@ -16,10 +16,10 @@ func _ready() -> void:
 	for trigger in triggers:
 		MPF.server._send("register_trigger?event=%s" % trigger)
 	# Remove any service pages with no content
-	for i in $TabContainer.get_child_count():
-		var c = $TabContainer.get_child(i)
+	for i in $MarginContainer/TabContainer.get_child_count():
+		var c = $MarginContainer/TabContainer.get_child(i)
 		if c is ServicePage and not c.has_settings():
-			$TabContainer.set_tab_hidden(i, true)
+			$MarginContainer/TabContainer.set_tab_hidden(i, true)
 	focus()
 
 func _exit_tree() -> void:
@@ -28,8 +28,8 @@ func _exit_tree() -> void:
 
 func focus():
 	# Use call_deferred to grab focus to ensure tree stability
-	$TabContainer.grab_focus.call_deferred()
-	$TabContainer.set("custom_colors/font_color_fg", highlight_color)
+	$MarginContainer/TabContainer.grab_focus.call_deferred()
+	$MarginContainer/TabContainer.set("custom_colors/font_color_fg", highlight_color)
 
 func _on_service(payload):
 	if payload.has("button"):
@@ -59,12 +59,12 @@ func _unhandled_key_input(event):
 	if event.key_label != -1:
 		return
 
-	if $TabContainer.has_focus():
+	if $MarginContainer/TabContainer.has_focus():
 		if event.keycode == KEY_ESCAPE:
-			$TabContainer.select_previous_available()
+			$MarginContainer/TabContainer.select_previous_available()
 			get_window().set_input_as_handled()
 		elif event.keycode == KEY_ENTER:
-			$TabContainer.select_next_available()
+			$MarginContainer/TabContainer.select_next_available()
 			get_window().set_input_as_handled()
 		elif event.keycode == KEY_DOWN:
 			self.select_page()
@@ -72,16 +72,16 @@ func _unhandled_key_input(event):
 	elif event.keycode == KEY_BACKSPACE:
 		self.focus()
 		# Reset the focus settings of the child page
-		var page = $TabContainer.get_child($TabContainer.current_tab)
+		var page = $MarginContainer/TabContainer.get_child($MarginContainer/TabContainer.current_tab)
 		page.unfocus()
 		get_window().set_input_as_handled()
 
 func select_page():
 	# Last tab is always exit
-	if $TabContainer.current_tab == $TabContainer.get_tab_count() - 1:
+	if $MarginContainer/TabContainer.current_tab == $MarginContainer/TabContainer.get_tab_count() - 1:
 		MPF.server.send_event("service_trigger&action=service_exit")
 		return
-	var target = $TabContainer.get_child($TabContainer.current_tab)
+	var target = $MarginContainer/TabContainer.get_child($MarginContainer/TabContainer.current_tab)
 	target.focus()
 
-	$TabContainer.set("custom_colors/font_color_fg", null)
+	$MarginContainer/TabContainer.set("custom_colors/font_color_fg", null)

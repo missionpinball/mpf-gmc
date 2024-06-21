@@ -1,0 +1,16 @@
+[gd_resource type="Theme" load_steps=4 format=3 uid="uid://ergwdj4cg7t1"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_cxbwg"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_h7vlo"]
+bg_color = Color(1, 1, 1, 0.360784)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ftyfi"]
+
+[resource]
+default_font_size = 24
+Button/colors/font_pressed_color = Color(0, 0.721569, 0, 1)
+Button/styles/normal = SubResource("StyleBoxEmpty_cxbwg")
+Button/styles/pressed = SubResource("StyleBoxFlat_h7vlo")
+TabBar/colors/font_selected_color = Color(0.980392, 0.396078, 0, 1)
+TabBar/styles/tab_selected = SubResource("StyleBoxFlat_ftyfi")
