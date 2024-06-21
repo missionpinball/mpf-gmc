@@ -1,15 +1,34 @@
-[gd_scene load_steps=3 format=3 uid="uid://d1si4xecf5lf7"]
+[gd_scene load_steps=6 format=3 uid="uid://d1si4xecf5lf7"]
 
 [ext_resource type="Script" path="res://addons/mpf-gmc/slides/service/Settings_Item.gd" id="1"]
 [ext_resource type="PackedScene" uid="uid://b0exigwv3clut" path="res://addons/mpf-gmc/slides/service/List_Button.tscn" id="2"]
 
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_y5gq5"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_h7aki"]
+bg_color = Color(1, 1, 1, 0.466667)
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_pguqd"]
+
 [node name="HSplitContainer" type="HSplitContainer"]
+custom_minimum_size = Vector2(500, 2.08165e-12)
+size_flags_horizontal = 2
 focus_mode = 2
 dragger_visibility = 1
 script = ExtResource("1")
 
 [node name="Setting" parent="." instance=ExtResource("2")]
+layout_direction = 2
 layout_mode = 2
+size_flags_horizontal = 1
+theme_override_colors/font_pressed_color = Color(0, 0.917647, 0.109804, 1)
+theme_override_font_sizes/font_size = 28
+theme_override_styles/normal = SubResource("StyleBoxEmpty_y5gq5")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_h7aki")
+alignment = 0
 
 [node name="Option" type="Button" parent="."]
 layout_mode = 2
+theme_override_colors/font_focus_color = Color(0, 0.870588, 0.14902, 1)
+theme_override_font_sizes/font_size = 28
+theme_override_styles/normal = SubResource("StyleBoxEmpty_pguqd")
