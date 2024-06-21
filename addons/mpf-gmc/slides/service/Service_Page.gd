@@ -8,7 +8,6 @@ var is_focused := false
 @onready var List = $MarginContainer/VBoxContainer
 
 func focus():
-	print("%s taking focus" % self)
 	is_focused = true
 	List.get_child(0).grab_focus()
 
@@ -21,6 +20,9 @@ func add_setting(item: SettingsItem) -> void:
 
 func get_focused_setting() -> SettingsItem:
 	return List.get_child(focused_index)
+
+func has_settings() -> bool:
+	return List.get_child_count() > 0
 
 func _exit_tree() -> void:
 	for child in List.get_children():

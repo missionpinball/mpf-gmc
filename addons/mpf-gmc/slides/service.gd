@@ -15,6 +15,11 @@ func _ready() -> void:
 	MPF.server.service.connect(self._on_service)
 	for trigger in triggers:
 		MPF.server._send("register_trigger?event=%s" % trigger)
+	# Remove any service pages with no content
+	for i in $TabContainer.get_child_count():
+		var c = $TabContainer.get_child(i)
+		if c is ServicePage and not c.has_settings():
+			$TabContainer.set_tab_hidden(i, true)
 	focus()
 
 func _exit_tree() -> void:
