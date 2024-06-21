@@ -1,4 +1,3 @@
-@tool
 class_name MPFCarousel
 extends Node2D
 

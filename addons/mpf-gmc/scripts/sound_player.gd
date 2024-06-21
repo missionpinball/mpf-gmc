@@ -1,6 +1,5 @@
 # Copyright 2021 Paradigm Tilt
 
-@tool
 extends LoggingNode
 
 signal marker(event_name: String)

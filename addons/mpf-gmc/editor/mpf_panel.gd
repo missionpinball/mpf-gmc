@@ -26,19 +26,22 @@ func _ready() -> void:
 	$main/buttons/save.pressed.connect(self._save)
 
 func _enable_toggled(toggled_on: bool) -> void:
-	MPF.config.set_value(config_section, "spawn_mpf", toggled_on)
-	MPF.save_config()
+	# Until we have a singleton in the editor, re-load the config
+	# in case another panel has modified it
+	var err = self.config.load(CONFIG_PATH)
+	self.config.set_value(config_section, "spawn_mpf", toggled_on)
+	self.config.save(CONFIG_PATH)
 
 func _set_dirty(_param = null) -> void:
 	$main/buttons/save.disabled = false
 
 func _set_enable_available():
 	# If no path is set, show an alert icon
-	if MPF.config.get_value(config_section, "executable_path", ""):
+	if self.config.get_value(config_section, "executable_path", ""):
 		$main/enable/spawn_mpf.show()
 		$main/enable/spawn_error.hide()
 		$main/enable/spawn_mpf.disabled = false
-		$main/enable/spawn_mpf.button_pressed = MPF.config.get_value(config_section, "spawn_mpf", false)
+		$main/enable/spawn_mpf.button_pressed = self.config.get_value(config_section, "spawn_mpf", false)
 	else:
 		$main/enable/spawn_mpf.hide()
 		$main/enable/spawn_error.show()

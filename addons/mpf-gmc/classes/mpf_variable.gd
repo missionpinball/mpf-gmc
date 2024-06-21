@@ -1,5 +1,5 @@
-@tool
-class_name MPFVariable extends Label
+extends Label
+class_name MPFVariable
 
 const VariableType = preload("const.gd").VariableType
 const numbered_players = [VariableType.PLAYER_1, VariableType.PLAYER_2, VariableType.PLAYER_3, VariableType.PLAYER_4]
