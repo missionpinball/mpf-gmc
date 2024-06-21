@@ -347,8 +347,9 @@ func _thread_poll(_userdata=null) -> void:
 							_send("register_trigger?event=%s" % e)
 					"service":
 						call_deferred("emit_signal", "service", message)
-					# "service_mode_entered":
-					# 	call_deferred("deferred_scene", "res://modes/Service.tscn")
+					"service_mode_entered":
+						# The default service.yaml includes a slide_player for service slide
+						pass
 					"settings":
 						call_deferred("deferred_game", "update_settings", message)
 					"signal":
