@@ -3,7 +3,6 @@
 # Original code © 2021 Anthony van Winkle / Paradigm Tilt
 # Released under the MIT License
 
-@tool
 extends LoggingNode
 class_name GMCServer
 
