@@ -197,9 +197,9 @@ func _on_clear(context_name) -> void:
 	for s in self._slide_stack:
 		s.clear(context_name)
 
-func _build_slide_container(name: String):
+func _build_slide_container(cname: String):
 	var container = Control.new()
-	container.name = name
+	container.name = cname
 	container.set_anchors_preset(PRESET_FULL_RECT)
 	container.size_flags_horizontal = SIZE_EXPAND
 	container.size_flags_vertical = SIZE_EXPAND

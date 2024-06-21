@@ -3,7 +3,6 @@
 # Original code © 2021 Anthony van Winkle / Paradigm Tilt
 # Released under the MIT License
 
-@tool
 extends LoggingNode
 class_name GMCServer
 
@@ -266,6 +265,13 @@ func _thread_poll(_userdata=null) -> void:
 		if not bytes:
 			OS.delay_msec(delay)
 		else:
+			var err = _client.poll()
+			if err != OK:
+				push_error("BCP client error: %s" % error_string(err))
+				_client.disconnect_from_host()
+				_client = null
+				call_deferred("stop")
+				return
 			var messages := _client.get_string(bytes).split("\n")
 			for message_raw in messages:
 				if message_raw.is_empty():
