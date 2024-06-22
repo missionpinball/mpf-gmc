@@ -1,8 +1,6 @@
 [gd_scene load_steps=4 format=2]
 
-[ext_resource path="res://service/coil_test.gd" type="Script" id=1]
-[ext_resource path="res://fonts/body_sm.tres" type="DynamicFont" id=2]
-[ext_resource path="res://fonts/body_xxs.tres" type="DynamicFont" id=3]
+[ext_resource path="res://addons/mpf-gmc/slides/service/coil_test.gd" type="Script" id=1]
 
 [node name="light_test" type="Control"]
 margin_right = 40.0
@@ -19,8 +17,6 @@ margin_left = 536.0
 margin_top = 96.0
 margin_right = 746.0
 margin_bottom = 121.0
-custom_colors/font_outline_modulate = Color( 0, 0, 0, 1 )
-custom_fonts/font = ExtResource( 2 )
 text = "Light Test"
 align = 1
 __meta__ = {
@@ -32,7 +28,6 @@ margin_left = 912.0
 margin_top = 160.0
 margin_right = 1104.0
 margin_bottom = 185.0
-custom_fonts/font = ExtResource( 3 )
 text = "Light:"
 __meta__ = {
 "_edit_use_anchors_": false
@@ -43,7 +38,6 @@ margin_left = 912.0
 margin_top = 200.0
 margin_right = 1104.0
 margin_bottom = 225.0
-custom_fonts/font = ExtResource( 3 )
 text = "Address:"
 __meta__ = {
 "_edit_use_anchors_": false
@@ -54,7 +48,6 @@ margin_left = 912.0
 margin_top = 320.0
 margin_right = 1104.0
 margin_bottom = 345.0
-custom_fonts/font = ExtResource( 3 )
 __meta__ = {
 "_edit_use_anchors_": false
 }
