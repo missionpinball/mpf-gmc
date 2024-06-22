@@ -9,6 +9,15 @@ func _on_service(payload: Dictionary) -> void:
 		self._update_active_switches(payload)
 		return
 
+	if payload.name == "service_switch_test_stop":
+		var parent = self.get_parent()
+		while parent:
+			if parent is UtilitiesPage:
+				parent.deselect_child()
+				break
+			parent = parent.get_parent()
+		return
+
 	if payload.name != "service_switch_test_start":
 		return
 	self._get_active_switches()
