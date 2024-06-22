@@ -3,7 +3,7 @@
 extends MPFSlide
 
 @export var highlight_color: Color
-
+@onready var tabRow = $MarginContainer/TabContainer
 
 const triggers = ["service_button",
 "service_switch_test_start", "service_switch_test_stop",
@@ -16,10 +16,10 @@ func _ready() -> void:
 	for trigger in triggers:
 		MPF.server._send("register_trigger?event=%s" % trigger)
 	# Remove any service pages with no content
-	for i in $MarginContainer/TabContainer.get_child_count():
-		var c = $MarginContainer/TabContainer.get_child(i)
+	for i in tabRow.get_child_count():
+		var c = tabRow.get_child(i)
 		if c is ServicePage and not c.has_settings():
-			$MarginContainer/TabContainer.set_tab_hidden(i, true)
+			tabRow.set_tab_hidden(i, true)
 	focus()
 
 func _exit_tree() -> void:
@@ -28,8 +28,8 @@ func _exit_tree() -> void:
 
 func focus():
 	# Use call_deferred to grab focus to ensure tree stability
-	$MarginContainer/TabContainer.grab_focus.call_deferred()
-	$MarginContainer/TabContainer.set("custom_colors/font_color_fg", highlight_color)
+	tabRow.grab_focus.call_deferred()
+	tabRow.set("theme_override_colors/font_selected_color", highlight_color)
 
 func _on_service(payload):
 	if payload.has("button"):
@@ -59,29 +59,32 @@ func _unhandled_key_input(event):
 	if event.key_label != -1:
 		return
 
-	if $MarginContainer/TabContainer.has_focus():
+	var is_exiting = tabRow.current_tab == tabRow.get_tab_count() - 1
+	if tabRow.has_focus():
 		if event.keycode == KEY_ESCAPE:
-			$MarginContainer/TabContainer.select_previous_available()
 			get_window().set_input_as_handled()
+			tabRow.select_previous_available()
 		elif event.keycode == KEY_ENTER:
-			$MarginContainer/TabContainer.select_next_available()
 			get_window().set_input_as_handled()
-		elif event.keycode == KEY_DOWN:
+			tabRow.select_next_available()
+		elif event.keycode == KEY_DOWN and not is_exiting:
+			get_window().set_input_as_handled()
 			self.select_page()
+		# Last tab is always exit
+		elif event.keycode == KEY_BACKSPACE and is_exiting:
 			get_window().set_input_as_handled()
+			self.exit_service()
 	elif event.keycode == KEY_BACKSPACE:
+		get_window().set_input_as_handled()
 		self.focus()
 		# Reset the focus settings of the child page
-		var page = $MarginContainer/TabContainer.get_child($MarginContainer/TabContainer.current_tab)
+		var page = tabRow.get_child(tabRow.current_tab)
 		page.unfocus()
-		get_window().set_input_as_handled()
 
 func select_page():
-	# Last tab is always exit
-	if $MarginContainer/TabContainer.current_tab == $MarginContainer/TabContainer.get_tab_count() - 1:
-		MPF.server.send_event("service_trigger&action=service_exit")
-		return
-	var target = $MarginContainer/TabContainer.get_child($MarginContainer/TabContainer.current_tab)
+	var target = tabRow.get_child(tabRow.current_tab)
 	target.focus()
+	tabRow.set("theme_override_colors/font_selected_color", null)
 
-	$MarginContainer/TabContainer.set("custom_colors/font_color_fg", null)
+func exit_service():
+	MPF.server.send_event("service_trigger&action=service_exit")
