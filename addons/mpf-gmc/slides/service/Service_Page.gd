@@ -53,9 +53,10 @@ func focus_child(direction: int, wrap_around=false):
 				parent = parent.get_parent()
 
 func _unhandled_key_input(event):
-	if not is_focused:
+	if not self.is_focused or event.key_label != -1:
 		return
-	if event.key_label == -1 and List.get_child(focused_index).has_focus():
+
+	if List.get_child(focused_index).has_focus():
 		if event.keycode == KEY_UP:
 			self.focus_child(-1)
 			get_window().set_input_as_handled()

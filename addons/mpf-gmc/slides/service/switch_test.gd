@@ -40,13 +40,6 @@ func _on_service(payload: Dictionary) -> void:
 		$recent_test/recent_switches.remove_child(switch_to_remove)
 		switch_to_remove.queue_free()
 
-	# # HACK! Use the start button to exit out of this mode
-	if payload.switch_name == "s_credit":
-		var e = InputEventKey.new()
-		e.scancode = KEY_KP_ENTER
-		e.pressed = true
-		get_tree().input_event(e)
-
 func _get_active_switches() -> void:
 	# TODO: Get switches that don't have labels
 	MPF.server.send_service("list_switches", ["name", "label", "state"])

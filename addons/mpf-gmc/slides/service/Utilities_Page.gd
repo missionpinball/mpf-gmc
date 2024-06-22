@@ -27,6 +27,7 @@ func _unhandled_key_input(event):
 	elif focused_child and (event.keycode == KEY_ESCAPE or event.keycode == KEY_CAPSLOCK):
 			self.deselect_child()
 			get_window().set_input_as_handled()
+	super(event)
 
 # A public method so children can de-select themselves
 func deselect_child():
