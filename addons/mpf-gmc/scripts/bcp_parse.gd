@@ -44,15 +44,21 @@ static func string_to_obj(message: String, _cmd: String) -> Dictionary:
 		var pair = chunk.split("=")
 		var raw_value: String = pair[1]
 		if ":" in raw_value:
+			var type_hint = raw_value.get_slice(":", 0)
+			var hint_value = raw_value.get_slice(":", 1)
 			# Basic typesetting
-			if raw_value.substr(0,4) == "int:":
-				result[pair[0]] = int(raw_value.substr(4))
-			elif raw_value.substr(0,6) == "float:":
-				result[pair[0]] = float(raw_value.substr(6))
-			elif raw_value.substr(0,5) == "bool:":
-				result[pair[0]] = raw_value.substr(5) == "True"
-			else:
-				result[pair[0]] = raw_value
+			match type_hint:
+				"int":
+					result[pair[0]] = int(hint_value)
+				"float":
+					result[pair[0]] = float(hint_value)
+				"bool":
+					result[pair[0]] = hint_value == "True"
+				"NoneType":
+					result[pair[0]] = null
+				"_":
+					push_warning("Unknown type hint %s in message %s" % [raw_value, message])
+					result[pair[0]] = hint_value
 		else:
 			result[pair[0]] = raw_value.uri_decode()
 	return result

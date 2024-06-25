@@ -135,14 +135,23 @@ func send_event_with_args(event_name: String, args: Dictionary) -> void:
 	args["name"] = event_name
 	var params = []
 	for k in args.keys():
+		var v = args[k]
+		var prefix: String = ""
 		if args[k] is String:
-			var v = args[k]
-			# Can't send back context because it interferes with triggering players
+			# Can't send back 'context' because it interferes with triggering players
 			if k == "context":
 				k = "original_context"
 			elif k == "calling_context":
 				k = "original_calling_context"
-			params.append("%s=%s" % [k,v])
+		# Some types need to be prefixed for MPF to type them appropriately
+		# TODO: Add JSON encoding for lists and dicts
+		elif args[k] is int:
+			prefix = "int:"
+		elif args[k] is float:
+			prefix = "float:"
+		elif args[k] is bool:
+			prefix = "bool:"
+		params.append("%s=%s%s" % [k,prefix,v])
 	_send("trigger?%s" % ["&".join(params)])
 
 func send_switch(switch_name: String, state: int = -1) -> void:
