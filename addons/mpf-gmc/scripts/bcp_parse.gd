@@ -62,3 +62,37 @@ static func string_to_obj(message: String, _cmd: String) -> Dictionary:
 		else:
 			result[pair[0]] = raw_value.uri_decode()
 	return result
+
+static func encode_event_args(event_name: String, args: Dictionary) -> String:
+	# Always include the event name in the args
+	args["name"] = event_name
+	var params = []
+	var needs_json = false
+	for k in args.keys():
+		var v = args[k]
+		var arg_type = typeof(args[k])
+		var prefix: String = ""
+		match arg_type:
+			TYPE_STRING:
+				# Can't send back 'context' because it interferes with triggering players
+				if k == "context":
+					k = "original_context"
+				elif k == "calling_context":
+					k = "original_calling_context"
+			# Some types need to be prefixed for MPF to type them appropriately
+			TYPE_INT:
+				prefix = "int:"
+			TYPE_FLOAT:
+				prefix = "float:"
+			TYPE_BOOL:
+				prefix = "bool:"
+			TYPE_ARRAY, TYPE_DICTIONARY:
+				needs_json = true
+				break
+		params.append("%s=%s%s" % [k,prefix,v])
+
+	# If anything needs json, send the whole thing as json
+	if needs_json:
+		return "json=%s" % JSON.stringify(args)
+
+	return "&".join(params)
