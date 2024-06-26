@@ -126,24 +126,19 @@ func listen() -> void:
 	set_process(true)
 
 ## Post an event to MPF
-func send_event(event_name: String) -> void:
+func send_event(event_name: String, bounceback: bool = false) -> void:
 	_send("trigger?name=%s" % event_name)
+	if bounceback:
+		self._bounceback(event_name)
 
-func send_event_with_args(event_name: String, args: Dictionary) -> void:
+
+func send_event_with_args(event_name: String, args: Dictionary, bounceback: bool = false) -> void:
 	if not args or args.is_empty():
 		return self.send_event(event_name)
-	args["name"] = event_name
-	var params = []
-	for k in args.keys():
-		if args[k] is String:
-			var v = args[k]
-			# Can't send back context because it interferes with triggering players
-			if k == "context":
-				k = "original_context"
-			elif k == "calling_context":
-				k = "original_calling_context"
-			params.append("%s=%s" % [k,v])
-	_send("trigger?%s" % ["&".join(params)])
+	var event_string = _bcp_parse.encode_event_args(event_name, args)
+	_send("trigger?%s" % event_string)
+	if bounceback:
+		self._bounceback(event_name, args)
 
 func send_switch(switch_name: String, state: int = -1) -> void:
 	var message = "switch?name=%s&state=%s" % [switch_name, state]
@@ -257,6 +252,14 @@ func _send(message: String) -> void:
 	self.log.verbose("Sending: %s", message)
 	_client.put_data(("%s\n" % message).to_ascii_buffer())
 
+func _bounceback(event_name: String, args = null):
+	# If any handlers are registered for this event, call them directly
+	if event_name in self.registered_handlers:
+		for h in self.registered_handlers[event_name]:
+			if args:
+				h.call_deferred(args)
+			else:
+				h.call_deferred()
 
 func _thread_poll(_userdata=null) -> void:
 	# TBD: What is the optimal polling rate for the BCP client?

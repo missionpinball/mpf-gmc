@@ -121,9 +121,14 @@ func stop_all(fade_out: float = 1.0) -> void:
 func _on_volume(bus: String, value: float, _change: float):
 	var bus_name: String = bus.trim_suffix("_volume")
 	# The Master bus is fixed and capitalized
-	if bus_name == "master":
+	if bus_name.to_lower() == "master":
 		bus_name = "Master"
 		AudioServer.set_bus_volume_db(AudioServer.get_bus_index(bus_name), linear_to_db(value))
+		return
+	# Some devices, like hardware sound platforms, have volumes as well.
+	# Those don't correspond to buses, so ignore them.
+	if bus_name not in self.buses:
+		self.log.debug("No software audio bus named '%s', ignoring.", bus_name)
 		return
 	self.buses[bus_name].set_bus_volume_full(linear_to_db(value))
 

@@ -44,15 +44,55 @@ static func string_to_obj(message: String, _cmd: String) -> Dictionary:
 		var pair = chunk.split("=")
 		var raw_value: String = pair[1]
 		if ":" in raw_value:
+			var type_hint = raw_value.get_slice(":", 0)
+			var hint_value = raw_value.get_slice(":", 1)
 			# Basic typesetting
-			if raw_value.substr(0,4) == "int:":
-				result[pair[0]] = int(raw_value.substr(4))
-			elif raw_value.substr(0,6) == "float:":
-				result[pair[0]] = float(raw_value.substr(6))
-			elif raw_value.substr(0,5) == "bool:":
-				result[pair[0]] = raw_value.substr(5) == "True"
-			else:
-				result[pair[0]] = raw_value
+			match type_hint:
+				"int":
+					result[pair[0]] = int(hint_value)
+				"float":
+					result[pair[0]] = float(hint_value)
+				"bool":
+					result[pair[0]] = hint_value == "True"
+				"NoneType":
+					result[pair[0]] = null
+				"_":
+					push_warning("Unknown type hint %s in message %s" % [raw_value, message])
+					result[pair[0]] = hint_value
 		else:
 			result[pair[0]] = raw_value.uri_decode()
 	return result
+
+static func encode_event_args(event_name: String, args: Dictionary) -> String:
+	# Always include the event name in the args
+	args["name"] = event_name
+	var params = []
+	var needs_json = false
+	for k in args.keys():
+		var v = args[k]
+		var arg_type = typeof(args[k])
+		var prefix: String = ""
+		match arg_type:
+			TYPE_STRING:
+				# Can't send back 'context' because it interferes with triggering players
+				if k == "context":
+					k = "original_context"
+				elif k == "calling_context":
+					k = "original_calling_context"
+			# Some types need to be prefixed for MPF to type them appropriately
+			TYPE_INT:
+				prefix = "int:"
+			TYPE_FLOAT:
+				prefix = "float:"
+			TYPE_BOOL:
+				prefix = "bool:"
+			TYPE_ARRAY, TYPE_DICTIONARY:
+				needs_json = true
+				break
+		params.append("%s=%s%s" % [k,prefix,v])
+
+	# If anything needs json, send the whole thing as json
+	if needs_json:
+		return "json=%s" % JSON.stringify(args)
+
+	return "&".join(params)
