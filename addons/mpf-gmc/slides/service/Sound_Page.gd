@@ -41,4 +41,10 @@ func _enter_tree():
 		}
 		item.populate(setting)
 		item.save_on_change = true
+		# Currently only FAST Audio is implemented, so hard code those
+		# values because I'm lazy.
+		item.min_value = 0
+		item.max_value = 63
+		item.step = 1
+		item.convert_to_percent = false
 		self.add_setting(item)
