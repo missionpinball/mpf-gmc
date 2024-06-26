@@ -41,6 +41,7 @@ layout_mode = 2
 focus_mode = 2
 
 [node name="Standard" parent="MarginContainer/TabContainer" instance=ExtResource("2")]
+visible = false
 layout_mode = 2
 
 [node name="Features" parent="MarginContainer/TabContainer" instance=ExtResource("2")]
@@ -66,10 +67,11 @@ layout_mode = 2
 visible = false
 layout_mode = 2
 
-[node name="Exit" type="Control" parent="MarginContainer/TabContainer"]
-visible = false
+[node name="Exit" type="CenterContainer" parent="MarginContainer/TabContainer"]
 layout_mode = 2
 
 [node name="Label" type="Label" parent="MarginContainer/TabContainer/Exit"]
-layout_mode = 0
+layout_mode = 2
 text = "Press Start Button to Exit"
+horizontal_alignment = 1
+vertical_alignment = 1
