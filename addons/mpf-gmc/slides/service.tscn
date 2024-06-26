@@ -62,10 +62,6 @@ settingType = "coin"
 visible = false
 layout_mode = 2
 
-[node name="Audits" parent="MarginContainer/TabContainer" instance=ExtResource("3")]
-visible = false
-layout_mode = 2
-
 [node name="Sound" parent="MarginContainer/TabContainer" instance=ExtResource("4")]
 visible = false
 layout_mode = 2
