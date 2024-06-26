@@ -15,13 +15,13 @@ var value: float:
 
 func ready() -> void:
 	# Shift from a saved float to a displayed int
-	var int_selected_value = int(self.selected_value * 100)
+	self.selected_value = int(self.selected_value * 100)
 	$Setting.text = title
-	$HSlider.value = selected_value
 	$HSlider.min_value = min_value
 	$HSlider.max_value = max_value
 	$HSlider.step = step
-	$Option.text = "%d" % int_selected_value
+	$HSlider.value = selected_value
+	$Option.text = "%d" % selected_value
 
 func select_option(direction: int = 0) -> void:
 	var next: float = (selected_value + ($HSlider.step * direction)) if direction else 0
@@ -34,7 +34,8 @@ func select_option(direction: int = 0) -> void:
 			self.save()
 
 func save() -> void:
-	var float_val: float = selected_value / 100
+	# Clamp to 2 decimals by converting to string and back to float
+	var float_val: float = float("%0.2f" % (selected_value / 100))
 	MPF.server.set_machine_var(variable, float_val, self.persist)
 
 func get_value() -> float:
