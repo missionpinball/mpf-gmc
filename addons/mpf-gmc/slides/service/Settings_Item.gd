@@ -22,7 +22,6 @@ func populate(setting=null):
 	if not setting:
 		push_error("No setting provided when instantiating Settings_Item.")
 		return
-	push_warning("Populating setting with %s" % setting)
 	self.variable = setting.variable
 	self.title = setting.label
 	self.default = setting.default
