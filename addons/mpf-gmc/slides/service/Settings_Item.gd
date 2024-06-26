@@ -1,6 +1,6 @@
 # Copyright 2021 Paradigm Tilt
 
-extends HSplitContainer
+extends HBoxContainer
 class_name SettingsItem
 
 @export var title: String
@@ -19,17 +19,20 @@ const IS_TOGGLE_STYLE: bool = false
 
 func populate(setting=null):
 	# Accept a setting object from Game.settings as init values
-	if setting:
-		self.variable = setting.variable
-		self.title = setting.label
-		self.default = setting.default
-		if setting.get("options"):
-			self.options = setting["options"]
-		# Look for a custom value in machine vars
-		if MPF.game.machine_vars.has(setting.variable):
-			self.selected_value = MPF.game.machine_vars[setting.variable]
-		else:
-			self.selected_value = self.default
+	if not setting:
+		push_error("No setting provided when instantiating Settings_Item.")
+		return
+	push_warning("Populating setting with %s" % setting)
+	self.variable = setting.variable
+	self.title = setting.label
+	self.default = setting.default
+	if setting.get("options"):
+		self.options = setting["options"]
+	# Look for a custom value in machine vars
+	if MPF.game.machine_vars.has(setting.variable):
+		self.selected_value = MPF.game.machine_vars[setting.variable]
+	else:
+		self.selected_value = self.default
 
 func _ready() -> void:
 	self.focus_entered.connect(self._focus_entered)

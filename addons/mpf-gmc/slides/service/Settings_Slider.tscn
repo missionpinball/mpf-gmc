@@ -3,14 +3,15 @@
 [ext_resource type="Script" path="res://addons/mpf-gmc/slides/service/Settings_Slider.gd" id="1"]
 [ext_resource type="PackedScene" uid="uid://b0exigwv3clut" path="res://addons/mpf-gmc/slides/service/List_Button.tscn" id="2"]
 
-[node name="Settings_Slider" type="HSplitContainer"]
+[node name="Settings_Slider" type="HBoxContainer"]
+custom_minimum_size = Vector2(500, 2.08165e-12)
 focus_mode = 2
 script = ExtResource("1")
 
 [node name="Setting" parent="." instance=ExtResource("2")]
 layout_mode = 2
 size_flags_stretch_ratio = 2.0
-text = ""
+text = "Slider Name"
 
 [node name="HSlider" type="HSlider" parent="."]
 layout_mode = 2

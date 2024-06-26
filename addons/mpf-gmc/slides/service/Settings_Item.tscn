@@ -3,11 +3,10 @@
 [ext_resource type="Script" path="res://addons/mpf-gmc/slides/service/Settings_Item.gd" id="1"]
 [ext_resource type="PackedScene" uid="uid://b0exigwv3clut" path="res://addons/mpf-gmc/slides/service/List_Button.tscn" id="2"]
 
-[node name="HSplitContainer" type="HSplitContainer"]
+[node name="HBoxContainer" type="HBoxContainer"]
 custom_minimum_size = Vector2(500, 2.08165e-12)
 size_flags_horizontal = 2
 focus_mode = 2
-dragger_visibility = 1
 script = ExtResource("1")
 
 [node name="Setting" parent="." instance=ExtResource("2")]
