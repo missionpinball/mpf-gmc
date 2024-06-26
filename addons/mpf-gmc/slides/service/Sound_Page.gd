@@ -22,3 +22,23 @@ func _enter_tree():
 		item.save_on_change = true
 		item.persist = true
 		self.add_setting(item)
+
+	var hardware_volumes = MPF.game.settings.values().filter(
+		func (s): return s.type == "hw_volume"
+	)
+	if not hardware_volumes:
+		return
+	#var separator = HSeparator.new()
+	#List.add_child(separator)
+	hardware_volumes.sort_custom(func (a, b): return a.priority < b.priority)
+	for hw in hardware_volumes:
+		var item = SettingsSliderScene.instantiate()
+		item.name = "%sSlider" % hw.variable
+		var setting = {
+			"label": hw.label,
+			"variable": hw.variable,
+			"default": hw.default
+		}
+		item.populate(setting)
+		item.save_on_change = true
+		self.add_setting(item)
