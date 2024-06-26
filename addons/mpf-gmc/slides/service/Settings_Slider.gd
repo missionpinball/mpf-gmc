@@ -7,26 +7,21 @@ class_name Settings_Slider
 @export var max_value: int = 100
 @export var step: int = 5
 @export var save_on_change: bool = false
+
+var persist = null
 # Expose the value of the underlying slider
 var value: float:
 	get = get_value
 
-func _ready():
-	# _ready() must be defined so parents wait for
-	# this node before proceeding with ready()
-	pass
-
 func ready() -> void:
-	print("Slider has these children:")
-	print(self.get_children())
 	# Shift from a saved float to a displayed int
-	selected_value = int(self.selected_value * 100)
+	var int_selected_value = int(self.selected_value * 100)
 	$Setting.text = title
 	$HSlider.value = selected_value
 	$HSlider.min_value = min_value
 	$HSlider.max_value = max_value
 	$HSlider.step = step
-	$Option.text = "%d" % selected_value
+	$Option.text = "%d" % int_selected_value
 
 func select_option(direction: int = 0) -> void:
 	var next: float = (selected_value + ($HSlider.step * direction)) if direction else 0
@@ -40,7 +35,7 @@ func select_option(direction: int = 0) -> void:
 
 func save() -> void:
 	var float_val: float = selected_value / 100
-	MPF.server.set_machine_var(variable, float_val)
+	MPF.server.set_machine_var(variable, float_val, self.persist)
 
 func get_value() -> float:
 	return $HSlider.value
