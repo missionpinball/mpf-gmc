@@ -1,0 +1,30 @@
+[gd_scene load_steps=2 format=3 uid="uid://dggqurkmge26t"]
+
+[ext_resource type="Script" path="res://addons/mpf-gmc/slides/service/coil_test.gd" id="1"]
+
+[node name="light_test" type="VBoxContainer"]
+focus_mode = 2
+script = ExtResource("1")
+device_type = "lights"
+
+[node name="title" type="Label" parent="."]
+layout_mode = 2
+text = "Light Test"
+
+[node name="coil_label" type="Label" parent="."]
+layout_mode = 2
+text = "Light:"
+
+[node name="coil_number" type="Label" parent="."]
+layout_mode = 2
+text = "Address:"
+
+[node name="instructions" type="Label" parent="."]
+layout_mode = 2
+
+[node name="ScrollContainer" type="ScrollContainer" parent="."]
+layout_mode = 2
+follow_focus = true
+
+[node name="coil_list" type="VBoxContainer" parent="ScrollContainer"]
+layout_mode = 2

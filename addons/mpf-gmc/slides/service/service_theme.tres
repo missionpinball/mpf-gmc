@@ -1,0 +1,29 @@
+[gd_resource type="Theme" load_steps=6 format=3 uid="uid://ergwdj4cg7t1"]
+
+[sub_resource type="FontVariation" id="FontVariation_chif8"]
+spacing_top = 16
+spacing_bottom = 16
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_cxbwg"]
+content_margin_left = 20.0
+content_margin_right = 20.0
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_h7vlo"]
+content_margin_left = 20.0
+content_margin_right = 20.0
+bg_color = Color(0, 0.709804, 0.890196, 0.196078)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_e487c"]
+bg_color = Color(0.980392, 0.380392, 0, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ftyfi"]
+
+[resource]
+default_font_size = 28
+Button/colors/font_pressed_color = Color(1, 1, 1, 1)
+Button/fonts/font = SubResource("FontVariation_chif8")
+Button/styles/normal = SubResource("StyleBoxEmpty_cxbwg")
+Button/styles/pressed = SubResource("StyleBoxFlat_h7vlo")
+TabBar/colors/font_selected_color = Color(0.980392, 0.396078, 0, 1)
+TabBar/styles/tab_focus = SubResource("StyleBoxFlat_e487c")
+TabBar/styles/tab_selected = SubResource("StyleBoxFlat_ftyfi")

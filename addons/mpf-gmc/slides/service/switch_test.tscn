@@ -1,0 +1,59 @@
+[gd_scene load_steps=2 format=3 uid="uid://booq71g6iyumj"]
+
+[ext_resource type="Script" path="res://addons/mpf-gmc/slides/service/switch_test.gd" id="1"]
+
+[node name="switch_test" type="HBoxContainer"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+focus_mode = 2
+script = ExtResource("1")
+
+[node name="Control3" type="Control" parent="."]
+custom_minimum_size = Vector2(80, 2.08165e-12)
+layout_mode = 2
+
+[node name="active_test" type="VBoxContainer" parent="."]
+layout_mode = 2
+
+[node name="Label3" type="Label" parent="active_test"]
+layout_mode = 2
+text = "Most Recent Switch:"
+
+[node name="last_switch_label" type="Label" parent="active_test"]
+layout_mode = 2
+
+[node name="last_switch_address" type="Label" parent="active_test"]
+layout_mode = 2
+
+[node name="last_switch_state" type="Label" parent="active_test"]
+layout_mode = 2
+
+[node name="Control" type="Control" parent="active_test"]
+custom_minimum_size = Vector2(2.08165e-12, 40)
+layout_mode = 2
+
+[node name="Label" type="Label" parent="active_test"]
+layout_mode = 2
+text = "Active Switches:"
+
+[node name="active_switches" type="VBoxContainer" parent="active_test"]
+layout_mode = 2
+alignment = 2
+
+[node name="Control2" type="Control" parent="."]
+custom_minimum_size = Vector2(80, 2.08165e-12)
+layout_mode = 2
+
+[node name="recent_test" type="VBoxContainer" parent="."]
+layout_mode = 2
+
+[node name="Label3" type="Label" parent="recent_test"]
+layout_mode = 2
+text = "Recent Switches:"
+
+[node name="recent_switches" type="VBoxContainer" parent="recent_test"]
+layout_mode = 2
+alignment = 2

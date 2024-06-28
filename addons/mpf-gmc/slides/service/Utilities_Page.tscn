@@ -1,0 +1,48 @@
+[gd_scene load_steps=3 format=3 uid="uid://b6hafueawwvxw"]
+
+[ext_resource type="Script" path="res://addons/mpf-gmc/slides/service/Utilities_Page.gd" id="2"]
+[ext_resource type="PackedScene" uid="uid://b0exigwv3clut" path="res://addons/mpf-gmc/slides/service/List_Button.tscn" id="3"]
+
+[node name="Utilities" type="ScrollContainer"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+size_flags_horizontal = 3
+size_flags_vertical = 3
+follow_focus = true
+script = ExtResource("2")
+
+[node name="MarginContainer" type="MarginContainer" parent="."]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/margin_left = 20
+theme_override_constants/margin_top = 20
+theme_override_constants/margin_right = 20
+theme_override_constants/margin_bottom = 20
+
+[node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer"]
+layout_mode = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="switch_test" parent="MarginContainer/HBoxContainer/VBoxContainer" instance=ExtResource("3")]
+layout_mode = 2
+size_flags_vertical = 1
+text = "Switch Edge Test"
+
+[node name="coil_test" parent="MarginContainer/HBoxContainer/VBoxContainer" instance=ExtResource("3")]
+layout_mode = 2
+size_flags_vertical = 1
+text = "Coil Pulse Test"
+
+[node name="light_test" parent="MarginContainer/HBoxContainer/VBoxContainer" instance=ExtResource("3")]
+layout_mode = 2
+size_flags_vertical = 1
+text = "Single Light Test"
+
+[node name="TestViews" type="VBoxContainer" parent="MarginContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3

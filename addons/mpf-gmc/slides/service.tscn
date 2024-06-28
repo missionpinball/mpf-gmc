@@ -1,0 +1,77 @@
+[gd_scene load_steps=6 format=3 uid="uid://dhy8ilap4a45x"]
+
+[ext_resource type="Script" path="res://addons/mpf-gmc/slides/service.gd" id="1"]
+[ext_resource type="Theme" uid="uid://ergwdj4cg7t1" path="res://addons/mpf-gmc/slides/service/service_theme.tres" id="1_fyx83"]
+[ext_resource type="PackedScene" uid="uid://devjc6glsblde" path="res://addons/mpf-gmc/slides/service/Settings_Page.tscn" id="2"]
+[ext_resource type="PackedScene" uid="uid://b6hafueawwvxw" path="res://addons/mpf-gmc/slides/service/Utilities_Page.tscn" id="3"]
+[ext_resource type="PackedScene" uid="uid://3kclu455k7h4" path="res://addons/mpf-gmc/slides/service/Sound_Page.tscn" id="4"]
+
+[node name="Service" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = ExtResource("1_fyx83")
+script = ExtResource("1")
+highlight_color = Color(0, 0.882353, 0.054902, 1)
+
+[node name="ColorRect" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0.67451, 0.992157, 1)
+
+[node name="MarginContainer" type="MarginContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 0
+theme_override_constants/margin_top = 20
+
+[node name="TabContainer" type="TabContainer" parent="MarginContainer"]
+layout_mode = 2
+focus_mode = 2
+
+[node name="Standard" parent="MarginContainer/TabContainer" instance=ExtResource("2")]
+visible = false
+layout_mode = 2
+
+[node name="Features" parent="MarginContainer/TabContainer" instance=ExtResource("2")]
+visible = false
+layout_mode = 2
+settingType = "feature"
+
+[node name="Game" parent="MarginContainer/TabContainer" instance=ExtResource("2")]
+visible = false
+layout_mode = 2
+settingType = "game"
+
+[node name="Coin" parent="MarginContainer/TabContainer" instance=ExtResource("2")]
+visible = false
+layout_mode = 2
+settingType = "coin"
+
+[node name="Utilities" parent="MarginContainer/TabContainer" instance=ExtResource("3")]
+visible = false
+layout_mode = 2
+
+[node name="Sound" parent="MarginContainer/TabContainer" instance=ExtResource("4")]
+visible = false
+layout_mode = 2
+
+[node name="Exit" type="CenterContainer" parent="MarginContainer/TabContainer"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="MarginContainer/TabContainer/Exit"]
+layout_mode = 2
+text = "Press Start Button to Exit"
+horizontal_alignment = 1
+vertical_alignment = 1

@@ -150,8 +150,13 @@ func send_service(subcommand: String, values: PackedStringArray = []) -> void:
 	self._send("service?subcommand=%s&sort=bool:false%s" % [subcommand, suffix])
 
 ## Set a machine variable in MPF
-func set_machine_var(var_name: String, value) -> void:
-	self._send("set_machine_var?name=%s&value=%s" % [var_name, self.wrap_value_type(value)])
+func set_machine_var(var_name: String, value, persist=null) -> void:
+	# Only send the persist flag if explicitly passed, otherwise let the
+	# MPF config value take precedent
+	var persist_string = ""
+	if persist != null:
+		persist_string = "&persist=%s" % persist
+	self._send("set_machine_var?name=%s&value=%s%s" % [var_name, self.wrap_value_type(value), persist_string])
 
 ## Register an event handler for an MPFVariable
 func add_event_handler(event: String, handler: Callable) -> void:
@@ -351,7 +356,8 @@ func _thread_poll(_userdata=null) -> void:
 					"service":
 						call_deferred("emit_signal", "service", message)
 					"service_mode_entered":
-						call_deferred("deferred_scene", "res://modes/Service.tscn")
+						# The default service.yaml includes a slide_player for service slide
+						pass
 					"settings":
 						call_deferred("deferred_game", "update_settings", message)
 					"signal":

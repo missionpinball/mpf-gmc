@@ -1,0 +1,28 @@
+[gd_scene load_steps=3 format=3 uid="uid://ctkmknkqetc56"]
+
+[ext_resource type="Script" path="res://addons/mpf-gmc/slides/service/Settings_Slider.gd" id="1"]
+[ext_resource type="PackedScene" uid="uid://b0exigwv3clut" path="res://addons/mpf-gmc/slides/service/List_Button.tscn" id="2"]
+
+[node name="Settings_Slider" type="HBoxContainer"]
+custom_minimum_size = Vector2(500, 2.08165e-12)
+focus_mode = 2
+script = ExtResource("1")
+
+[node name="Setting" parent="." instance=ExtResource("2")]
+layout_mode = 2
+size_flags_stretch_ratio = 2.0
+text = "Slider Name"
+
+[node name="HSlider" type="HSlider" parent="."]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 1
+size_flags_stretch_ratio = 2.0
+step = 5.0
+
+[node name="Option" type="Button" parent="."]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+size_flags_stretch_ratio = 2.0
+text = "0"

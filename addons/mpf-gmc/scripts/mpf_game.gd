@@ -134,8 +134,6 @@ func update_player(kwargs: Dictionary) -> void:
 			emit_signal("player_update", kwargs.name, kwargs.value)
 
 func update_settings(result: Dictionary) -> void:
-	# TODO: Determine if settings changes are individual or the whole package
-	settings = {}
 	var _settingType
 	for option in result.get("settings", []):
 		var s := {}
@@ -157,19 +155,21 @@ func update_settings(result: Dictionary) -> void:
 		# By default, store the setting as the default value.
 		# This will be overridden later with a machine_var update
 		s.value = s.default
-		for key in option[5].keys():
-			# Store the value so we can modify the key
-			var value = option[5][key]
-			# The parser converts "None" to null, convert back
-			if value == null:
-				value = "None"
-			# Some keys are sent as true/false, which both int() eval to 0
-			if key == "true":
-				key = "1"
-			elif key == "false":
-				key = "0"
-			# The default interpretation uses strings as keys, convert to ints or floats
-			s.options[cvrt.call(key)] = value
+		# Not all settings options include values (e.g. hw_volume)
+		if option[5]:
+			for key in option[5].keys():
+				# Store the value so we can modify the key
+				var value = option[5][key]
+				# The parser converts "None" to null, convert back
+				if value == null:
+					value = "None"
+				# Some keys are sent as true/false, which both int() eval to 0
+				if key == "true":
+					key = "1"
+				elif key == "false":
+					key = "0"
+				# The default interpretation uses strings as keys, convert to ints or floats
+				s.options[cvrt.call(key)] = value
 		# The default brightness settings include percent signs, update them for string printing
 		if s.label == "brightness":
 			for key in s.options.keys():
