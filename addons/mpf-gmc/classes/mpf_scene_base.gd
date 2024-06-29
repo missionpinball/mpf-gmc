@@ -155,15 +155,17 @@ func _create_expire(child: MPFSceneBase, expiration_secs: float) -> void:
 	timer.one_shot = true
 	timer.autostart = true
 	self._expirations[child.key] = timer
-	timer.timeout.connect(self._remove_expiration.bind(child))
+	timer.timeout.connect(self._remove_expiration.bind(child, timer))
 	self.add_child(timer)
 
-func _remove_expiration(child) -> void:
-	var timer = self._expirations.get(child.key)
-	self._expirations.erase(child.key)
+func _remove_expiration(child, timer=null) -> void:
+	# This expiration may come after the child was removed for other reasons
+	if is_instance_valid(child):
+		# Check to see if there's a leftover timer from a previous instance
+		if not timer:
+			timer = self._expirations.get(child.key)
+		self._expirations.erase(child.key)
+		self.action_remove(child)
 	if timer and is_instance_valid(timer):
 		self.remove_child(timer)
 		timer.queue_free()
-	# This expiration may come after the child was removed for other reasons
-	if is_instance_valid(child):
-		self.action_remove(child)
