@@ -76,7 +76,9 @@ func process_action(child_name: String, children: Array, action: String, setting
 			child = null
 		"remove":
 			if child:
-				self.action_remove(child)
+				# Use the _remove_expiration method to handle any expire timers
+				# before calling action_remove (done within that method)
+				self._remove_expiration(child)
 		"update":
 			if child:
 				child.action_update(settings, kwargs)
@@ -142,8 +144,9 @@ func _trigger_animation(animation_name: String) -> bool:
 	return false
 
 func _create_expire(child: MPFSceneBase, expiration_secs: float) -> void:
-	# If there is already a timer for this child to expire, reset it
-	if self._expirations.has(child.key):
+	# Check for an existing expiration timer on this child
+	if self._expirations.has(child.key) and is_instance_valid(self._expirations[child.key]):
+		# If there is already a valid timer for this child to expire, reset it
 		self._expirations[child.key].start(expiration_secs)
 		return
 
@@ -151,15 +154,16 @@ func _create_expire(child: MPFSceneBase, expiration_secs: float) -> void:
 	timer.wait_time = expiration_secs
 	timer.one_shot = true
 	timer.autostart = true
-	timer.timeout.connect(self._on_expire.bind(child, timer))
-	self.add_child(timer)
 	self._expirations[child.key] = timer
+	timer.timeout.connect(self._remove_expiration.bind(child))
+	self.add_child(timer)
 
-func _on_expire(child, timer: Timer) -> void:
-	# This expiration may come after the child was removed for other reasons
-	if is_instance_valid(child):
-		self._expirations.erase(child.key)
-		self.action_remove(child)
-	if is_instance_valid(timer):
+func _remove_expiration(child) -> void:
+	var timer = self._expirations.get(child.key)
+	self._expirations.erase(child.key)
+	if timer and is_instance_valid(timer):
 		self.remove_child(timer)
 		timer.queue_free()
+	# This expiration may come after the child was removed for other reasons
+	if is_instance_valid(child):
+		self.action_remove(child)
