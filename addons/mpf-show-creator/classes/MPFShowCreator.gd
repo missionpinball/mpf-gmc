@@ -36,7 +36,7 @@ var preview: Dictionary
 var render_animation: bool = true
 
 func _enter_tree():
-	if Engine.is_editor_hint() or (self.get_parent() is MPFShowPreview):
+	if Engine.is_editor_hint() or (self.get_parent() is MPFShowPreview) or (self.get_parent() is MPFMonitor):
 		render_animation = false
 	if not render_animation:
 		return
