@@ -23,6 +23,7 @@ func _ready() -> void:
 	self._set_enable_available()
 
 	$main/buttons/save.disabled = true
+	$main/buttons/save_alert.visible = false
 	$main/buttons/save.pressed.connect(self._save)
 
 func _enable_toggled(toggled_on: bool) -> void:
@@ -33,6 +34,7 @@ func _enable_toggled(toggled_on: bool) -> void:
 	self.config.save(CONFIG_PATH)
 
 func _set_dirty(_param = null) -> void:
+	$main/buttons/save_alert.visible = true
 	$main/buttons/save.disabled = false
 
 func _set_enable_available():
@@ -52,4 +54,5 @@ func _set_enable_available():
 func _save() -> void:
 	super()
 	$main/buttons/save.disabled = true
+	$main/buttons/save_alert.visible = false
 	self._set_enable_available()
