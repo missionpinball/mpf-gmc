@@ -56,10 +56,10 @@ func log(message: String, args=null) -> void:
 
 func warning(message: String, args=null) -> void:
 	if _level <= LogLevel.WARNING:
-		push_warning(GMCLogger._log(self.log_name, "WARNING", message, args))
+		print(GMCLogger._log(self.log_name, "WARNING", message, args))
 
 func error(message: String, args=null) -> void:
-	push_error(GMCLogger._log(self.log_name, "ERROR", message, args))
+	printerr(GMCLogger._log(self.log_name, "ERROR", message, args))
 
 func fail(message: String, args=null) -> void:
 	self.error(message, args)

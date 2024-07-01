@@ -1,7 +1,11 @@
 extends LoggingNode
 class_name GMCProcess
 
+signal mpf_spawned(result)
 signal mpf_log_created(log_file_path)
+
+const MAX_MPF_ATTEMPTS = 3
+const ATTEMPT_WAIT_TIME_SECS = 3
 
 var mpf_pid: int
 var mpf_attempts := 0
@@ -18,6 +22,7 @@ func _spawn_mpf():
 	self.log.info("Spawning MPF process...")
 	MPF.server.set_status(MPF.server.ServerStatus.LAUNCHING)
 	var launch_timer = Timer.new()
+	launch_timer.one_shot = true
 	launch_timer.connect("timeout", self._check_mpf)
 	self.add_child(launch_timer)
 	var exec: String = MPF.get_config_value("mpf", "executable_path", "")
@@ -63,24 +68,52 @@ func _spawn_mpf():
 
 	self.log.info("Executing %s with args [%s]", [exec, ", ".join(mpf_args)])
 	mpf_pid = OS.create_process(exec, mpf_args, false)
+	if mpf_pid == -1:
+		MPF.server.set_status(MPF.server.ServerStatus.ERROR)
+		self._debug_mpf(exec, mpf_args)
+		return
 
 	EngineDebugger.send_message("mpf_log_created:process", [log_file_path])
-	launch_timer.start(5)
+	launch_timer.start(ATTEMPT_WAIT_TIME_SECS)
+
+	# Only subscribe on the first loop through
+	if mpf_attempts > 0:
+		return
+
+	var result = await self.mpf_spawned
+	self.log.debug("MPF spawn returned result %s" % result)
+	if result == -1:
+		MPF.server.set_status(MPF.server.ServerStatus.ERROR)
+		self._debug_mpf(exec, mpf_args)
 
 func _check_mpf():
 	# Detect if the pid is still alive
 	self.log.debug("Checking MPF PID %s...", mpf_pid)
 	var output = []
 	OS.execute("ps", [mpf_pid, "-o", "state="], output, true, true)
-	self.log.debug(" ".join(output))
-	if output and output[0].strip_edges() == "Z":
+	if not output:
+		return
+	var result = output[0].strip_edges()
+	if result  == "Z":
 		mpf_attempts += 1
-		if mpf_attempts <= 5:
-			self.log.info("MPF Failed to Start, Retrying (%s/5)", mpf_attempts)
+		if mpf_attempts <= MAX_MPF_ATTEMPTS:
+			self.log.info("MPF Failed to Start, Retrying (%d/%d)", [mpf_attempts, MAX_MPF_ATTEMPTS])
 			self._spawn_mpf()
 		else:
 			MPF.server.set_status(MPF.server.ServerStatus.ERROR)
-			self.log.error("ERROR: Unable to start MPF.")
+			self.mpf_spawned.emit(-1)
+	elif result == "Ss":
+		self.mpf_spawned.emit(1)
+	else:
+		self.log.warning("Unknown process status '%s'", result)
+		self.mpf_spawned.emit(0)
+
+## Run the mpf spawn synchronously and capture the output to
+## assist in debugging why it failed to start.
+func _debug_mpf(exec: String, args: Array):
+	var output = []
+	OS.execute(exec, args, output, true)
+	self.log.error("Unable to start MPF:\n%s" % "\n".join(output))
 
 func _exit_tree():
 	if mpf_pid:
