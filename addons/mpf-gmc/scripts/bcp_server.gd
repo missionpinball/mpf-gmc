@@ -126,13 +126,13 @@ func listen() -> void:
 	set_process(true)
 
 ## Post an event to MPF
-func send_event(event_name: String, bounceback: bool = false) -> void:
+func send_event(event_name: String, bounceback: bool = true) -> void:
 	_send("trigger?name=%s" % event_name)
 	if bounceback:
 		self._bounceback(event_name)
 
 
-func send_event_with_args(event_name: String, args: Dictionary, bounceback: bool = false) -> void:
+func send_event_with_args(event_name: String, args: Dictionary, bounceback: bool = true) -> void:
 	if not args or args.is_empty():
 		return self.send_event(event_name)
 	var event_string = _bcp_parse.encode_event_args(event_name, args)
@@ -364,7 +364,7 @@ func _thread_poll(_userdata=null) -> void:
 						call_deferred("emit_signal", message.name, message)
 					"slides_play":
 						call_deferred("deferred_mc", "play", message)
-					"slides_clear":
+					"slides_clear", "widgets_clear":
 						# TBD: Need to distinguish slides/widgets/sounds?
 						# Don't think so, all config_players have the same callback
 						# so all three will post at the same time.
