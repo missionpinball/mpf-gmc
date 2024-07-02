@@ -1,4 +1,4 @@
-extends Node2D
+extends AspectRatioContainer
 class_name MPFMonitor
 
 const CONFIG_PATH = "res://mpf_show_creator.cfg"

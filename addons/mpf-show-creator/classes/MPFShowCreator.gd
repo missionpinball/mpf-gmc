@@ -1,5 +1,5 @@
 @tool
-extends Sprite2D
+extends TextureRect
 class_name MPFShowCreator
 
 ## The root node for creating light shows for MPF.
@@ -37,6 +37,7 @@ var preview: Dictionary
 var render_animation: bool = true
 
 func _enter_tree():
+	self.stretch_mode = StretchMode.STRETCH_KEEP_ASPECT_CENTERED
 	if Engine.is_editor_hint() or (self.get_parent() is MPFShowPreview) or (self.get_parent() is MPFMonitor):
 		render_animation = false
 	if not render_animation:
@@ -68,8 +69,8 @@ func _ready():
 	assert(animation_player, "No AnimationPlayer node attached to the MPFShowGenerator root.")
 	assert(animation_player.has_animation(animation_name), "AnimationPlayer has no animation named '%s'" % animation_name)
 
-	ProjectSettings.set_setting("display/window/size/window_width_override", self.texture.get_width())
-	ProjectSettings.set_setting("display/window/size/window_height_override", self.texture.get_height())
+	# ProjectSettings.set_setting("display/window/size/window_width_override", self.texture.get_width())
+	# ProjectSettings.set_setting("display/window/size/window_height_override", self.texture.get_height())
 
 
 	if not self.lights:

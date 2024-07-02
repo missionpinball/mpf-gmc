@@ -2,5 +2,5 @@
 
 [ext_resource type="Script" path="res://addons/mpf-show-creator/scenes/mpf_monitor.gd" id="1_wa1l3"]
 
-[node name="MpfMonitor" type="Node2D"]
+[node name="MpfMonitor" type="AspectRatioContainer"]
 script = ExtResource("1_wa1l3")
