@@ -174,6 +174,9 @@ func _get_animation_names():
 	if not edit_show_scene.text:
 		debug_log("No show scene selected, cannot find animations.")
 		return
+	if not scene.animation_player:
+		debug_log("No animation player attached to scene, animations unavailable.")
+		return
 	var scene = load(edit_show_scene.text).instantiate()
 	var animp = scene.animation_player
 	var animations = animp.get_animation_list()
