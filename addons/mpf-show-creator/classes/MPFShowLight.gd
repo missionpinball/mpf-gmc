@@ -31,16 +31,21 @@ var current_color
 
 func _ready():
 	self.scale_to_inches()
-	var parent = self.get_parent()
-	while parent:
-		if parent is MPFShowCreator:
-			parent.register_light(self)
-		parent = parent.get_parent()
 	if Engine.is_editor_hint():
 		self.set_notify_transform(true)
 	# If not in editor, make it invisible
 	else:
 		self.visible = false
+	var parent = self.get_parent()
+	while parent:
+		# For the parent MPFShowCreator, register the light
+		if parent is MPFShowCreator:
+			parent.register_light(self)
+		# For a parent MPFShowPreview or MPFMonitor, it's visible
+		elif parent is MPFShowPreview or parent is MPFMonitor:
+			self.visible = true
+		parent = parent.get_parent()
+
 
 func restore(props):
 	var global_space = Vector2(
