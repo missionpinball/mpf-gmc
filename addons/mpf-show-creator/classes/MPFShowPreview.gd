@@ -1,7 +1,7 @@
 extends Node2D
 class_name MPFShowPreview
 
-const CONFIG_PATH = "user://mpf_show_creator.cfg"
+const CONFIG_PATH = "res://mpf_show_creator.cfg"
 const LOOP_SHOW_DELAY_SECS = 1.0
 
 var config: ConfigFile

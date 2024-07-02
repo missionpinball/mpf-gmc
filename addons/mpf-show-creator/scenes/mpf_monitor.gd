@@ -1,7 +1,7 @@
 extends Node2D
 class_name MPFMonitor
 
-const CONFIG_PATH = "user://mpf_show_creator.cfg"
+const CONFIG_PATH = "res://mpf_show_creator.cfg"
 
 var server
 var scene
