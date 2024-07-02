@@ -25,8 +25,6 @@ var status: ServerStatus = ServerStatus.IDLE
 
 # A connected MPF Client
 var _client: StreamPeerTCP
-# Our WebSocketServer instance
-var _server: TCPServer = TCPServer.new()
 # A timer to mitigate updates
 var time: float = 0.0
 
@@ -35,13 +33,11 @@ var time: float = 0.0
 ###
 
 func _ready() -> void:
-	print("READY")
-
-func _enter_tree():
-	print("ENTER TREE")
+	_client = StreamPeerTCP.new()
+	print("Opening client connection on port %s" % port)
 
 func _exit_tree():
-	self.stop(true)
+	self.disconnect_client()
 
 func _process(delta: float) -> void:
 
@@ -55,22 +51,14 @@ func _process(delta: float) -> void:
 		return
 
 	var err = _client.poll()
-	if err != OK:
-		push_error("BCP client error: %s" % error_string(err))
-		_client.disconnect_from_host()
-		_client = null
-		self.stop()
+	if err != OK or _client.get_status() != StreamPeerTCP.STATUS_CONNECTED:
+		if _client.get_status() != StreamPeerTCP.STATUS_CONNECTING:
+			self.disconnect_client()
 		return
-
-	if _client.get_status() != StreamPeerTCP.STATUS_CONNECTED:
-		print("Status is %s" % _client.get_status())
-		return
-
 
 	var bytes = _client.get_available_bytes()
 	if not bytes:
 		return
-
 
 	var messages := _client.get_string(bytes).split("\n")
 	for message_raw in messages:
@@ -90,7 +78,6 @@ func _process(delta: float) -> void:
 				self.update_device.emit(message)
 			"goodbye":
 				_send("goodbye")
-				self.stop()
 			"hello":
 				_send("hello")
 			"list_coils":
@@ -132,19 +119,19 @@ func listen() -> void:
 		self.status = ServerStatus.WAITING
 		status_changed.emit(self.status)
 
-	if not _client or _client.get_status() == StreamPeerTCP.STATUS_NONE:
-		_client = StreamPeerTCP.new()
-		print("Opening client connection on port %s" % port)
+	var st = _client.get_status()
+	if st == StreamPeerTCP.STATUS_NONE:
 		var e = _client.connect_to_host("localhost", port)
 		if e != OK:
-			printerr("Unable to connect: %s" % error_string(e))
+			_client.disconnect_from_host()
+			return
 
 	var err = _client.poll()
 	if err != OK:
-		printerr("Error connecting: %s" % error_string(err))
+		_client.disconnect_from_host()
 		return
 
-	var st = _client.get_status()
+	st = _client.get_status()
 	if st == StreamPeerTCP.STATUS_CONNECTED:
 		self.status = ServerStatus.CONNECTED
 		print("Connected!")
@@ -161,23 +148,9 @@ func send_switch(switch_name: String, state: int = -1) -> void:
 	var message = "switch?name=%s&state=%s" % [switch_name, state]
 	_send(message)
 
-## Disconnect the BCP server
-func stop(is_exiting: bool = false) -> void:
-	print("Shutting down BCP Server and %s", "will not restart" if is_exiting else "awaiting new connection")
-	# Lock the mutex to prevent the BCP thread from polling
-	_server.stop()
-	if _client:
-		# Say goodbye to MPF!
-		_send("goodbye")
-		_client.disconnect_from_host()
-		_client = null
-
-	if not is_exiting:
-		# Set an exit code so we know MPF is the cause of the exit
-		get_tree().quit(6)
-		# TODO: Add a configuration option to exit-on-disconnect and if false,
-		# call self.deferred_scene("res://Main.tscn") instead of quit()
-
+func disconnect_client():
+	_client.disconnect_from_host()
+	self.status = ServerStatus.IDLE
 
 ###
 # Private Methods
