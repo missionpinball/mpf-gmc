@@ -10,7 +10,7 @@ enum ServerStatus { IDLE, WAITING, LAUNCHING, CONNECTED, ERROR }
 signal switch(payload)
 signal light(payload)
 signal status_changed(status)
-signal player_added()
+signal player_added(num)
 signal update_device(payload)
 signal update_player_var(name, value, num)
 signal update_machine_var(name, value)
@@ -82,6 +82,9 @@ func _process(delta: float) -> void:
 		if message.has("error"):
 			printerr(message.error)
 
+		if message.cmd == "monitored_event":
+			message.cmd = message.event_name
+
 		match message.cmd:
 			"device":
 				self.update_device.emit(message)
@@ -101,7 +104,7 @@ func _process(delta: float) -> void:
 			"mode_list":
 				self.update_modes.emit(message)
 			"player_added":
-				self.player_added.emit()
+				self.player_added.emit(message.event_kwargs.num)
 			"player_variable":
 				self.update_player_var.emit(message.name, message.value, int(message.player_num))
 			"reset":

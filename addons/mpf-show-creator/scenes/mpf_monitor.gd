@@ -10,6 +10,7 @@ var config: ConfigFile
 var players = []
 var machine_vars = {}
 var lights = {}
+var switches = {}
 var modes = []
 
 func _enter_tree() -> void:
@@ -39,6 +40,8 @@ func _ready():
 	for l in scene.lights:
 		self.lights[l.name] = l
 		l.set_color(Color(0.0,0.0,0.0))
+	for s in scene.switches:
+		self.switches[s.name] = s
 
 
 func _on_light(payload):
@@ -50,13 +53,20 @@ func _on_light(payload):
 
 func _on_switch(payload):
 	print("SWITCH: %s" % payload)
+	if not payload.name in self.switches:
+		printerr("Unknown switch named '%s'" % payload.name)
+		return
+	self.switches[payload.name].set_switch_state(payload.state.state)
 
-func _add_player():
-	self.players.append({})
+func _add_player(num):
+	while self.players.size() < num:
+		self.players.append({})
 
 func _update_device(payload):
 	if payload.type == "light":
 		self._on_light(payload)
+	elif payload.type == "switch":
+		self._on_switch(payload)
 
 func _update_machine_var(var_name, value):
 	self.machine_vars[var_name] = value
@@ -64,7 +74,7 @@ func _update_machine_var(var_name, value):
 func _update_player_var(var_name, value, num):
 	if num > self.players.size():
 		self.players.append({})
-	self.players[num][var_name] = value
+	self.players[num - 1][var_name] = value
 
 func _update_modes(payload):
 	print("MODES: %s" % payload)

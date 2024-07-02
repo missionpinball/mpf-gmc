@@ -20,8 +20,6 @@ func _ready():
             server = parent.server
         parent = parent.get_parent()
 
-    self.pressed.connect(self.on_pressed)
-    self.toggled.connect(self.on_toggled)
     self.gui_input.connect(self.on_input)
 
 func on_input(event):
@@ -30,17 +28,14 @@ func on_input(event):
     print("INPUT: %s" % event)
     # Ctrl+click to lock switch on
     var is_pressed = true if event.ctrl_pressed else event.pressed
-
     server.send_switch(self.name, 1 if is_pressed else 0)
+    self.set_switch_state(is_pressed)
 
+func set_switch_state(is_pressed: bool) -> void:
     if is_pressed:
         self.modulate = Color(0.0, 1.0, 0.0)
     else:
         self.modulate = Color(1.0, 1.0, 1.0)
+    self.button_pressed = is_pressed
 
 
-func on_pressed():
-    print("Pressed")
-
-func on_toggled(is_toggled):
-    print("Toggle state: %s" % is_toggled)
