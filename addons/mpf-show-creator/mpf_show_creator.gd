@@ -10,10 +10,12 @@ func _enter_tree():
 		return
 	add_custom_type("MPFShowCreator", "Sprite2D", preload("classes/MPFShowCreator.gd"), preload("icons/Camera2D.svg"))
 	add_custom_type("MPFShowLight", "Node2D", preload("classes/MPFShowLight.gd"), preload("icons/DirectionalLight2D.svg"))
+	add_custom_type("MPFShowSwitch", "TextureButton", preload("classes/MPFShowSwitch.gd"), preload("icons/Button.svg"))
 	show_creator_dock = preload("res://addons/mpf-show-creator/mpf_show_creator_dock.tscn").instantiate()
 	add_control_to_bottom_panel(show_creator_dock, "MPF Show Creator")
 
 func _exit_tree():
 	remove_custom_type("MPFShowCreator")
 	remove_custom_type("MPFShowLight")
+	remove_custom_type("MPFShowSwitch")
 	remove_control_from_bottom_panel(show_creator_dock)

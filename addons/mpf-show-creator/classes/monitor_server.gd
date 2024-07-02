@@ -103,7 +103,7 @@ func _process(delta: float) -> void:
 			"player_added":
 				self.player_added.emit()
 			"player_variable":
-				self.update_player_var.emit(message.name, message.value, message.player_num)
+				self.update_player_var.emit(message.name, message.value, int(message.player_num))
 			"reset":
 				print("Resetting connection with BCP client")
 				_send("reset_complete")
