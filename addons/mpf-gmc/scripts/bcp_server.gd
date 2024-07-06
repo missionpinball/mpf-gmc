@@ -304,6 +304,8 @@ func _thread_poll(_userdata=null) -> void:
 						call_deferred("on_ball_end")
 					"ball_start":
 						call_deferred("on_ball_start", message.ball, message.player_num)
+					"buses_play":
+						call_deferred("deferred_mc", "play", message)
 					"goodbye":
 						_send("goodbye")
 						call_deferred("stop")
