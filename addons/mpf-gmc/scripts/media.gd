@@ -38,6 +38,9 @@ func register_window(inst: Node) -> void:
 func play(payload: Dictionary) -> void:
 	var command = payload.name
 	match command:
+		"buses_play":
+			print("BUS PLAYER PAYLOAD: %s" % payload)
+			self.sound.play_bus(payload)
 		"slides_play":
 			self.window.play_slides(payload)
 		"widgets_play":

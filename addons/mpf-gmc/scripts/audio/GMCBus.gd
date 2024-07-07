@@ -197,6 +197,12 @@ func is_resource_playing(filepath: String) -> bool:
 			return true
 	return false
 
+func pause(settings: Dictionary) -> void:
+	# Track player uses a universal "fade" rather than fade_in or fade_out
+	var fade_out = settings.get("fade")
+	for channel in self.channels:
+		channel.pause_with_settings({"fade_out": fade_out})
+
 func stop(key: String, settings: Dictionary) -> void:
 	var is_bus_playing := false
 	# Find the channel playing this file
@@ -216,7 +222,7 @@ func stop_all(fade_out: float = 1.0) -> void:
 	self.clear_queue()
 	for channel in self.channels:
 		if channel.playing and not channel.get_meta("is_stopping", false):
-			channel.stop_with_settings({ "fade_out": fade_out }, "stop_all")
+			channel.stop_with_settings({"action": "stop_all", "fade_out": fade_out })
 
 func _abort_ducking_check():
 	# However, if nothing is playing and there's a duck, kill it

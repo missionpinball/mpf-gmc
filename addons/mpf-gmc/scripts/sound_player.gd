@@ -112,6 +112,20 @@ func play_sounds(s: Dictionary) -> void:
 					channel.stop_with_settings()
 		bus.play(file, settings)
 
+func play_bus(s: Dictionary) -> void:
+	for bus_name in s.settings.keys():
+		assert(bus_name in self.buses, "Bus name %s is not a valid audio bus." % bus_name)
+		var bus = self.buses[bus_name]
+		var settings = s.settings[bus_name]
+
+		match settings["action"]:
+			"pause":
+				bus.pause({"fade_out": settings.get("fade")})
+			# "unpause":
+			# 	bus.unpause_with_settings({"fade_in": settings.get("fade")})
+			"stop":
+				bus.stop_all({"fade_out": settings.get("fade")})
+
 # Not currently implemented anywhere
 func stop_all(fade_out: float = 1.0) -> void:
 	self.log.debug("STOP ALL called with fadeout of %s" , fade_out)

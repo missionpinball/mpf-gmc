@@ -38,6 +38,8 @@ func play_with_settings(settings: Dictionary) -> AudioStream:
 	self.log.debug("playing %s (%s) on %s with settings %s", [self.stream.resource_path, self.stream, self, settings])
 	self.stream.set_meta("context", settings.context)
 	self.stream.set_meta("key", settings.key)
+	self.stream_paused = false
+
 	var start_at: float = settings["start_at"] if settings.get("start_at") else 0.0
 	var fade_in: float = settings["fade_in"] if settings.get("fade_in") else 0.0
 	if settings.get("fade_out"):
@@ -105,12 +107,30 @@ func clear():
 	self.volume_db = 0.0
 	self.remove_meta("tween")
 	self.remove_meta("is_stopping")
+	self.stream_paused = false
 	self.markers = []
 	self.stream = null
 	set_process(false)
 
-func stop_with_settings(settings: Dictionary = {}, action: String = "stop") -> void:
-	if settings.get("action") == "loop_stop":
+func pause_with_settings(settings: Dictionary = {}) -> void:
+	if not self.stream or not self.playing or stream.get_meta("is_stopping", false):
+		return
+	var fade_out = settings.get("fade_out")
+	if not fade_out:
+		self.stream_paused = true
+		self.log.info("%s is paused: stream_paused is %s, self.playing is %s", [self, self.stream_paused, self.playing])
+		return
+
+	var tween = self.create_tween()
+	tween.tween_property(self, "volume_db", -80.0, fade_out) \
+		.set_trans(Tween.TRANS_QUINT).set_ease(Tween.EASE_IN)
+	tween.finished.connect(self._on_fade_complete.bind(tween, "pause"))
+	self.tweens.append(tween)
+	self.set_meta("tween", tween)
+
+func stop_with_settings(settings: Dictionary = {}) -> void:
+	var action = settings.get("action", "stop")
+	if action == "loop_stop":
 		# The position is reset when the loop mode changes, so store it first
 		var pos: float = self.get_playback_position()
 		self.stream.loop_mode = 0
@@ -142,6 +162,8 @@ func _on_fade_complete(tween, action) -> void:
 		self.clear()
 	elif action == "play":
 		self.log.debug("Fade in to %0.2f complete on channel %s", [self.volume_db, self])
+	elif action == "pause":
+		self.stream_paused = true
 
 func _on_loop() -> void:
 	var loops_remaining = self.stream.get_meta("loops_remaining") - 1
