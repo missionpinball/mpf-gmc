@@ -121,10 +121,10 @@ func play_bus(s: Dictionary) -> void:
 		match settings["action"]:
 			"pause":
 				bus.pause({"fade_out": settings.get("fade")})
-			# "unpause":
-			# 	bus.unpause_with_settings({"fade_in": settings.get("fade")})
+			"unpause":
+				bus.unpause({"fade_in": settings.get("fade")})
 			"stop":
-				bus.stop_all({"fade_out": settings.get("fade")})
+				bus.stop_all(settings.get("fade", 0.0))
 
 # Not currently implemented anywhere
 func stop_all(fade_out: float = 1.0) -> void:

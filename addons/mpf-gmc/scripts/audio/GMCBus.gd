@@ -198,10 +198,12 @@ func is_resource_playing(filepath: String) -> bool:
 	return false
 
 func pause(settings: Dictionary) -> void:
-	# Track player uses a universal "fade" rather than fade_in or fade_out
-	var fade_out = settings.get("fade")
 	for channel in self.channels:
-		channel.pause_with_settings({"fade_out": fade_out})
+		channel.pause_with_settings(settings)
+
+func unpause(settings: Dictionary) -> void:
+	for channel in self.channels:
+		channel.unpause_with_settings(settings)
 
 func stop(key: String, settings: Dictionary) -> void:
 	var is_bus_playing := false
