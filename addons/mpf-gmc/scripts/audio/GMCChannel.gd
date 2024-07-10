@@ -107,6 +107,8 @@ func clear():
 	self.volume_db = 0.0
 	self.remove_meta("tween")
 	self.remove_meta("is_stopping")
+	for c in self.finished.get_connections():
+		self.finished.disconnect(c.callable)
 	self.stream_paused = false
 	self.markers = []
 	self.stream = null
