@@ -82,7 +82,7 @@ func _get_scene(scene_name: String, collection: Dictionary, preload_only: bool =
 func traverse_tree_for(obj_type: String, acc: Dictionary, ext="tscn") -> void:
 	# Look for a specified content root
 	var content_root: String = "res://%s" % obj_type
-	if MPF.has_config_section("settings"):
+	if MPF.has_config_section("gmc"):
 		var root = MPF.get_config_value("gmc", "content_root", "")
 		if root:
 			content_root = "res://%s/%s" % [root, obj_type]
