@@ -41,14 +41,14 @@ func process_slide(slide_name: String, action: String, settings: Dictionary, c: 
 	self.process_action(slide_name, self._slide_stack, action, settings, c, p, kwargs)
 
 func process_widget(widget_name: String, action: String, settings: Dictionary, c: String, p: int = 0, kwargs: Dictionary = {}) -> void:
-	var slide = self.get_slide(settings.get('slide'))
+	var slide: MPFSlide = self.get_slide(settings.get('slide'))
 	# The requested slide may not exist
 	if not slide:
 		return
 	slide.process_widget(widget_name, action, settings, c, p, kwargs)
 
 func action_play(slide_name: String, settings: Dictionary, c: String, p: int = 0, kwargs: Dictionary = {}) -> MPFSlide:
-	var slide = MPF.media.get_slide_instance(slide_name)
+	var slide: MPFSlide = MPF.media.get_slide_instance(slide_name)
 	assert(slide is MPFSlide, "Slide scenes must use (or extend) the MPFSlide script on the root node.")
 	slide.initialize(slide_name, settings, c, p, kwargs)
 	if settings.get("queue"):
@@ -85,14 +85,14 @@ func action_queue(action: String, slide_name: String, settings: Dictionary, c: S
 	if self._queue.size() == 1 or action == "queue_immediate":
 		return self._process_queue()
 
-func update_stack(kwargs):
+func update_stack(kwargs: Dictionary) -> void:
 	self._update_stack(kwargs)
 
-func action_remove(slide) -> void:
+func action_remove(slide: Node) -> void:
 	self._slide_stack.erase(slide)
 	self._update_stack()
 
-func get_slide(slide_name):
+func get_slide(slide_name: String):
 	if not slide_name:
 		return self._current_slide
 	elif slide_name == "_overlay":
@@ -135,12 +135,12 @@ func _update_stack(kwargs: Dictionary = {}) -> void:
 			self._current_slide = null
 		return
 
-	var new_slide = self._slide_stack[-1]
-	var old_slide = self._current_slide
+	var new_slide: MPFSlide = self._slide_stack[-1]
+	var old_slide: MPFSlide = self._current_slide
 	if new_slide != old_slide:
 		new_slide.on_active()
 		if old_slide:
-			var is_removed = self._slide_stack.find(old_slide) == -1
+			var is_removed: bool = self._slide_stack.find(old_slide) == -1
 			MPF.server.send_event_with_args("slide_%s_inactive" % old_slide.key,
 				{"is_removing": is_removed})
 		MPF.server.send_event_with_args("slide_%s_active" % new_slide.key, kwargs)
@@ -148,7 +148,7 @@ func _update_stack(kwargs: Dictionary = {}) -> void:
 		# If the old slide is removed, check for animations
 		if old_slide and old_slide not in self._slide_stack:
 			# Store the old slide key in case its removed
-			var old_slide_key = old_slide.key
+			var old_slide_key: String = old_slide.key
 			# If the old slide is persisted, always put it at the bottom
 			if old_slide.has_meta("persisted"):
 				self._slides.move_child(old_slide, 0)
@@ -171,14 +171,14 @@ func _process_queue():
 		return
 	var now = Time.get_ticks_msec()
 	while self._queue.size():
-		var s = self._queue[0]
+		var s: Dictionary = self._queue[0]
 		if s["expiration"] and s["expiration"] < now:
 			self._queue.pop_front()
 		else:
 			self.process_slide(s["slide_name"], "play", s["settings"], s["context"], s["priority"], s["kwargs"])
 			return s
 
-func _on_clear(context_name) -> void:
+func _on_clear(context_name: String) -> void:
 	# Track the top-most (i.e. currently active) queue item
 	var top_queued = self._queue[0] if self._queue.size() else null
 	self._queue = self._queue.filter(
@@ -199,8 +199,8 @@ func _on_clear(context_name) -> void:
 	for s in self._slide_stack:
 		s.clear(context_name)
 
-func _build_slide_container(cname: String):
-	var container = Control.new()
+func _build_slide_container(cname: String) -> Control:
+	var container := Control.new()
 	container.name = cname
 	container.set_anchors_preset(PRESET_FULL_RECT)
 	container.size_flags_horizontal = SIZE_EXPAND
@@ -210,7 +210,7 @@ func _build_slide_container(cname: String):
 func _get_overlay_slide() -> MPFSlide:
 	if self._overlay_slide:
 		return self._overlay_slide
-	var overlay_container = self._build_slide_container("%s_overlay" % self.name)
+	var overlay_container: Container = self._build_slide_container("%s_overlay" % self.name)
 	self._overlay_slide = MPFSlide.new()
 	self._overlay_slide.name = "%s_overlay_slide" % self.name
 	overlay_container.add_child(self._overlay_slide)
@@ -218,20 +218,20 @@ func _get_overlay_slide() -> MPFSlide:
 	return self._overlay_slide
 
 func _register_display_in_window() -> void:
-	var window = MPF.util.find_parent_window(self)
+	var window: MPFWindow = MPF.util.find_parent_window(self)
 	if window:
 		window.register_display(self)
 
 
-func _render_preview():
-	var preview_colors = ["ff002e", "004eff", "ff7d00", "00ff9a", "9900ff", "ffc500"]
-	var display_index = self.get_parent().get_children().find(self)
-	var color_box = ColorRect.new()
+func _render_preview() -> void:
+	var preview_colors := ["ff002e", "004eff", "ff7d00", "00ff9a", "9900ff", "ffc500"]
+	var display_index := self.get_parent().get_children().find(self)
+	var color_box := ColorRect.new()
 	color_box.color = preview_colors[display_index]
 	color_box.set_anchors_preset(PRESET_FULL_RECT)
 	color_box.size_flags_horizontal = SIZE_EXPAND
 	color_box.size_flags_vertical = SIZE_EXPAND
-	var label = Label.new()
+	var label := Label.new()
 	label.text = self.name
 	label.set("theme_override_font_sizes/font_size", 80)
 	label.horizontal_alignment = HorizontalAlignment.HORIZONTAL_ALIGNMENT_CENTER
@@ -242,7 +242,7 @@ func _render_preview():
 	color_box.add_child(label)
 	self.add_child(color_box)
 
-func _on_renamed():
+func _on_renamed() -> void:
 	# Hard-code the path to the label
 	self.get_child(0).get_child(0).text = self.name
 

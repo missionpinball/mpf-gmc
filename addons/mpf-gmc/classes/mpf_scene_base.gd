@@ -12,7 +12,7 @@ var key: String
 @warning_ignore("shadowed_global_identifier")
 var log: GMCLogger
 var _expirations: Dictionary = {}
-var _updaters: Array = []
+var _updaters: Array[Node] = []
 
 var current_animation: String:
 	get: return self.animation_player.current_animation if self.animation_player else ""
@@ -49,9 +49,9 @@ func initialize(n: String, settings: Dictionary, c: String, p: int = 0, kwargs: 
 	# Play a created animation, if applicable
 	self._trigger_animation(CoreAnimation.CREATED)
 
-func _enter_tree():
+func _enter_tree() -> void:
 	# Create a log
-	var scene_type = "Slide" if self is MPFSlide else "Display" if self is MPFDisplay else "Widget" if self is MPFWidget else "MPFSceneBase"
+	var scene_type: String = "Slide" if self is MPFSlide else "Display" if self is MPFDisplay else "Widget" if self is MPFWidget else "MPFSceneBase"
 	self.log = preload("res://addons/mpf-gmc/scripts/log.gd").new("%s<%s>" % [scene_type, self.name])
 
 func _exit_tree() -> void:
@@ -62,7 +62,7 @@ func _exit_tree() -> void:
 func process_action(child_name: String, children: Array, action: String, settings: Dictionary, c: String, p: int = 0, kwargs: Dictionary = {}) -> void:
 	self.log.debug("Action '%s' called with name '%s' and settings: %s", [action, child_name, settings])
 	var child: MPFSceneBase
-	var ckey = settings['key'] if settings.get('key') else child_name
+	var ckey: String = settings['key'] if settings.get('key') else child_name
 	for ch in children:
 		if ch.key == ckey:
 			child = ch
@@ -89,24 +89,24 @@ func process_action(child_name: String, children: Array, action: String, setting
 	if child and settings.expire:
 		self._create_expire(child, settings.expire)
 
-func action_play(_child_name: String, _settings: Dictionary, _context: String, _priority: int = 0, _kwargs: Dictionary = {}):
+func action_play(_child_name: String, _settings: Dictionary, _context: String, _priority: int = 0, _kwargs: Dictionary = {}) -> void:
 	assert(false, "Method 'action_play' must be overridden in child classes of MPFSceneBase")
 
 func action_remove(_widget: Node) -> void:
 	assert(false, "Method 'action_remove' must be overridden in child classes of MPFSceneBase")
 
-func action_queue(_action: String, _slide_name: String, _settings: Dictionary, _context: String, _priority: int = 0, _kwargs: Dictionary = {}):
+func action_queue(_action: String, _slide_name: String, _settings: Dictionary, _context: String, _priority: int = 0, _kwargs: Dictionary = {}) -> void:
 	assert(false, "Method 'action_queue' must be overridden in child classes of MPFSceneBase")
 
-func action_update(settings: Dictionary, kwargs: Dictionary = {}):
+func action_update(settings: Dictionary, kwargs: Dictionary = {}) -> void:
 	for c in self._updaters:
 		c.update(settings, kwargs)
 
-func register_updater(node):
+func register_updater(node: Node) -> void:
 	if self._updaters.find(node) == -1:
 		self._updaters.append(node)
 
-func remove_updater(node):
+func remove_updater(node: Node) -> void:
 	if node in self._updaters:
 		self._updaters.erase(node)
 
@@ -114,7 +114,7 @@ func on_active():
 	if self._trigger_animation(CoreAnimation.ACTIVE):
 		return self.animation_player.animation_finished
 
-func remove(with_animation=true):
+func remove(with_animation: bool=true) -> void:
 	if with_animation:
 		if self._trigger_animation(CoreAnimation.REMOVED):
 			await self.animation_player.animation_finished
@@ -150,7 +150,7 @@ func _create_expire(child: MPFSceneBase, expiration_secs: float) -> void:
 		self._expirations[child.key].start(expiration_secs)
 		return
 
-	var timer = Timer.new()
+	var timer := Timer.new()
 	timer.wait_time = expiration_secs
 	timer.one_shot = true
 	timer.autostart = true

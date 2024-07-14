@@ -89,7 +89,7 @@ func update(settings: Dictionary, kwargs: Dictionary = {}) -> void:
 	elif variable_name in settings:
 		self.update_text(settings[variable_name])
 
-func update_text(value):
+func update_text(value: Variant) -> void:
 	if value == null:
 		self.text = ""
 		return
@@ -105,7 +105,7 @@ func update_text(value):
 	else:
 		self.text = value
 
-func _on_player_update(var_name, value):
+func _on_player_update(var_name: String, value: Variant) -> void:
 	if var_name == variable_name:
 		# For formatting, we need a key/value pair
 		if self.format_string:
@@ -113,7 +113,7 @@ func _on_player_update(var_name, value):
 		else:
 			self.update_text(value)
 
-func _on_player_added(total_players):
+func _on_player_added(total_players: int) -> void:
 	if min_players > 0 and min_players > total_players:
 		self.hide()
 	elif max_players > 0 and total_players > max_players:
@@ -127,11 +127,11 @@ func _on_player_added(total_players):
 		self._calculate_player_value()
 		self.show()
 
-func _calculate_player_value():
+func _calculate_player_value() -> bool:
 	var mpf_player_num = MPF.game.player.get("number")
 	if not mpf_player_num:
 		MPF.log.warning("MPFVariable '%s' is a player variable and should only exist in game modes.", self.name)
-		return
+		return false
 	if variable_type == VariableType.CURRENT_PLAYER:
 		self.player_number = mpf_player_num
 	elif variable_type in numbered_players:
@@ -142,4 +142,4 @@ func _calculate_player_value():
 		return true
 	elif MPF.game.players.size() >= self.player_number:
 		self.update_text(MPF.game.players[self.player_number - 1].get(self.variable_name))
-
+	return false

@@ -31,7 +31,7 @@ func action_remove(widget: Node) -> void:
 	self.remove_updater(widget)
 	widget.queue_free()
 
-func clear(context_name):
+func clear(context_name: String) -> void:
 	if not self._widgets:
 		return
 	for w in self._widgets.get_children():
@@ -39,7 +39,7 @@ func clear(context_name):
 			self.action_remove(w)
 
 func _sort_widgets() -> void:
-	var new_order = self._widgets.get_children()
+	var new_order: Array[Node] = self._widgets.get_children()
 	new_order.sort_custom(
 		func(a: MPFWidget, b: MPFWidget): return a.priority < b.priority
 	)
