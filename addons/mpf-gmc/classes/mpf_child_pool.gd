@@ -50,18 +50,18 @@ func show() -> void:
 		self._initialize()
 	self.visible = true
 
-func _initialize():
+func _initialize() -> void:
 	# Pure random does not require a tracker
 	if self.playback_method != PlaybackMethod.RANDOM:
 		self._player_num = MPF.game.player.number if self.track_per_player else 0
 		self._tracker = MPF.game.get_tracker(self.get_path(), self._player_num, reset_on_game_end)
 
-	var child_count = self.get_child_count()
+	var child_count: int = self.get_child_count()
 	if not child_count:
 		self.log.info("No children found, will not display anything.")
 		return
 
-	var child_to_show = self._find_next_child() if child_count > 1 else self.get_child(0)
+	var child_to_show: Node = self._find_next_child() if child_count > 1 else self.get_child(0)
 	self.log.info("Selected child %s to show.", child_to_show.name)
 	for c in self.get_children():
 		if c == child_to_show:
@@ -71,7 +71,7 @@ func _initialize():
 		else:
 			c.hide()
 
-func _find_next_child():
+func _find_next_child() -> Node:
 	if self.playback_method == PlaybackMethod.RANDOM:
 		return self.get_children().pick_random()
 	if self.playback_method == PlaybackMethod.RANDOM_NO_REPEAT:
@@ -80,27 +80,28 @@ func _find_next_child():
 		return self._find_random_child_force_all()
 	if self.playback_method == PlaybackMethod.SEQUENTIAL:
 		return self._find_sequential_child()
+	return null
 
 func _find_sequential_child() -> Node:
-	var idx = self._tracker["last_index"] + 1
+	var idx: int = self._tracker["last_index"] + 1
 	if idx >= self.get_child_count():
 		idx = 0
 	self._tracker["last_index"] = idx
 	return self.get_child(idx)
 
 func _find_random_child() -> Node:
-	var idx = self._tracker["last_index"]
-	var r = self.get_child_count()
-	var i = randi_range(0, r-1)
+	var idx: int = self._tracker["last_index"]
+	var r: int = self.get_child_count()
+	var i: int = randi_range(0, r-1)
 	while idx == i:
 		i = randi_range(0, r-1)
 	self._tracker["last_index"] = i
 	return self.get_child(i)
 
 func _find_random_child_force_all() -> Node:
-	var used = self._tracker["used"]
-	var r = self.get_child_count()
-	var i = randi_range(0, r-1)
+	var used: Array = self._tracker["used"]
+	var r: int = self.get_child_count()
+	var i: int = randi_range(0, r-1)
 	while used.find(i) != -1:
 		i = randi_range(0, r-1)
 	# If this is the last unused one, clear the array

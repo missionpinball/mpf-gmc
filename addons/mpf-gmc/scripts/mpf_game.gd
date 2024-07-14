@@ -92,8 +92,8 @@ func start_player_turn(kwargs: Dictionary) -> void:
 	player = players[kwargs.player_num - 1]
 
 func update_machine(kwargs: Dictionary) -> void:
-	var var_name = kwargs.get("name")
-	var value = kwargs.get("value")
+	var var_name: String = kwargs.get("name")
+	var value: Variant = kwargs.get("value")
 	if value is String:
 		value = value.uri_decode()
 	if var_name.begins_with("audit"):
@@ -134,7 +134,7 @@ func update_player(kwargs: Dictionary) -> void:
 			emit_signal("player_update", kwargs.name, kwargs.value)
 
 func update_settings(result: Dictionary) -> void:
-	var _settingType
+	var _settingType: String
 	for option in result.get("settings", []):
 		var s := {}
 		# Each setting comes as an array with the following fields:
@@ -177,7 +177,7 @@ func update_settings(result: Dictionary) -> void:
 		# Store all settings as root-level keys, regardless of settingType
 		settings[option[0]] = s
 
-func get_tracker(node_path, player_number, reset_on_game_end):
+func get_tracker(node_path: String, player_number: int, reset_on_game_end: bool) -> Dictionary:
 	if not node_path in self._trackers:
 		# TODO: Make a class for Trackers
 		self._trackers[node_path] = {"_reset_on_game_end": reset_on_game_end}

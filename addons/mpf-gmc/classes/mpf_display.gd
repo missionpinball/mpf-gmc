@@ -41,14 +41,14 @@ func process_slide(slide_name: String, action: String, settings: Dictionary, c: 
 	self.process_action(slide_name, self._slide_stack, action, settings, c, p, kwargs)
 
 func process_widget(widget_name: String, action: String, settings: Dictionary, c: String, p: int = 0, kwargs: Dictionary = {}) -> void:
-	var slide: MPFSlide = self.get_slide(settings.get('slide'))
+	var slide: Node = self.get_slide(settings.get('slide'))
 	# The requested slide may not exist
 	if not slide:
 		return
 	slide.process_widget(widget_name, action, settings, c, p, kwargs)
 
 func action_play(slide_name: String, settings: Dictionary, c: String, p: int = 0, kwargs: Dictionary = {}) -> MPFSlide:
-	var slide: MPFSlide = MPF.media.get_slide_instance(slide_name)
+	var slide: Node = MPF.media.get_slide_instance(slide_name)
 	assert(slide is MPFSlide, "Slide scenes must use (or extend) the MPFSlide script on the root node.")
 	slide.initialize(slide_name, settings, c, p, kwargs)
 	if settings.get("queue"):
@@ -92,7 +92,7 @@ func action_remove(slide: Node) -> void:
 	self._slide_stack.erase(slide)
 	self._update_stack()
 
-func get_slide(slide_name: String):
+func get_slide(slide_name) -> Node:
 	if not slide_name:
 		return self._current_slide
 	elif slide_name == "_overlay":
@@ -100,6 +100,7 @@ func get_slide(slide_name: String):
 	for s in self._slide_stack:
 		if s.key == slide_name:
 			return s
+	return null
 
 func _update_stack(kwargs: Dictionary = {}) -> void:
 	# Sort the stack by priority

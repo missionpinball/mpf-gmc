@@ -46,7 +46,7 @@ text = "Global Logging Level"
 layout_mode = 2
 alignment = 2
 item_count = 5
-selected = 1
+selected = 2
 popup/item_0/text = "Verbose"
 popup/item_0/id = 1
 popup/item_1/text = "Debug"
@@ -226,6 +226,7 @@ text = "Exit Game on ESC"
 
 [node name="exit_on_esc" type="CheckButton" parent="main/flags_bottom"]
 layout_mode = 2
+button_pressed = true
 
 [node name="fullscreen-label" type="Label" parent="main/flags_bottom"]
 visible = false

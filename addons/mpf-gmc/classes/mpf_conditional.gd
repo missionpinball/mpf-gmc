@@ -33,7 +33,7 @@ var initialized := false
 var log: GMCLogger
 var operator: Callable
 var true_variable_name: String
-var target: Dictionary
+var target
 
 func _enter_tree() -> void:
 	self.log = preload("res://addons/mpf-gmc/scripts/log.gd").new("Conditional<%s>" % self.name)

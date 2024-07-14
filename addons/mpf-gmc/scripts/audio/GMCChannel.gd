@@ -18,9 +18,9 @@ func _init(n: String, b: GMCBus):
 	# Channels don't use unique logs, just ref the Bus log
 	self.log = b.log
 
-func _process(_delta) -> void:
-	var playback_time = self.get_playback_position()
-	var remaining_markers = 0
+func _process(_delta: float) -> void:
+	var playback_time: float = self.get_playback_position()
+	var remaining_markers: int = 0
 	for m in self.markers:
 		remaining_markers += m.mark(playback_time)
 	if not remaining_markers:
@@ -92,14 +92,14 @@ func play_with_settings(settings: Dictionary) -> AudioStream:
 	if not self.playing:
 		self.volume_db = -80.0
 		self.play(start_at)
-	var tween = self.create_tween()
+	var tween: Tween = self.create_tween()
 	tween.tween_property(self, "volume_db", 0.0, fade_in).set_trans(Tween.TRANS_QUINT).set_ease(Tween.EASE_OUT)
 	tween.finished.connect(self._on_fade_complete.bind(tween, "play"))
 	self.tweens.append(tween)
 	self.set_meta("tween", tween)
 	return self.stream
 
-func clear():
+func clear() -> void:
 	if self.stream and self.stream.has_meta("loops_remaining"):
 		# self.finished.disconnect(self._on_loop)
 		self.stream.remove_meta("loops_remaining")
@@ -118,12 +118,12 @@ func pause_with_settings(settings: Dictionary = {}) -> void:
 	if not self.stream or not self.playing or stream.get_meta("is_stopping", false):
 		return
 
-	var fade_out = settings.get("fade_out")
+	var fade_out: float = settings.get("fade_out", 0)
 	if not fade_out:
 		self.stream_paused = true
 		return
 
-	var tween = self.create_tween()
+	var tween: Tween = self.create_tween()
 	tween.tween_property(self, "volume_db", -80.0, fade_out) \
 		.set_trans(Tween.TRANS_QUINT).set_ease(Tween.EASE_IN)
 	tween.finished.connect(self._on_fade_complete.bind(tween, "pause"))
@@ -133,14 +133,14 @@ func pause_with_settings(settings: Dictionary = {}) -> void:
 func unpause_with_settings(settings: Dictionary = {}) -> void:
 	if not self.stream or not self.stream_paused or stream.get_meta("is_stopping", false):
 		return
-	var fade_in = settings.get("fade_in")
+	var fade_in: float = settings.get("fade_in", 0)
 	self.log.debug("Unpausing bus %s with fade_in %s from settings %s" % [self, fade_in, settings])
 
 	self.stream_paused = false
 	# If we are fading in, set the volume down
 	if fade_in:
 		self.volume_db = -80.0
-		var tween = self.create_tween()
+		var tween: Tween = self.create_tween()
 		tween.tween_property(self, "volume_db", 0.0, fade_in) \
 			.set_trans(Tween.TRANS_QUINT).set_ease(Tween.EASE_IN)
 		tween.finished.connect(self._on_fade_complete.bind(tween, "unpause"))
@@ -148,7 +148,7 @@ func unpause_with_settings(settings: Dictionary = {}) -> void:
 		self.set_meta("tween", tween)
 
 func stop_with_settings(settings: Dictionary = {}) -> void:
-	var action = settings.get("action", "stop")
+	var action: String = settings.get("action", "stop")
 	if action == "loop_stop":
 		# The position is reset when the loop mode changes, so store it first
 		var pos: float = self.get_playback_position()
@@ -156,7 +156,7 @@ func stop_with_settings(settings: Dictionary = {}) -> void:
 		# Play the sound to the end of the file
 		self.play(pos)
 		return
-	var fade_out = settings.get("fade_out")
+	var fade_out: float = settings.get("fade_out", 0)
 	if not fade_out and self.stream.has_meta("fade_out"):
 		# On a stop-all call, bypass the stream's built-in fade_out value
 		if action != "stop_all":
@@ -164,7 +164,7 @@ func stop_with_settings(settings: Dictionary = {}) -> void:
 	if not fade_out:
 		self.clear()
 		return
-	var tween = self.create_tween()
+	var tween: Tween = self.create_tween()
 	tween.tween_property(self, "volume_db", -80.0, fade_out) \
 		.set_trans(Tween.TRANS_QUINT).set_ease(Tween.EASE_IN)
 	tween.finished.connect(self._on_fade_complete.bind(tween, action))
@@ -172,7 +172,7 @@ func stop_with_settings(settings: Dictionary = {}) -> void:
 	self.set_meta("tween", tween)
 	self.set_meta("is_stopping", true)
 
-func _on_fade_complete(tween, action) -> void:
+func _on_fade_complete(tween: Tween, action: String) -> void:
 	self.tweens.erase(tween)
 	# If this is a stop_all action, finish all the channels that are stopping
 	# If this is a stop action, stop the channel
@@ -187,7 +187,7 @@ func _on_fade_complete(tween, action) -> void:
 			self.stream_paused = true
 
 func _on_loop() -> void:
-	var loops_remaining = self.stream.get_meta("loops_remaining") - 1
+	var loops_remaining: int = self.stream.get_meta("loops_remaining") - 1
 	if loops_remaining == 0:
 		self.stream.remove_meta("loops_remaining")
 		self.finished.disconnect(self._on_loop)
@@ -198,7 +198,7 @@ func _on_loop() -> void:
 	else:
 		self.stream.set_meta("loops_remaining", loops_remaining)
 
-func _trigger_events(state, events) -> void:
+func _trigger_events(state: String, events: Array[String]) -> void:
 	for e in events:
 		MPF.server.send_event(e)
 	self.finished.disconnect(self.stream.get_meta("events_when_%s" % state))

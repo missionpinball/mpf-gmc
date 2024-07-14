@@ -89,8 +89,9 @@ func process_action(child_name: String, children: Array, action: String, setting
 	if child and settings.expire:
 		self._create_expire(child, settings.expire)
 
-func action_play(_child_name: String, _settings: Dictionary, _context: String, _priority: int = 0, _kwargs: Dictionary = {}) -> void:
+func action_play(_child_name: String, _settings: Dictionary, _context: String, _priority: int = 0, _kwargs: Dictionary = {}) -> Node:
 	assert(false, "Method 'action_play' must be overridden in child classes of MPFSceneBase")
+	return null
 
 func action_remove(_widget: Node) -> void:
 	assert(false, "Method 'action_remove' must be overridden in child classes of MPFSceneBase")
