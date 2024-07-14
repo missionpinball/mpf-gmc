@@ -56,7 +56,7 @@ func log(message: String, args=null) -> void:
 
 func warning(message: String, args=null) -> void:
 	if _level <= LogLevel.WARNING:
-		print(GMCLogger._log(self.log_name, "WARNING", message, args))
+		print_rich("[color=yellow]%s[/color]" % GMCLogger._log(self.log_name, "WARNING", message, args))
 
 func error(message: String, args=null) -> void:
 	printerr(GMCLogger._log(self.log_name, "ERROR", message, args))
