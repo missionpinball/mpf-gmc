@@ -8,7 +8,7 @@ signal marker(event_name: String)
 @onready var duckReleaseTimer = Timer.new()
 var musicDuck: Tween
 
-var buses = {}
+var buses := {}
 var default_bus: GMCBus
 var default_duck_bus: GMCBus
 
@@ -16,23 +16,23 @@ var default_duck_bus: GMCBus
 func initialize(config: ConfigFile, log_level: int = 30) -> void:
 	self.configure_logging("SoundPlayer")
 	for i in range(0, AudioServer.bus_count):
-		var bus_name = AudioServer.get_bus_name(i)
+		var bus_name: String = AudioServer.get_bus_name(i)
 		self.buses[bus_name] = GMCBus.new(bus_name, log_level)
 		# Buses have tweens so must be in the tree
 		self.add_child(self.buses[bus_name])
 	if config.has_section("sound_system"):
 		for key in config.get_section_keys("sound_system"):
-			var settings = config.get_value("sound_system", key)
-			var target_bus_name = settings['bus'] if settings.get('bus') else key
+			var settings: Dictionary = config.get_value("sound_system", key)
+			var target_bus_name: String = settings['bus'] if settings.get('bus') else key
 			assert(target_bus_name in self.buses, "Sound system does not have an audio bus '%s' configured." % target_bus_name)
 			assert(settings.get("type"), "Sound system bus '%s' missing required field 'type'." % target_bus_name)
-			var bus_type = GMCBus.get_bus_type(settings["type"])
-			var bus = self.buses[target_bus_name]
+			var bus_type := GMCBus.get_bus_type(settings["type"])
+			var bus: GMCBus = self.buses[target_bus_name]
 			bus.set_type(bus_type)
 			var channels_to_make = 2 if bus_type == GMCBus.BusType.SOLO else settings.get("simultaneous_sounds", 1)
 			for i in range(0, channels_to_make):
-				var channel_name = "%s_%s" % [target_bus_name, i+1]
-				var channel = bus.create_channel(channel_name)
+				var channel_name: String = "%s_%s" % [target_bus_name, i+1]
+				var channel: GMCChannel = bus.create_channel(channel_name)
 				# TBD: Do the buses need to be in the tree too?
 				self.add_child(channel)
 			# A bus can be marked default
@@ -62,7 +62,7 @@ func play_sounds(s: Dictionary) -> void:
 	assert(typeof(s) == TYPE_DICTIONARY, "Sound player called with non-dict value: %s" % s)
 	self.log.debug("play_sounds called with: %s", s)
 	for asset in s.settings.keys():
-		var settings = s.settings[asset]
+		var settings: Dictionary = s.settings[asset]
 
 		assert(MPF.media.sounds.has(asset), "Unknown sound file or resource '%s'" % asset)
 		# A key can override the default value
@@ -78,7 +78,7 @@ func play_sounds(s: Dictionary) -> void:
 			bus.stop(settings.key, settings)
 			return
 
-		var config = MPF.media.get_sound_instance(asset)
+		var config: Variant = MPF.media.get_sound_instance(asset)
 		if not config:
 			printerr("Unable to find sound instance for asset '%s'" % asset)
 			return
@@ -115,8 +115,8 @@ func play_sounds(s: Dictionary) -> void:
 func play_bus(s: Dictionary) -> void:
 	for bus_name in s.settings.keys():
 		assert(bus_name in self.buses, "Bus name %s is not a valid audio bus." % bus_name)
-		var bus = self.buses[bus_name]
-		var settings = s.settings[bus_name]
+		var bus: GMCBus = self.buses[bus_name]
+		var settings: Dictionary = s.settings[bus_name]
 
 		match settings["action"]:
 			"pause":
@@ -132,7 +132,7 @@ func stop_all(fade_out: float = 1.0) -> void:
 	for bus in self.buses.values():
 		bus.stop_all(fade_out)
 
-func _on_volume(bus: String, value: float, _change: float):
+func _on_volume(bus: String, value: float, _change: float) -> void:
 	var bus_name: String = bus.trim_suffix("_volume")
 	# The Master bus is fixed and capitalized
 	if bus_name.to_lower() == "master":

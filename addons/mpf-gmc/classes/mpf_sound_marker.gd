@@ -7,15 +7,15 @@ const FLOAT_MARGIN = 0.015
 
 @export var time: float
 @export var event: String
-var last_marked
+var _last_marked: float
 
 # TODO: Need to reset on each loop
 func reset() -> void:
-	self.last_marked = null
+	self._last_marked = 0.0
 
 func mark(current_time:float) -> int:
 	# If this marker has already posted
-	if self.last_marked:
+	if self._last_marked:
 		return 0
 	# If this marker hasn't been reached yet
 	if current_time < self.time:
@@ -23,7 +23,7 @@ func mark(current_time:float) -> int:
 	# If this marker was skipped
 	if current_time - self.time > FLOAT_MARGIN:
 		return 0
-	self.last_marked = current_time
+	self._last_marked = current_time
 	MPF.server.send_event(self.event)
 	MPF.media.sound.marker.emit(self.event)
 	return 0
