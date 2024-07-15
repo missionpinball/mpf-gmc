@@ -66,7 +66,7 @@ func play_with_settings(settings: Dictionary) -> AudioStream:
 			MPF.server.send_event(e)
 	if settings.get("events_when_stopped"):
 		# Store a reference to the callable so it can be disconnected
-		var callable = self._trigger_events.bind("stopped", settings["events_when_stopped"])
+		var callable = self._trigger_events.bind("stopped", settings["events_when_stopped"] as Array[String])
 		self.stream.set_meta("events_when_stopped", callable)
 		self.finished.connect(callable)
 
