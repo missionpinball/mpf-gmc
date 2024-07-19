@@ -10,13 +10,14 @@ class_name GMCServer
 enum ServerStatus { IDLE, WAITING, LAUNCHING, CONNECTED, ERROR }
 
 signal bonus(payload)
+signal clear(mode_name)
+signal item_highlighted(payload)
 signal mpf_timer(payload)
 signal options(payload)
-signal item_highlighted(payload)
 signal player_var(value, prev_value, change, player_num)
 signal service(payload)
-signal clear(mode_name)
 signal status_changed(status)
+signal text_input(payload)
 
 # A list of events that trigger their own automatic signals
 var auto_signals := []
@@ -352,9 +353,8 @@ func _thread_poll(_userdata=null) -> void:
 						_send("monitor_start?category=machine_vars")
 						# Standard events
 						_send("register_trigger?event=item_highlighted")
+						_send("register_trigger?event=text_input")
 						_send("register_trigger?event=bonus_entry")
-						_send("register_trigger?event=high_score_enter_initials")
-						_send("register_trigger?event=high_score_award_display")
 						# Custom events
 						for e in self.registered_events + self.auto_signals:
 							_send("register_trigger?event=%s" % e)
@@ -378,6 +378,8 @@ func _thread_poll(_userdata=null) -> void:
 						pass
 					"sounds_play":
 						call_deferred("deferred_mc", "play", message)
+					"text_input":
+						call_deferred("emit_signal", "text_input", message)
 					"timer":
 						call_deferred("emit_signal", "mpf_timer", message)
 					"widgets_play":

@@ -14,6 +14,8 @@ var grid_width: int = 0:
 		self.custom_minimum_size.x = value
 		self._on_rect_changed()
 
+var is_special_char = false
+
 func _init():
 	self.item_rect_changed.connect(self._on_rect_changed)
 

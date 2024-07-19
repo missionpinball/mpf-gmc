@@ -211,7 +211,7 @@ func _build_slide_container(cname: String) -> Control:
 func _get_overlay_slide() -> MPFSlide:
 	if self._overlay_slide:
 		return self._overlay_slide
-	var overlay_container: Container = self._build_slide_container("%s_overlay" % self.name)
+	var overlay_container: Control = self._build_slide_container("%s_overlay" % self.name)
 	self._overlay_slide = MPFSlide.new()
 	self._overlay_slide.name = "%s_overlay_slide" % self.name
 	overlay_container.add_child(self._overlay_slide)

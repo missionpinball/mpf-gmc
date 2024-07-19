@@ -14,4 +14,4 @@ void fragment() {
 [resource]
 shader = SubResource("Shader_qofm4")
 shader_parameter/base_color = Color(1, 1, 1, 1)
-shader_parameter/highlight_color = Color(1, 0, 0.886275, 1)
+shader_parameter/highlight_color = Color(1, 0, 1, 1)

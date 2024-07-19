@@ -1,0 +1,25 @@
+[gd_scene load_steps=3 format=3 uid="uid://lqeoxevsy0ex"]
+
+[ext_resource type="Script" path="res://addons/mpf-gmc/classes/mpf_slide.gd" id="1_adeqt"]
+[ext_resource type="Script" path="res://addons/mpf-gmc/classes/mpf_text_input.gd" id="2_6uslk"]
+
+[node name="HighScore" type="Control"]
+layout_mode = 3
+anchors_preset = 0
+script = ExtResource("1_adeqt")
+
+[node name="Label" type="Label" parent="."]
+layout_mode = 0
+offset_left = 691.0
+offset_top = 104.0
+offset_right = 1356.0
+offset_bottom = 246.0
+
+[node name="MPFTextInput" type="HFlowContainer" parent="." node_paths=PackedStringArray("display_node")]
+layout_mode = 0
+offset_left = 720.0
+offset_top = 419.0
+offset_right = 1272.0
+offset_bottom = 605.0
+script = ExtResource("2_6uslk")
+display_node = NodePath("../Label")
