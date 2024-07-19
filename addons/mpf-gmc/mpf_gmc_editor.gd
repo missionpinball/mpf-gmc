@@ -12,6 +12,7 @@ func _enter_tree():
 	# Add the new type with a name, a parent type, a script and an icon.
 	add_custom_type("MPFChildPool", "Node2D", preload("classes/mpf_child_pool.gd"), preload("icons/BackBufferCopy.svg"))
 	add_custom_type("MPFSceneBase", "Node2D", preload("classes/mpf_scene_base.gd"), preload("icons/Node.svg"))
+	add_custom_type("MPFTextInput", "HFlowContainer", preload("classes/mpf_text_input.gd"), preload("icons/Keyboard.svg"))
 	add_custom_type("MPFWidget", "Node2D", preload("classes/mpf_widget.gd"), preload("icons/ReferenceRect.svg"))
 	add_custom_type("MPFWindow", "Node2D", preload("classes/mpf_window.gd"), preload("icons/WorldEnvironment.svg"))
 	add_custom_type("MPFDisplay", "MPFSceneBase", preload("classes/mpf_display.gd"), preload("icons/PhysicalSkyMaterial.svg"))
@@ -61,6 +62,7 @@ func _exit_tree():
 	remove_custom_type("MPFEventHandler")
 	remove_custom_type("MPFConditional")
 	remove_custom_type("MPFConditionalChildren")
+	remove_custom_type("MPFTextInput")
 
 	remove_control_from_docks(gmc_dock)
 	gmc_dock.free()

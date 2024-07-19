@@ -1,0 +1,17 @@
+[gd_resource type="ShaderMaterial" load_steps=2 format=3 uid="uid://c5606sl0e32qh"]
+
+[sub_resource type="Shader" id="Shader_qofm4"]
+code = "shader_type canvas_item;
+uniform vec3 base_color: source_color = vec3(1.0, 1.0, 1.0);
+uniform vec3 highlight_color: source_color = vec3(1.0, 0.0, 0.0);
+
+void fragment() {
+	COLOR.rgb = mix(COLOR.rgb, highlight_color, abs(sin(TIME * 2.0)));
+}
+
+"
+
+[resource]
+shader = SubResource("Shader_qofm4")
+shader_parameter/base_color = Color(1, 1, 1, 1)
+shader_parameter/highlight_color = Color(1, 0, 0.886275, 1)
