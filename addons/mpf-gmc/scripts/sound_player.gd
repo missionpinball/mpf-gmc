@@ -6,7 +6,6 @@ signal marker(event_name: String)
 
 @onready var duckAttackTimer = Timer.new()
 @onready var duckReleaseTimer = Timer.new()
-var musicDuck: Tween
 
 var buses := {}
 var default_bus: GMCBus
@@ -32,9 +31,7 @@ func initialize(config: ConfigFile, log_level: int = 30) -> void:
 			var channels_to_make = 2 if bus_type == GMCBus.BusType.SOLO else settings.get("simultaneous_sounds", 1)
 			for i in range(0, channels_to_make):
 				var channel_name: String = "%s_%s" % [target_bus_name, i+1]
-				var channel: GMCChannel = bus.create_channel(channel_name)
-				# TBD: Do the buses need to be in the tree too?
-				self.add_child(channel)
+				bus.create_channel(channel_name)
 			# A bus can be marked default
 			if settings.get("default", false):
 				self.default_bus = self.buses[target_bus_name]

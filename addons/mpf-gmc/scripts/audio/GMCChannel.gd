@@ -2,9 +2,6 @@ extends AudioStreamPlayer
 class_name GMCChannel
 
 
-# AudioStreamPlayer class has a bus property that is the string name
-# of the AudioServer bus. This value is the GMC bus instance.
-var _bus: GMCBus
 var tweens: Array[Tween]
 var markers: Array[SoundMarker]
 
@@ -13,12 +10,15 @@ var log: GMCLogger
 
 func _init(n: String, b: GMCBus):
 	self.name = n
-	self._bus = b
+	# This sets the AudioStreamPlayer.bus property to control its playback,
+	# and must be set to the StringName of the bus being used.
 	self.bus = b.name
-	# Channels don't use unique logs, just ref the Bus log
+	# Channels don't need their own logs, just use the GMCBus log
 	self.log = b.log
 
 func _exit_tree():
+	# Seems like this would be default in Godot, but no. Not stopping on exit
+	# causes memory leaks, so make sure to stop.
 	self.stop()
 
 func _process(_delta: float) -> void:
@@ -137,7 +137,7 @@ func unpause_with_settings(settings: Dictionary = {}) -> void:
 	if not self.stream or not self.stream_paused or stream.get_meta("is_stopping", false):
 		return
 	var fade_in: float = settings.get("fade_in", 0)
-	self.log.debug("Unpausing bus %s with fade_in %s from settings %s" % [self, fade_in, settings])
+	self.log.debug("Unpausing channel %s with fade_in %s from settings %s" % [self, fade_in, settings])
 
 	self.stream_paused = false
 	# If we are fading in, set the volume down
@@ -208,4 +208,4 @@ func _trigger_events(state: String, events: Array[String]) -> void:
 	self.stream.remove_meta("events_when_%s" % state)
 
 func _to_string() -> String:
-	return "<GMCChannel:%s:current_stream=%s>" % [self.name, self.stream or "None"]
+	return "<GMCChannel:%s:current_stream=%s>" % [self.name, "%s" % self.stream if self.stream else "None"]

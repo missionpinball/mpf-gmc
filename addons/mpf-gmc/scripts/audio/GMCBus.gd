@@ -18,12 +18,14 @@ func _init(n: String, log_level: int = 30):
 	self.configure_logging("Bus<%s>" % self.name, log_level)
 	# Store the target restore volume for post-ducks
 	self._bus_index = AudioServer.get_bus_index(self.name)
-	assert(self._bus_index != -1, "No audio bus %s configured in Godot Audio layout.")
+	assert(self._bus_index != -1, "No audio bus %s configured in Godot Audio layout." % n)
 	self._full_volume_db = AudioServer.get_bus_volume_db(self._bus_index)
 
 func create_channel(channel_name: String) -> GMCChannel:
 	var channel = GMCChannel.new(channel_name, self)
 	self.channels.append(channel)
+	# Channels have tweens so must be in the tree
+	self.add_child(channel)
 	if self.type == BusType.SEQUENTIAL:
 		channel.finished.connect(self._on_queue_channel_finished)
 	return channel
