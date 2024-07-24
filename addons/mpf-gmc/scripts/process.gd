@@ -22,6 +22,7 @@ func _spawn_mpf():
 	self.log.info("Spawning MPF process...")
 	MPF.server.set_status(MPF.server.ServerStatus.LAUNCHING)
 	var launch_timer = Timer.new()
+	launch_timer.name = "SpawnMpfLaunchTimer"
 	launch_timer.one_shot = true
 	launch_timer.connect("timeout", self._check_mpf)
 	self.add_child(launch_timer)

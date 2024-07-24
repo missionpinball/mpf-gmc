@@ -152,6 +152,7 @@ func _create_expire(child: MPFSceneBase, expiration_secs: float) -> void:
 		return
 
 	var timer := Timer.new()
+	timer.name = "%sExpirationTimer" % child.name
 	timer.wait_time = expiration_secs
 	timer.one_shot = true
 	timer.autostart = true

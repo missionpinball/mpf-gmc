@@ -50,6 +50,7 @@ func duck(settings) -> void:
 
 	if not self._duck_release_timer:
 		self._duck_release_timer = Timer.new()
+		self._duck_release_timer.name = "%sDuckReleaseTimer" % self.name
 		self._duck_release_timer.one_shot = true
 		self._duck_release_timer.timeout.connect(self.duck_release)
 		self.add_child(self._duck_release_timer)

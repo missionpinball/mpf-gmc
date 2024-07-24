@@ -45,6 +45,13 @@ func initialize(config: ConfigFile, log_level: int = 30) -> void:
 func _ready() -> void:
 	MPF.game.volume.connect(self._on_volume)
 	MPF.server.connect("clear", self._on_clear_context)
+	# Set names to help debugging
+	duckAttackTimer.name = "DuckAttackTimer"
+	duckReleaseTimer.name = "DuckReleaseTimer"
+
+func _exit_tree():
+	duckAttackTimer.free()
+	duckReleaseTimer.free()
 
 func get_bus(bus_name: String = "") -> GMCBus:
 	if not bus_name:

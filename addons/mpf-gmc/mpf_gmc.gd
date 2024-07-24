@@ -67,10 +67,12 @@ func _init():
 
 func _enter_tree():
 	# self._process() is only called on children in the tree, so add the children
-	# that need to call _process() or that have _enter_tree() methods
+	# that need to call _process() or that have _enter_tree() methods. Also children
+	# will be automatically freed on exit, so it's good to add them anyway.
 	self.add_child(server)
 	self.add_child(media)
 	self.add_child(process)
+	self.add_child(game)
 
 func _ready():
 	if self.config.has_section("keyboard"):
