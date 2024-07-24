@@ -201,7 +201,7 @@ func _on_loop() -> void:
 	else:
 		self.stream.set_meta("loops_remaining", loops_remaining)
 
-func _trigger_events(state: String, events: Array[String]) -> void:
+func _trigger_events(state: String, events: Array) -> void:
 	for e in events:
 		MPF.server.send_event(e)
 	self.finished.disconnect(self.stream.get_meta("events_when_%s" % state))
