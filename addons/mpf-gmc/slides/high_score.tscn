@@ -22,4 +22,13 @@ offset_top = 419.0
 offset_right = 1272.0
 offset_bottom = 605.0
 script = ExtResource("2_6uslk")
-display_node = NodePath("../Label")
+display_node = NodePath("../RichTextLabel")
+
+[node name="RichTextLabel" type="RichTextLabel" parent="."]
+layout_mode = 0
+offset_left = 664.0
+offset_top = 72.0
+offset_right = 1264.0
+offset_bottom = 332.0
+theme_override_font_sizes/normal_font_size = 60
+bbcode_enabled = true

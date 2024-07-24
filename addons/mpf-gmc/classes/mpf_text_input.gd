@@ -5,7 +5,7 @@ extends HFlowContainer
 const MPFTextInputChar = preload("res://addons/mpf-gmc/classes/mpf_textinput_character.gd")
 
 signal text_changed(new_value)
-var selected_index: int = 0
+var selected_index: int = -1
 var current_text: String = ""
 
 ## The name of this text input for MPF event handling
@@ -24,7 +24,7 @@ var current_text: String = ""
 ## Maximum number of characters allowed to be input
 @export var max_length := 10
 ## Label node to display the current text selection
-@export var display_node: Label
+@export var display_node: Control
 ## If true, the currently highlighted character will be added to the preview
 @export var preview_character: bool = true
 
@@ -48,9 +48,12 @@ func _enter_tree() -> void:
 		self.add_child(special)
 
 func _ready() -> void:
-	self.get_child(selected_index).focus()
+	# self.get_child(selected_index).focus()
 	if not Engine.is_editor_hint():
 		MPF.server.connect("text_input", self._on_text_input_event)
+	# Trigger the movement to select the first character and
+	# Preview the initial character that's focused
+	self._on_move_input()
 
 func generate_character(text: String, is_special_char:=false) -> MPFTextInputChar:
 	var charact = MPFTextInputChar.new()
@@ -77,14 +80,14 @@ func _on_select():
 		"SPACE":
 			current_text += " "
 		"DEL":
-			current_text.erase(current_text.length() - 1, 1)
+			current_text = current_text.left(-1)
 		"END":
 			MPF.server.send_event("text_input_%s_complete&text=%s" % [self.input_name, self.current_text.strip_edges()])
 			return
 		_:
 			current_text += selection.text
 	self.text_changed.emit(current_text)
-	self._update_preview()
+	self._update_preview("" if selection.is_special_char else selection.text)
 
 
 func _on_move_input(reverse:=false) -> void:
@@ -96,10 +99,16 @@ func _on_move_input(reverse:=false) -> void:
 		selected_index = 0
 	var new_selection = self.get_child(selected_index)
 	new_selection.focus()
-	if preview_character and not new_selection.is_special_char:
-		self._update_preview(new_selection.text)
+	if preview_character:
+		self._update_preview("" if new_selection.is_special_char else new_selection.text)
 
 func _update_preview(preview_char=""):
 	if not display_node:
 		return
-	display_node.text = current_text + preview_char
+	var text: String
+	if preview_char and display_node is RichTextLabel:
+		text = "%s[pulse freq=3.0 color=#%s ease=-1.0]%s[/pulse]" % [current_text, highlight_color.to_html(), preview_char]
+	else:
+		text = current_text + preview_char
+	# Use the set_text method so custom nodes can handle it how they like
+	display_node.set_text(text)
