@@ -18,6 +18,9 @@ func _init(n: String, b: GMCBus):
 	# Channels don't use unique logs, just ref the Bus log
 	self.log = b.log
 
+func _exit_tree():
+	self.stop()
+
 func _process(_delta: float) -> void:
 	var playback_time: float = self.get_playback_position()
 	var remaining_markers: int = 0
