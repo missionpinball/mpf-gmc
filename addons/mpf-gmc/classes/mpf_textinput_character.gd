@@ -16,7 +16,7 @@ var grid_width: int = 0:
 		self._on_rect_changed()
 
 var is_special_char = false
-var _natural_width := 0
+var _natural_width := 0.0
 
 func _init():
 	self.item_rect_changed.connect(self._on_rect_changed)
@@ -39,6 +39,7 @@ func _on_rect_changed():
 		self.custom_minimum_size.x = 0
 		return
 	if _natural_width > grid_width:
+		@warning_ignore("integer_division")
 		self.custom_minimum_size.x = grid_width * ceil(_natural_width / grid_width)
 	else:
 		self.custom_minimum_size.x = grid_width
