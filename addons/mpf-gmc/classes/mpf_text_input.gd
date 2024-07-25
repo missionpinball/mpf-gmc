@@ -14,7 +14,10 @@ var current_text: String = ""
 ## The list of characters to display in the text input
 @export_multiline var allowed_characters := "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 ## Allow spaces in input strings
-@export var allow_space := true
+@export var allow_space := true:
+	set(value):
+		allow_space = value
+		self._generate_characters()
 ## A fixed (minimum) width for each character displayed
 @export var grid_width := 0:
 	set(value):
@@ -35,8 +38,34 @@ var current_text: String = ""
 		highlight_color = value
 		for c in self.get_children():
 			c.highlight_color = value
+## Label settings to apply to the characters
+@export var character_appearance: LabelSettings:
+	set(value):
+		character_appearance = value
+		for c in self.get_children():
+			if c.is_special_char and self.special_appearance:
+				continue
+			c.label_settings = value
+## Label settings to apply to the special inputs
+@export var special_appearance: LabelSettings:
+	set(value):
+		special_appearance = value
+		for c in self.get_children():
+			if c.is_special_char:
+				# If a value is set, use it for the special chars
+				if value:
+					c.label_settings = value
+				# If a value is not set, fall back to the standard
+				else:
+					c.label_settings = self.character_appearance
 
 func _enter_tree() -> void:
+	self._generate_characters()
+
+func _generate_characters() -> void:
+	for c in self.get_children():
+		self.remove_child(c)
+		c.queue_free()
 	for c in allowed_characters:
 		var charact = self.generate_character(c)
 		self.add_child(charact)
@@ -61,6 +90,10 @@ func generate_character(text: String, is_special_char:=false) -> MPFTextInputCha
 	charact.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	charact.highlight_color = highlight_color
 	charact.is_special_char = is_special_char
+	if is_special_char and self.special_appearance:
+		charact.label_settings = self.special_appearance
+	else:
+		charact.label_settings = self.character_appearance
 	if grid_width:
 		charact.grid_width = grid_width
 	return charact

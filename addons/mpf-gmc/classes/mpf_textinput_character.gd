@@ -11,13 +11,21 @@ var highlight_color := Color(1, 0, 0):
 var grid_width: int = 0:
 	set(value):
 		grid_width = value
-		self.custom_minimum_size.x = value
+		# Reset the min width
+		self.custom_minimum_size.x = 0
 		self._on_rect_changed()
 
 var is_special_char = false
+var _natural_width := 0
 
 func _init():
 	self.item_rect_changed.connect(self._on_rect_changed)
+	self.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+
+func _enter_tree():
+	# Save the natural width so we can recalculate new grid sizes
+	_natural_width = self.size.x
+	self._on_rect_changed()
 
 func focus():
 	self.material = highlight_material
@@ -26,5 +34,11 @@ func unfocus():
 	self.material = null
 
 func _on_rect_changed():
-	if grid_width and self.size.x > grid_width:
-		self.custom_minimum_size.x = grid_width * ceil(self.size.x / grid_width)
+	# Wait for the natural width to be calculated
+	if not grid_width or not _natural_width:
+		self.custom_minimum_size.x = 0
+		return
+	if _natural_width > grid_width:
+		self.custom_minimum_size.x = grid_width * ceil(_natural_width / grid_width)
+	else:
+		self.custom_minimum_size.x = grid_width

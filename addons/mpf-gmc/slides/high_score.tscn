@@ -19,9 +19,10 @@ offset_bottom = 246.0
 layout_mode = 0
 offset_left = 720.0
 offset_top = 419.0
-offset_right = 1272.0
+offset_right = 1259.0
 offset_bottom = 605.0
 script = ExtResource("2_6uslk")
+grid_width = 30
 display_node = NodePath("../RichTextLabel")
 
 [node name="RichTextLabel" type="RichTextLabel" parent="."]
