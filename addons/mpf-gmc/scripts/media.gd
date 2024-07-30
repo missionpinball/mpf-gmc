@@ -66,7 +66,7 @@ func generate_traversal() -> void:
 	self.traverse_tree_for("slides", slides)
 	self.traverse_tree_for("widgets", widgets)
 	# Always do TRES files last so they'll supersede WAV/OGG files of the same name
-	for ext in ["wav", "ogg", "tres"]:
+	for ext in ["mp3", "wav", "ogg", "tres"]:
 		self.traverse_tree_for("sounds", sounds, ext)
 
 func _get_scene(scene_name: String, collection: Dictionary, preload_only: bool = false):
