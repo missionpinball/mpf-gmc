@@ -121,7 +121,7 @@ func pause_with_settings(settings: Dictionary = {}) -> void:
 	if not self.stream or not self.playing or stream.get_meta("is_stopping", false):
 		return
 
-	var fade_out: float = settings.get("fade_out", 0)
+	var fade_out: float = settings["fade_out"] if settings.get("fade_out") else 0.0
 	if not fade_out:
 		self.stream_paused = true
 		return
@@ -136,7 +136,7 @@ func pause_with_settings(settings: Dictionary = {}) -> void:
 func unpause_with_settings(settings: Dictionary = {}) -> void:
 	if not self.stream or not self.stream_paused or stream.get_meta("is_stopping", false):
 		return
-	var fade_in: float = settings.get("fade_in", 0)
+	var fade_in: float = settings["fade_in"] if settings.get("fade_in") else 0.0
 	self.log.debug("Unpausing channel %s with fade_in %s from settings %s" % [self, fade_in, settings])
 
 	self.stream_paused = false
@@ -159,7 +159,7 @@ func stop_with_settings(settings: Dictionary = {}) -> void:
 		# Play the sound to the end of the file
 		self.play(pos)
 		return
-	var fade_out: float = settings.get("fade_out", 0)
+	var fade_out: float = settings["fade_out"] if settings.get("fade_out") else 0.0
 	if not fade_out and self.stream.has_meta("fade_out"):
 		# On a stop-all call, bypass the stream's built-in fade_out value
 		if action != "stop_all":
