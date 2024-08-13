@@ -44,6 +44,7 @@ func process_widget(widget_name: String, action: String, settings: Dictionary, c
 	var slide: Node = self.get_slide(settings.get('slide'))
 	# The requested slide may not exist
 	if not slide:
+		self.log.warning("Unable to add widget '%s' because target slide '%s' is not on this display.", [widget_name, settings.get('slide')])
 		return
 	slide.process_widget(widget_name, action, settings, c, p, kwargs)
 
