@@ -182,19 +182,21 @@ func remove_event_handler(event: String, handler: Callable) -> void:
 
 ## Disconnect the BCP server
 func stop(is_exiting: bool = false) -> void:
-	self.log.log("Shutting down BCP Server and %s", "will not restart" if is_exiting else "awaiting new connection")
+	self.log.info("Shutting down BCP Server and %s", "will not restart" if is_exiting else "awaiting new connection")
 	# Lock the mutex to prevent the BCP thread from polling
-	_mutex.lock()
+	var did_lock = _mutex.try_lock()
 	_server.stop()
 	if _client:
 		# Say goodbye to MPF!
 		_send("goodbye")
 		_client.disconnect_from_host()
 		_client = null
-	_mutex.unlock()
+	if did_lock:
+		_mutex.unlock()
 
 	if _thread and _thread.is_started():
 		_thread.wait_to_finish()
+	_thread = null
 
 	if not is_exiting:
 		self.on_disconnect()
@@ -270,128 +272,136 @@ func _thread_poll(_userdata=null) -> void:
 		# If the mutex is locked, the system is shutting down
 		if not _mutex.try_lock():
 			return
+		var err = _client.poll()
+		if err != OK:
+			self.log.error("BCP client error: %s" % error_string(err))
+			_mutex.unlock()
+			call_deferred("stop")
+			return
+
+		var cstat = _client.get_status()
+		if cstat != StreamPeerTCP.Status.STATUS_CONNECTED:
+			self.log.info("BCP client disconnected.")
+			_mutex.unlock()
+			call_deferred("stop")
+			return
+
 		var bytes = _client.get_available_bytes()
 		if not bytes:
 			OS.delay_msec(delay)
-		else:
-			var err = _client.poll()
-			if err != OK:
-				push_error("BCP client error: %s" % error_string(err))
-				_client.disconnect_from_host()
-				_client = null
-				call_deferred("stop")
-				return
-			var messages := _client.get_string(bytes).split("\n")
-			for message_raw in messages:
-				if message_raw.is_empty():
-					continue
-				self.log.verbose("Received: %s", message_raw)
-				var message: Dictionary = _bcp_parse.parse(message_raw)
-				# Log any errors
-				if message.has("error"):
-					self.log.error(message.error)
+			continue
 
-				# Known signals can be broadcast with arbitrary payloads
-				if message.cmd in auto_signals:
-					message.cmd = "signal"
+		var messages := _client.get_string(bytes).split("\n")
+		for message_raw in messages:
+			if message_raw.is_empty():
+				continue
+			self.log.verbose("Received: %s", message_raw)
+			var message: Dictionary = _bcp_parse.parse(message_raw)
+			# Log any errors
+			if message.has("error"):
+				self.log.error(message.error)
 
-				# If on_message() returns null, the message has been handled
-				# and no further action is necessary.
-				if self.on_message(message) == null:
-					continue
+			# Known signals can be broadcast with arbitrary payloads
+			if message.cmd in auto_signals:
+				message.cmd = "signal"
 
-				match message.cmd:
-					"ball_end":
-						call_deferred("on_ball_end")
-					"ball_start":
-						call_deferred("on_ball_start", message.ball, message.player_num)
-					"bonus_entry":
-						# We are subscribed for bonus handlers, but no explicit action
-						pass
-					"buses_play":
-						call_deferred("deferred_mc", "play", message)
-					"goodbye":
-						_send("goodbye")
-						call_deferred("stop")
-						# Resume polling for new client connections
-						call_deferred("set_process", true)
-					"hello":
-						_send("hello")
-						call_deferred("_on_connect", message)
-					"item_highlighted":
-						call_deferred("emit_signal", "item_highlighted", message)
-					"list_coils":
-						call_deferred("emit_signal", "service", message)
-					"list_lights":
-						call_deferred("emit_signal", "service", message)
-					"list_switches":
-						call_deferred("emit_signal", "service", message)
-					"machine_variable":
-						call_deferred("deferred_game", "update_machine", message)
-					"mode_list":
-						call_deferred("deferred_game", "update_modes", message)
-					"mode_start":
-						if message.name == "game":
-							call_deferred("deferred_game", "reset")
-						call_deferred("on_mode_start", message.name)
-					"mode_stop":
-						pass
-					"player_added":
-						call_deferred("deferred_game", "add_player", message)
-					"player_turn_start":
-						call_deferred("deferred_game", "start_player_turn", message)
-					"player_variable":
-						call_deferred("deferred_game_player", message)
-					"reset":
-						self.log.info("Resetting connection with BCP client")
-						_send("reset_complete")
-						# Core MPF events
-						_send("monitor_start?category=core_events")
-						_send("monitor_start?category=service_events")
-						_send("monitor_start?category=modes")
-						_send("monitor_start?category=player_vars")
-						_send("monitor_start?category=machine_vars")
-						# Standard events
-						_send("register_trigger?event=item_highlighted")
-						_send("register_trigger?event=text_input")
-						_send("register_trigger?event=bonus_entry")
-						# Custom events
-						for e in self.registered_events + self.auto_signals:
-							_send("register_trigger?event=%s" % e)
-					"service":
-						call_deferred("emit_signal", "service", message)
-					"service_mode_entered":
-						# The default service.yaml includes a slide_player for service slide
-						pass
-					"settings":
-						call_deferred("deferred_game", "update_settings", message)
-					"signal":
-						call_deferred("emit_signal", message.name, message)
-					"slides_play":
-						call_deferred("deferred_mc", "play", message)
-					"slides_clear", "widgets_clear":
-						# TBD: Need to distinguish slides/widgets/sounds?
-						# Don't think so, all config_players have the same callback
-						# so all three will post at the same time.
-						call_deferred("emit_signal", "clear", message.context)
-					"sounds_clear":
-						pass
-					"sounds_play":
-						call_deferred("deferred_mc", "play", message)
-					"text_input":
-						call_deferred("emit_signal", "text_input", message)
-					"timer":
-						call_deferred("emit_signal", "mpf_timer", message)
-					"widgets_play":
-						call_deferred("deferred_mc", "play", message)
-					_:
-						if message.get("name") not in self.registered_handlers:
-							self.log.warning("No handler defined for BCP action %s", message_raw)
+			# If on_message() returns null, the message has been handled
+			# and no further action is necessary.
+			if self.on_message(message) == null:
+				continue
 
-				# If any handlers are registered for this event, post them
-				if message.get("name") in self.registered_handlers:
-					for h in self.registered_handlers[message.name]:
-						h.call_deferred(message)
+			match message.cmd:
+				"ball_end":
+					call_deferred("on_ball_end")
+				"ball_start":
+					call_deferred("on_ball_start", message.ball, message.player_num)
+				"bonus_entry":
+					# We are subscribed for bonus handlers, but no explicit action
+					pass
+				"buses_play":
+					call_deferred("deferred_mc", "play", message)
+				"goodbye":
+					_send("goodbye")
+					call_deferred("stop")
+					# Resume polling for new client connections
+					call_deferred("set_process", true)
+				"hello":
+					_send("hello")
+					call_deferred("_on_connect", message)
+				"item_highlighted":
+					call_deferred("emit_signal", "item_highlighted", message)
+				"list_coils":
+					call_deferred("emit_signal", "service", message)
+				"list_lights":
+					call_deferred("emit_signal", "service", message)
+				"list_switches":
+					call_deferred("emit_signal", "service", message)
+				"machine_variable":
+					call_deferred("deferred_game", "update_machine", message)
+				"mode_list":
+					call_deferred("deferred_game", "update_modes", message)
+				"mode_start":
+					if message.name == "game":
+						call_deferred("deferred_game", "reset")
+					call_deferred("on_mode_start", message.name)
+				"mode_stop":
+					pass
+				"player_added":
+					call_deferred("deferred_game", "add_player", message)
+				"player_turn_start":
+					call_deferred("deferred_game", "start_player_turn", message)
+				"player_variable":
+					call_deferred("deferred_game_player", message)
+				"reset":
+					self.log.info("Resetting connection with BCP client")
+					_send("reset_complete")
+					# Core MPF events
+					_send("monitor_start?category=core_events")
+					_send("monitor_start?category=service_events")
+					_send("monitor_start?category=modes")
+					_send("monitor_start?category=player_vars")
+					_send("monitor_start?category=machine_vars")
+					# Standard events
+					_send("register_trigger?event=item_highlighted")
+					_send("register_trigger?event=text_input")
+					_send("register_trigger?event=bonus_entry")
+					# Custom events
+					for e in self.registered_events + self.auto_signals:
+						_send("register_trigger?event=%s" % e)
+				"service":
+					call_deferred("emit_signal", "service", message)
+				"service_mode_entered":
+					# The default service.yaml includes a slide_player for service slide
+					pass
+				"settings":
+					call_deferred("deferred_game", "update_settings", message)
+				"signal":
+					call_deferred("emit_signal", message.name, message)
+				"slides_play":
+					call_deferred("deferred_mc", "play", message)
+				"slides_clear", "widgets_clear":
+					# TBD: Need to distinguish slides/widgets/sounds?
+					# Don't think so, all config_players have the same callback
+					# so all three will post at the same time.
+					call_deferred("emit_signal", "clear", message.context)
+				"sounds_clear":
+					pass
+				"sounds_play":
+					call_deferred("deferred_mc", "play", message)
+				"text_input":
+					call_deferred("emit_signal", "text_input", message)
+				"timer":
+					call_deferred("emit_signal", "mpf_timer", message)
+				"widgets_play":
+					call_deferred("deferred_mc", "play", message)
+				_:
+					if message.get("name") not in self.registered_handlers:
+						self.log.warning("No handler defined for BCP action %s", message_raw)
+
+			# If any handlers are registered for this event, post them
+			if message.get("name") in self.registered_handlers:
+				for h in self.registered_handlers[message.name]:
+					h.call_deferred(message)
 
 		# Free the mutex in case the main thread is trying to shut down
 		_mutex.unlock()
