@@ -3,6 +3,8 @@ class_name GMCBus
 
 enum BusType { SOLO, SEQUENTIAL, SIMULTANEOUS }
 
+signal sound_play(sound_name, settings)
+
 var channels: Array[GMCChannel] = []
 var type: BusType = BusType.SIMULTANEOUS
 var queue
@@ -157,6 +159,7 @@ func play(filename: String, settings: Dictionary = {}) -> void:
 		self.log.error("Failed to load stream for filepath '%s' on channel %s", [filepath, available_channel])
 		return
 	var stream = available_channel.play_with_settings(settings)
+	self.sound_play.emit(filename, settings)
 
 	if settings.get("ducking", false):
 		if stream is AudioStreamRandomizer:
