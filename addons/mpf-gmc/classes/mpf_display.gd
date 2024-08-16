@@ -89,9 +89,9 @@ func action_queue(action: String, slide_name: String, settings: Dictionary, c: S
 func update_stack(kwargs: Dictionary) -> void:
 	self._update_stack(kwargs)
 
-func action_remove(slide: Node) -> void:
+func action_remove(slide: Node, kwargs: Dictionary = {}) -> void:
 	self._slide_stack.erase(slide)
-	self._update_stack()
+	self._update_stack(kwargs)
 
 func get_slide(slide_name) -> Node:
 	if not slide_name:

@@ -78,7 +78,7 @@ func process_action(child_name: String, children: Array, action: String, setting
 			if child:
 				# Use the _remove_expiration method to handle any expire timers
 				# before calling action_remove (done within that method)
-				self._remove_expiration(child)
+				self._remove_expiration(child, kwargs)
 		"update":
 			if child:
 				child.action_update(settings, kwargs)
@@ -93,7 +93,7 @@ func action_play(_child_name: String, _settings: Dictionary, _context: String, _
 	assert(false, "Method 'action_play' must be overridden in child classes of MPFSceneBase")
 	return null
 
-func action_remove(_widget: Node) -> void:
+func action_remove(_widget: Node, kwargs: Dictionary = {}) -> void:
 	assert(false, "Method 'action_remove' must be overridden in child classes of MPFSceneBase")
 
 func action_queue(_action: String, _slide_name: String, _settings: Dictionary, _context: String, _priority: int = 0, _kwargs: Dictionary = {}) -> void:

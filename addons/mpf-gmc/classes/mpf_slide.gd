@@ -24,11 +24,13 @@ func action_play(widget_name: String, settings: Dictionary, c: String, p: int = 
 	self._widgets.add_child(widget)
 	self._sort_widgets()
 	self.register_updater(widget)
+	MPF.server.send_event_with_args("widget_%s_active" % widget_name, kwargs)
 	return widget
 
-func action_remove(widget: Node) -> void:
+func action_remove(widget: Node, kwargs: Dictionary = {}) -> void:
 	self._widgets.remove_child(widget)
 	self.remove_updater(widget)
+	MPF.server.send_event_with_args("widget_%s_removed" % widget.name, kwargs)
 	widget.queue_free()
 
 func clear(context_name: String) -> void:
