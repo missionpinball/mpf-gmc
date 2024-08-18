@@ -26,7 +26,7 @@ func _ready():
 	MPF.server.item_highlighted.connect(self._on_item_highlighted)
 
 func _on_item_highlighted(payload: Dictionary) -> void:
-	if payload.carousel != self.carousel_name:
+	if payload.get("carousel") != self.carousel_name:
 		return
 	self.log.debug("Carousel looking for child matching name '%s'", payload.item)
 	for c in self.get_children():
