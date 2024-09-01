@@ -73,19 +73,11 @@ func play_sounds(s: Dictionary) -> void:
 		if not settings.get("key"):
 			settings["key"] = asset
 
-		var bus: GMCBus = self.buses[settings["bus"]] if settings.get("bus") else self.default_bus
-		var action: String = settings.get("action", "play")
-
-		# A key is all we need to stop
-		if action == "stop" or action == "loop_stop":
-			# TODO: Accept GMCBus as a stop param?
-			bus.stop(settings.key, settings)
-			return
-
 		var config: Variant = MPF.media.get_sound_instance(asset)
 		if not config:
 			printerr("Unable to find sound instance for asset '%s'" % asset)
 			return
+
 		# If the result is a stream, there's no custom asset resource
 		if config is AudioStream:
 			settings["file"] = config.resource_path
@@ -106,6 +98,15 @@ func play_sounds(s: Dictionary) -> void:
 				settings.markers = config.markers
 		else:
 			assert(false, "Cannot play sound of class %s" % config.get_class())
+
+		var bus: GMCBus = self.buses[settings["bus"]] if settings.get("bus") else self.default_bus
+		var action: String = settings.get("action", "play")
+
+		# A key is all we need to stop
+		if action == "stop" or action == "loop_stop":
+			# TODO: Accept GMCBus as a stop param?
+			bus.stop(settings.key, settings)
+			return
 
 		var file: String = settings.get("file", asset)
 		settings['context'] = settings.get("custom_context", s.context)
