@@ -1,3 +1,4 @@
+@tool
 class_name MPFVideoPlayer
 extends VideoStreamPlayer
 ## Renders a VideoStreamPlayer with options for end behavior and events.
@@ -32,17 +33,28 @@ enum EndBehavior {
 @export var end_method: String
 ## Ducking Settings
 @export var ducking: DuckSettings
+## If true, render the video in the editor (first frame)
+@export var preview_in_editor: bool = false
 
 
 @warning_ignore("shadowed_global_identifier")
 var log: GMCLogger
 
 func _enter_tree() -> void:
+	if Engine.is_editor_hint():
+		return
 	self.log = preload("res://addons/mpf-gmc/scripts/log.gd").new("VideoPlayer<%s>" % self.name)
 	if not self.is_visible_in_tree() and self.hide_behavior != HideBehavior.CONTINUE:
 		self.stop()
 
 func _ready() -> void:
+	if Engine.is_editor_hint():
+		if self.preview_in_editor:
+			self.play()
+			await get_tree().process_frame
+			self.paused = true
+		return
+
 	self.finished.connect(self._on_finished)
 	self.visibility_changed.connect(self._on_visibility)
 	if self.is_playing() and self.ducking:

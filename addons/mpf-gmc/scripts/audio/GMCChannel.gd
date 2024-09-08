@@ -88,7 +88,7 @@ func play_with_settings(settings: Dictionary) -> AudioStream:
 		fade_in = 0.5
 	if not fade_in:
 		# Ensure full volume in case it was tweened out previously
-		self.volume_db = settings["volume"] if settings.get("volume") else 0.0
+		self.volume_db = linear_to_db(settings["volume"] if settings.get("volume") else 1.0)
 		self.play(start_at)
 		return self.stream
 	# Set the volume and begin playing
