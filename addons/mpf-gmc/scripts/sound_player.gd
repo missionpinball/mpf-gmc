@@ -85,7 +85,7 @@ func play_sounds(s: Dictionary) -> void:
 		elif config is MPFSoundAsset:
 			assert(config.stream, "Sound asset %s is missing a Stream resource." % asset)
 			settings["file"] = config.stream.resource_path
-			for prop in [ "bus", "fade_in", "fade_out", "start_at", "max_queue_time"]:
+			for prop in [ "bus", "fade_in", "fade_out", "loops", "start_at", "max_queue_time"]:
 				# Any values passed from the event have priority, only populate
 				# asset property values not defined from the event.
 				if settings.get(prop) == null and config.get(prop):
