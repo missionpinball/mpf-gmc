@@ -52,7 +52,7 @@ func play_with_settings(settings: Dictionary) -> AudioStream:
 		if settings["loops"] == -1:
 			# For infinite looping of OGG/WAV/MPF, use the native loop
 			# OGG and MPF use the 'loop' property, while WAV uses 'loop_mode
-			if self.stream is AudioStreamOggVorbis or AudioStreamMP3:
+			if self.stream is AudioStreamOggVorbis or self.stream is AudioStreamMP3:
 				self.stream.loop = true
 			elif self.stream is AudioStreamWAV:
 				self.stream.loop_mode = 1
