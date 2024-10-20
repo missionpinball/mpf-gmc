@@ -22,12 +22,13 @@ func _ready():
 	for c in self.get_children():
 		c.hide()
 	if not carousel_name:
+		self.log.info("Carousel node does not have a carousel_name property defined. Using '%s' as fallback.", self.name)
 		carousel_name = self.name
 	MPF.server.item_highlighted.connect(self._on_item_highlighted)
 
 func _on_item_highlighted(payload: Dictionary) -> void:
 	if payload.get("carousel") != self.carousel_name:
-		self.log.debug("Carousel node '%s' carousel_name does not match item_highlighted carousel name '%s', ignoring.", [self.carousel_name, payload.get("carousel")])
+		self.log.debug("carousel_name does not match item_highlighted carousel name '%s', ignoring.", payload.get("carousel"))
 		return
 	self.log.debug("Carousel looking for child matching name '%s'", payload.item)
 	for c in self.get_children():
