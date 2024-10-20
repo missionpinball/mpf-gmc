@@ -6,11 +6,11 @@ const numbered_players = [VariableType.PLAYER_1, VariableType.PLAYER_2, Variable
 
 ## Displays a player, machine, or event variable as text on screen.
 
-## The source of the variable value
+## The source of the variable value.
 @export var variable_type: VariableType = VariableType.CURRENT_PLAYER
-## The name of the variable or event arg to show
+## The name of the variable or event arg to show.
 @export var variable_name: String
-## If checked, number values will be comma-separated into thousands
+## If checked, number values will be comma-separated into thousands.
 @export var comma_separate: bool
 ## If greater than zero, numbers will be left-padded with zeroes to this minimum number of digits.
 @export var min_digits: int = -1
