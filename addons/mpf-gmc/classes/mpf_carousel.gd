@@ -27,6 +27,7 @@ func _ready():
 
 func _on_item_highlighted(payload: Dictionary) -> void:
 	if payload.get("carousel") != self.carousel_name:
+		self.log.debug("Carousel node '%s' carousel_name does not match item_highlighted carousel name '%s', ignoring.", [self.carousel_name, payload.get("carousel")])
 		return
 	self.log.debug("Carousel looking for child matching name '%s'", payload.item)
 	for c in self.get_children():

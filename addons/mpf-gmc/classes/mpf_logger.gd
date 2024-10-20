@@ -23,3 +23,10 @@ func _ready() -> void:
 			n.log.setLevel(self.log_level)
 		else:
 			printerr("Node %s does not support GMCLogger. Logging will not be available for this node." % n)
+
+# In case this node is a child of something that wants to show/hide
+func show() -> void:
+	return
+
+func hide() -> void:
+	return
