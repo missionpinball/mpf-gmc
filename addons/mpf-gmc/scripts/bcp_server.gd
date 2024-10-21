@@ -310,6 +310,7 @@ func _thread_poll(_userdata=null) -> void:
 			if self.on_message(message) == null:
 				continue
 
+			self.log.debug("%s", message)
 			match message.cmd:
 				"ball_end":
 					call_deferred("on_ball_end")
