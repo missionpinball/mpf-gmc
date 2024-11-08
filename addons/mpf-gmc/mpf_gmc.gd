@@ -15,27 +15,35 @@ var config
 var local_config
 
 func _init():
+
+	# Configure logging with the value from the config, if provided.
+	# Otherwise will default to INFO for debug builds and LOG for production.
+	var default_log_level = 20 if OS.has_feature("debug") else 25
+	# Set the GMC level as global log level before instantiating other loggers
+	self.configure_logging("GMC", default_log_level, true)
+
+	var plugin_config = ConfigFile.new()
+	var perr = plugin_config.load("res://addons/mpf-gmc/plugin.cfg")
+	self.log.log("Initializing GMC version %s" % plugin_config.get_value("plugin", "version"))
+
 	for cfg in [[CONFIG_PATH, "config"], [LOCAL_CONFIG_PATH, "local_config"]]:
 		self[cfg[1]] = ConfigFile.new()
 		var err = self[cfg[1]].load(cfg[0])
 		if err == OK:
 			if cfg[1] == "local_config":
-				print("Found local GMC config override file: %s" % ProjectSettings.globalize_path(cfg[0]))
+				self.log.log("Found local GMC config override file: %s" % ProjectSettings.globalize_path(cfg[0]))
 			else:
-				print("Found GMC configuration file %s." % ProjectSettings.globalize_path(cfg[0]))
+				self.log.log("Found GMC configuration file %s." % ProjectSettings.globalize_path(cfg[0]))
 		if err != OK:
 			# Error 7 is file not found, that's okay
 			if err == ERR_FILE_NOT_FOUND:
 				pass
 			else:
-				printerr("Error loading config file '%s': %s" % [cfg[0],err])
+				self.log.error("Error loading GMC config file '%s': %s" % [cfg[0], error_string(err)])
 
-	# Configure logging with the value from the config, if provided.
-	# Otherwise will default to INFO for debug builds and LOG for production.
-	var default_log_level = 20 if OS.has_feature("debug") else 25
+	# Now that configs are loaded, update the global log level
 	var global_log_level = self.get_config_value("gmc", "logging_global", default_log_level)
-	# Set the GMC level as global log level before instantiating other loggers
-	self.configure_logging("GMC", global_log_level, true)
+	self.log.setLevel(global_log_level, true)
 
 	# Any default script can be overridden with a custom one
 	# This is done explicitly line-by-line for optimized preload and relative paths
