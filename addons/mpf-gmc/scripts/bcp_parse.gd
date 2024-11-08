@@ -10,7 +10,7 @@ static func parse(message: String) -> Dictionary:
 	var result = {}
 
 	if "?" in message:
-		var split_message := message.split("?")
+		var split_message := message.split("?", true, 1)
 		cmd = split_message[0]
 		result = string_to_obj(split_message[1], cmd)
 	else:
