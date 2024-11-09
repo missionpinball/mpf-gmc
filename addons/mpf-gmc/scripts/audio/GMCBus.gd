@@ -61,7 +61,6 @@ func duck(settings) -> void:
 	# Track which duck we are timing
 	self._duck_release_timer.set_meta("ducking", settings)
 	self._duck_release_timer.start(settings.duration)
-	self.log.info("Ducking %s by %s over %ss, will last %s", [self.name, settings.attenuation, settings.attack, settings.duration])
 
 func duck_release() -> void:
 	# Remove this duck from the list of duckings
