@@ -87,7 +87,7 @@ func duck_release() -> void:
 		self._active_duck.kill()
 
 	# If there is a next duck in the stack, use that as the release volume
-	var attenuation = next_duck.attenuation if next_duck else 0.0
+	var attenuation = (next_duck.attenuation if next_duck else 0.0) * -1.0
 	self._active_duck = self._create_duck_tween(attenuation, last_duck.release)
 	self.log.info("Releasing duck on %s over %ss", [self.name, last_duck.release])
 
@@ -98,6 +98,7 @@ func duck_release() -> void:
 		self._duck_release_timer.remove_meta("ducking")
 
 func set_bus_volume(value: float):
+	self.log.debug("Setting bus volume to %s", value)
 	AudioServer.set_bus_volume_db(self._bus_index, value)
 
 func set_bus_volume_full(value: float):
@@ -246,12 +247,23 @@ func _abort_ducking_check():
 	self.duck_release()
 
 func _create_duck_tween(attenuation: float, duration: float) -> Tween:
+	if (attenuation < 0 or attenuation > 1):
+		self.log.warning("Ducking attenuation settings have CHANGED from decibal values to linear. " +
+						 "Please specify attenuation as a value from 0.0 (no change) to 1.0 (full mute)")
+		attenuation = 0.0
 	var duck_tween = self.create_tween()
+	# TODO: Integrate default values
+	var full_volume = db_to_linear(self._full_volume_db)
+	# Attenuation value is the percentage of full volume to reduce.
+	var target_volume = full_volume * (1.0 - attenuation)
+	var target_volume_db = linear_to_db(target_volume)
+
 	duck_tween.tween_method(self.set_bus_volume,
 		# Always use the current level in case we're interrupting
 		AudioServer.get_bus_volume_db(self._bus_index),
-		# TODO: Integrate default values
-		self._full_volume_db - attenuation,
+		# The attenuation will be a negative value (-inf to 0.0) so *add* it
+		# to reduce the effective volume.
+		target_volume_db,
 		duration
 	).set_trans(Tween.TRANS_LINEAR).set_ease(Tween.EASE_IN)
 	return duck_tween
