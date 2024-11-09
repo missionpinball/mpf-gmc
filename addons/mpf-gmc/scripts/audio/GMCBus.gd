@@ -87,7 +87,7 @@ func duck_release() -> void:
 		self._active_duck.kill()
 
 	# If there is a next duck in the stack, use that as the release volume
-	var attenuation = (next_duck.attenuation if next_duck else 0.0) * -1.0
+	var attenuation = next_duck.attenuation if next_duck else 0.0
 	self._active_duck = self._create_duck_tween(attenuation, last_duck.release)
 	self.log.info("Releasing duck on %s over %ss", [self.name, last_duck.release])
 
