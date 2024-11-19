@@ -51,8 +51,6 @@ func _ready() -> void:
 	if Engine.is_editor_hint():
 		if self.preview_in_editor:
 			self.play()
-			await get_tree().process_frame
-			self.paused = true
 		return
 
 	self.finished.connect(self._on_finished)
