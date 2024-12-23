@@ -49,6 +49,8 @@ var _thread: Thread
 ###
 
 func _ready() -> void:
+	# Set the port for BCP connections
+	port = MPF.get_config_value("gmc", "bcp_port", port)
 	# Wait until a server is actively listening before polling for clients
 	set_process(false)
 
