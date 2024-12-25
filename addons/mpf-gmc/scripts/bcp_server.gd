@@ -134,7 +134,6 @@ func send_event(event_name: String, bounceback: bool = true) -> void:
 	if bounceback:
 		self._bounceback(event_name)
 
-
 func send_event_with_args(event_name: String, args: Dictionary, bounceback: bool = true) -> void:
 	if not args or args.is_empty():
 		return self.send_event(event_name)
