@@ -56,11 +56,11 @@ func _capture() -> void:
 	# If RGB shifting is needed, do it now
 	self._rgb_shift_fn and self._rgb_shift_fn.call(tex)
 	var data = tex.get_data()
-	# !!! Due to MPF BCP parsing limitations 'bytes' MUST be the last arg
-	MPF.server._send("rgb_dmd_frame?name=%s&bytes=%d" % [name, data.size()])
-	MPF.server._client.put_data(data)
+	# Send the data bytes from the frame to MPF for DMD handling
+	MPF.server.send_bytes("rgb_dmd_frame", data, {"name": name})
 
 func _apply_shader() -> void:
+	# Not yet implemented. Well it works, but not automatic
 	pass
 
 func _shift_grb(tex: Image) -> void:

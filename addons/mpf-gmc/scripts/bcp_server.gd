@@ -146,6 +146,15 @@ func send_switch(switch_name: String, state: int = -1) -> void:
 	var message = "switch?name=%s&state=%s" % [switch_name, state]
 	_send(message)
 
+func send_bytes(trigger_name: String, data: PackedByteArray, kwargs: Dictionary = {}) -> void:
+	var params = []
+	for k in kwargs.keys():
+		params.append("%s=%s" % [k, kwargs[k]])
+	# !!! Due to MPF BCP parsing limitations 'bytes' MUST be the last arg
+	params.append("bytes=%d" % data.size())
+	self._send("%s?%s" % [trigger_name, "&".join(params)])
+	self._client.put_data(data)
+
 ## Send a specialized Service Mode command to MPF
 func send_service(subcommand: String, values: PackedStringArray = []) -> void:
 	var suffix: String = "&values=%s" % ",".join(values) if values else ""
