@@ -27,7 +27,8 @@ func _ready() -> void:
 	RenderingServer.frame_pre_draw.connect(self._pre_draw)
 	# Force additional output to continue rendering even if
 	# the window is not visible. Requires Godot 4.3
-	DisplayServer.register_additional_output(self)
+	if Engine.get_version_info().hex >= 0x040300:
+		DisplayServer.register_additional_output(self)
 
 	if use_gpu == GPUStrategy.ALWAYS or (use_gpu == GPUStrategy.PRODUCTION and OS.has_feature("template")):
 		self.log.warning("GPU-based DMD shading is in progress, please inquire!")
@@ -38,7 +39,8 @@ func _ready() -> void:
 		_rgb_shift_fn = self._shift_grb
 
 func _exit_tree() -> void:
-	DisplayServer.unregister_additional_output(self)
+	if Engine.get_version_info().hex >= 0x040300:
+		DisplayServer.unregister_additional_output(self)
 
 func _pre_draw():
 	# If the drawing changes, wait for the new draw and capture
