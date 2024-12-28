@@ -6,11 +6,11 @@ const numbered_players = [VariableType.PLAYER_1, VariableType.PLAYER_2, Variable
 
 ## Displays a player, machine, or event variable as text on screen.
 
-## The source of the variable value
+## The source of the variable value.
 @export var variable_type: VariableType = VariableType.CURRENT_PLAYER
-## The name of the variable or event arg to show
+## The name of the variable or event arg to show.
 @export var variable_name: String
-## If checked, number values will be comma-separated into thousands
+## If checked, number values will be comma-separated into thousands.
 @export var comma_separate: bool
 ## If greater than zero, numbers will be left-padded with zeroes to this minimum number of digits.
 @export var min_digits: int = -1
@@ -77,6 +77,7 @@ func update(settings: Dictionary, kwargs: Dictionary = {}) -> void:
 			settings = settings.duplicate()
 			settings.merge(settings.get("tokens", {}))
 			settings.merge(kwargs)
+		# Pass the entire dictionary as the update value
 		self.update_text(settings)
 		return
 	# If there is an explicit variable name, kwargs have highest priority
@@ -89,7 +90,20 @@ func update(settings: Dictionary, kwargs: Dictionary = {}) -> void:
 	elif variable_name in settings:
 		self.update_text(settings[variable_name])
 
-func update_text(value: Variant) -> void:
+func update_text(value) -> void:
+	if self.format_string:
+		match variable_type:
+			VariableType.CURRENT_PLAYER:
+				value = MPF.game.player
+			VariableType.MACHINE_VAR:
+				value = MPF.game.machine_vars
+			VariableType.SETTING:
+				value = MPF.game.settings
+			_:
+				if variable_type in numbered_players:
+					value = MPF.game.players[numbered_players.find(variable_type)]
+		self.text = format_string.format(value)
+		return
 	if value == null:
 		self.text = ""
 		return
@@ -100,18 +114,12 @@ func update_text(value: Variant) -> void:
 			value = var_template % value
 	if template_string:
 		self.text = template_string % value
-	elif format_string:
-		self.text = format_string.format(value)
 	else:
 		self.text = value
 
 func _on_player_update(var_name: String, value: Variant) -> void:
 	if var_name == variable_name:
-		# For formatting, we need a key/value pair
-		if self.format_string:
-			self.update_text({ "value": value })
-		else:
-			self.update_text(value)
+		self.update_text(value)
 
 func _on_player_added(total_players: int) -> void:
 	if min_players > 0 and min_players > total_players:

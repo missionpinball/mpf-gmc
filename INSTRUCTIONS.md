@@ -21,12 +21,12 @@ In the Godot Editor, go to the Godot Asset Library and search for the MPF GMC Pl
 
 Alternatively, you can clone the MPF GMC repository from https://github.com/missionpinball/mpf-gmc/ and copy or symlink the */addons/mpf-gmc* folder into your project's folder (also at */addons/mpf-gmc*).
 
-The plugin provides the necessary framework to build MPF-responsive scenes in your project, but does not provide access to MPF data and communications. 
+The plugin provides the necessary framework to build MPF-responsive scenes in your project, but does not provide access to MPF data and communications.
 
-**You must go to *Project Settings -> Autoloads* and select */addons/mpf-gmc/mpf_gmc.gd* as an Autoload and give it the name `MPF`.** Add and enable this autoload, then restart the Godot editor.
+**You must go to *Project Settings -> Globals* and select */addons/mpf-gmc/mpf_gmc.gd* as a Global and give it the name `MPF`.** Add and enable this global, then restart the Godot editor.
 
 > [!CAUTION]
-> It is critical that the Autoload has the name `MPF` in order for the GMC to function properly!
+> It is critical that the Global has the name `MPF` in order for the GMC to function properly!
 
 
 ## Basic Usage
@@ -39,7 +39,7 @@ The GMC plugin provides a few components (nodes) that provide the foundation of 
 * `MPFWindow`: The base window that runs all the displays and slides. This is the entry point of GMC.
 * `MPFDisplay`: A virtual display that contains slides. Your game may have one or more displays.
 * `MPFSlide`: A slide (scene) containing any number of components that is rendered on a display
-* `MPFWidget`: A widget (scene) containing any number of components that is added to a slide 
+* `MPFWidget`: A widget (scene) containing any number of components that is added to a slide
 * `MPFVariable`: A text component with dynamic content based on machine, player, or event variables
 
 To start building your game in GMC, you will create scenes for your slides and use `slide_player` to play the slides based on triggering events.
@@ -73,7 +73,7 @@ slide_player:
 > [!TIP]
 > The default action for the slide player is `play`, so it's not necessary to include `action: play` in the config (but you can if you'd like).
 
-GMC slides support context tracking, which means that GMC knows that this slide is being triggered from the skillshot mode. Consequently, when the skillshot mode ends this slide will automatically be removed. 
+GMC slides support context tracking, which means that GMC knows that this slide is being triggered from the skillshot mode. Consequently, when the skillshot mode ends this slide will automatically be removed.
 
 If you want to remove a slide before its triggering mode ends, you can manually remove the slide with the `action: remove` config:
 ```
@@ -154,7 +154,7 @@ In this example, the scene includes an AnimationPlayer with an animation called 
 
 ```
 slide_player:
-  mode_wacky_score_started: 
+  mode_wacky_score_started:
     wacky_score:
       action: play
   score_jackpot_hit:

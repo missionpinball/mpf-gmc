@@ -49,19 +49,17 @@ func play_with_settings(settings: Dictionary) -> AudioStream:
 		self.stream.set_meta("fade_out", settings.fade_out)
 
 	if settings.get("loops"):
-		# OGG and MPF use the 'loop' property, while WAV uses 'loop_mode
-		if self.stream is AudioStreamWAV:
-			self.stream.loop_mode = 1 if settings["loops"] != 0 else 0
+		if settings["loops"] == -1:
+			# For infinite looping of OGG/WAV/MPF, use the native loop
+			# OGG and MPF use the 'loop' property, while WAV uses 'loop_mode
+			if self.stream is AudioStreamOggVorbis or self.stream is AudioStreamMP3:
+				self.stream.loop = true
+			elif self.stream is AudioStreamWAV:
+				self.stream.loop_mode = 1
+			else:
+				self._connect_loop(settings["loops"])
 		else:
-			self.stream.loop = settings["loops"] != 0
-		# Attach metadata to track the loops
-		if settings["loops"] > 0:
-			self.stream.set_meta("loops_remaining", settings["loops"])
-			# AVW Disabling this during refactor
-			#self.finished.connect(self._on_loop.bind(self))
-	# elif start_at == -1.0:
-	# 	# Map the sound start position relative to the music position
-	# 	start_at = fmod(_music_loop_channel.get_playback_position(), channel.stream.get_length())
+			self._connect_loop(settings["loops"])
 
 	# TODO: Support marker events
 	if settings.get("events_when_started"):
@@ -103,13 +101,12 @@ func play_with_settings(settings: Dictionary) -> AudioStream:
 	return self.stream
 
 func clear() -> void:
-	if self.stream and self.stream.has_meta("loops_remaining"):
-		# self.finished.disconnect(self._on_loop)
-		self.stream.remove_meta("loops_remaining")
 	self.stop()
 	self.volume_db = 0.0
 	self.remove_meta("tween")
 	self.remove_meta("is_stopping")
+	if self.stream and self.stream.has_meta("loops_remaining"):
+		self.stream.remove_meta("loops_remaining")
 	for c in self.finished.get_connections():
 		self.finished.disconnect(c.callable)
 	self.stream_paused = false
@@ -189,17 +186,20 @@ func _on_fade_complete(tween: Tween, action: String) -> void:
 			self.log.debug("Fade out complete on channel %s, will pause now.", self)
 			self.stream_paused = true
 
+func _connect_loop(loop_count):
+	# The first loop is playing immediately, so *remaining* is count minus one
+	self.stream.set_meta("loops_remaining", loop_count - 1)
+	self.finished.connect(self._on_loop)
+
 func _on_loop() -> void:
-	var loops_remaining: int = self.stream.get_meta("loops_remaining") - 1
+	var loops_remaining = self.stream.get_meta("loops_remaining")
+	self.log.debug("Looping for %s, %s loops remaining" % [self, loops_remaining])
 	if loops_remaining == 0:
-		self.stream.remove_meta("loops_remaining")
-		self.finished.disconnect(self._on_loop)
-		if self.stream is AudioStreamWAV:
-			self.stream.loop_mode = 0
-		else:
-			self.loop = false
-	else:
-		self.stream.set_meta("loops_remaining", loops_remaining)
+		self.stop_with_settings()
+		return
+	if loops_remaining > 0:
+		self.stream.set_meta("loops_remaining", loops_remaining - 1)
+	self.play()
 
 func _trigger_events(state: String, events: Array) -> void:
 	for e in events:

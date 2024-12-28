@@ -9,7 +9,9 @@ var bus: GMCBus
 	set = _set_target_bus
 ## A delay (seconds) before the ducking attack
 @export var delay: float
-## The volume (in db) to reduce the target bus by
+## The volume (as decimal percent) to reduce the target bus by.
+## E.g. a value of 0.2 will reduce the target bus volume by 20%,
+## and a value of 0.5 will reduce the target bus by 50%.
 @export var attenuation: float
 ## The duration (seconds) over which to reduce the target bus value
 @export var attack: float

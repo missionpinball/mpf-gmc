@@ -101,7 +101,7 @@ func _find_target():
 		VariableType.CURRENT_PLAYER:
 			base = MPF.game.player
 		VariableType.MACHINE_VAR:
-			base = MPF.game.machine
+			base = MPF.game.machine_vars
 		VariableType.SETTING:
 			base = MPF.game.settings
 		VariableType.EVENT_ARG:

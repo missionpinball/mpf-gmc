@@ -45,6 +45,14 @@ func _init() -> void:
 	randomize()
 
 func add_player(kwargs: Dictionary) -> void:
+	## MPF has inconsistencies in how player_added events are sent, and
+	# may send two events: one with a 'num' kwarg and one with 'player_num'.
+	# For consistency, check the number against the player count to avoid dupes.
+	# TODO: Fix MPF's inconsistent/duplicate player_added events.
+	var player_number = kwargs.get("num", kwargs.get("player_num", 0))
+	var current_player_count = players.size()
+	if player_number <= current_player_count:
+		return
 	players.append({
 		"score": 0,
 		"number": kwargs.player_num
