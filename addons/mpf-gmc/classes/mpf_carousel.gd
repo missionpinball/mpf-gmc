@@ -25,7 +25,7 @@ func _ready():
 		self.log.info("Carousel node does not have a carousel_name property defined. Using '%s' as fallback.", self.name)
 		carousel_name = self.name
 	if not carousel_name in MPF.game.active_modes and OS.has_feature("debug"):
-		self.log.warning("No active mode '%s', carousel will not function until that modes is active.", [carousel_name])
+		self.log.warning("No active mode '%s', carousel will not function until that mode is active.", [carousel_name])
 	MPF.server.item_highlighted.connect(self._on_item_highlighted)
 	self.log.debug("Carousel active and waiting for 'carousel=%s' item_highlighted events.", carousel_name)
 
