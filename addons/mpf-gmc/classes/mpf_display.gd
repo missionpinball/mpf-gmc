@@ -145,7 +145,11 @@ func _update_stack(kwargs: Dictionary = {}) -> void:
 			var is_removed: bool = self._slide_stack.find(old_slide) == -1
 			MPF.server.send_event_with_args("slide_%s_inactive" % old_slide.key,
 				{"is_removing": is_removed})
-		MPF.server.send_event_with_args("slide_%s_active" % new_slide.key, kwargs)
+
+		# Copy the original kwargs and remove 'name' before sending active event
+		var evt_kwargs = kwargs.duplicate()
+		evt_kwargs.erase("name")
+		MPF.server.send_event_with_args("slide_%s_active" % new_slide.key, evt_kwargs)
 		self._current_slide = new_slide
 		# If the old slide is removed, check for animations
 		if old_slide and old_slide not in self._slide_stack:

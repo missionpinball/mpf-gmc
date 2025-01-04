@@ -24,7 +24,10 @@ func action_play(widget_name: String, settings: Dictionary, c: String, p: int = 
 	self._widgets.add_child(widget)
 	self._sort_widgets()
 	self.register_updater(widget)
-	MPF.server.send_event_with_args("widget_%s_active" % widget_name, kwargs)
+	# Copy the original kwargs and remove 'name' before sending active event
+	var evt_kwargs = kwargs.duplicate()
+	evt_kwargs.erase("name")
+	MPF.server.send_event_with_args("widget_%s_active" % widget_name, evt_kwargs)
 	return widget
 
 func action_remove(widget: Node, kwargs: Dictionary = {}) -> void:

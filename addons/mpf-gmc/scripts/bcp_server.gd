@@ -137,8 +137,8 @@ func send_event(event_name: String, bounceback: bool = true) -> void:
 func send_event_with_args(event_name: String, args: Dictionary, bounceback: bool = true) -> void:
 	if not args or args.is_empty():
 		return self.send_event(event_name)
-	if args.has("name"):
-		self.log.warning("'name' is a reserved key in send_event_with_args(). Arg value '%s' will be discarded.", args['name'])
+	if args.has("name") and args['name'] != event_name:
+		self.log.warning("'name' is a reserved key in send_event_with_args(). Arg value '%s' for event '%s' will be discarded.", [args['name'], event_name])
 	var event_string = _bcp_parse.encode_event_args(event_name, args)
 	_send("trigger?%s" % event_string)
 	if bounceback:
