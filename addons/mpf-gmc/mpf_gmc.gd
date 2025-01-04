@@ -146,7 +146,11 @@ func _unhandled_input(event: InputEvent) -> void:
 				# Only handle events on the press, not the release
 				if not event.is_pressed():
 					return
-				MPF.server.send_event(cfg[1])
+				# If a kwarg dict is provided, include it
+				if cfg.size() > 2:
+					MPF.server.send_event_with_args(cfg[1], cfg[2])
+				else:
+					MPF.server.send_event(cfg[1])
 			"switch":
 				var action
 				var state
