@@ -43,18 +43,18 @@ func save() -> void:
 		save_value = float("%0.2f" % (selected_value / 100))
 	MPF.server.set_machine_var(variable, save_value, self.persist)
 
-func get_value() -> float:
+func get_value() -> int:
 	return $HSlider.value
 
-func _on_volume_change(bus, value, change):
+func _on_volume_change(bus, new_value, _change) -> void:
 	if bus != self.variable:
 		return
 	if self.convert_to_percent:
-		value = int(value * 100)
-	if value != selected_value:
-		self.selected_value = value
+		new_value = int(new_value * 100)
+	if new_value != selected_value:
+		self.selected_value = new_value
 		$Option.text = "%d" % selected_value
-		$HSlider.value = value
+		$HSlider.value = new_value
 
 func _to_string() -> String:
 	return "<SettingsSlider:%s>" % variable

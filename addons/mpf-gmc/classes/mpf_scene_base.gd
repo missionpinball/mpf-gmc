@@ -93,7 +93,7 @@ func action_play(_child_name: String, _settings: Dictionary, _context: String, _
 	assert(false, "Method 'action_play' must be overridden in child classes of MPFSceneBase")
 	return null
 
-func action_remove(_widget: Node, kwargs: Dictionary = {}) -> void:
+func action_remove(_widget: Node, _kwargs: Dictionary = {}) -> void:
 	assert(false, "Method 'action_remove' must be overridden in child classes of MPFSceneBase")
 
 func action_queue(_action: String, _slide_name: String, _settings: Dictionary, _context: String, _priority: int = 0, _kwargs: Dictionary = {}) -> void:
