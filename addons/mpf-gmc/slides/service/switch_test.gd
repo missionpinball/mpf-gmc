@@ -31,7 +31,8 @@ func _on_service(payload: Dictionary) -> void:
 	if not label:
 		label = payload.switch_name
 	$active_test/last_switch_label.text = label
-	$active_test/last_switch_address.text = payload.switch_num.uri_decode()
+	var addr = payload.switch_num.uri_decode() if typeof(payload.switch_num) == TYPE_STRING else "%s" % payload.switch_num
+	$active_test/last_switch_address.text = addr
 
 	var recency = Label.new()
 	var prefix: String
