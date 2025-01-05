@@ -55,10 +55,14 @@ func _on_button(payload):
 	}[payload.button]
 	Input.parse_input_event(inputEvent)
 
-func _unhandled_key_input(event):
+func _input(event):
+	# Ignore actual key inputs, only manage artificial ones triggered
+	# by BCP commands. This ensures that menu behavior is accurate for
+	# hardware-connected switches and is not using the keyboard.
 	if event.key_label != -1:
 		return
 
+	# Last tab is always exit
 	var is_exiting = tabRow.current_tab == tabRow.get_tab_count() - 1
 	if tabRow.has_focus():
 		if event.keycode == KEY_ESCAPE:
@@ -70,7 +74,6 @@ func _unhandled_key_input(event):
 		elif event.keycode == KEY_DOWN and not is_exiting:
 			get_window().set_input_as_handled()
 			self.select_page()
-		# Last tab is always exit
 		elif event.keycode == KEY_BACKSPACE and is_exiting:
 			get_window().set_input_as_handled()
 			self.exit_service()

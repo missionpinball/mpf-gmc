@@ -68,7 +68,7 @@ func _focus_exited() -> void:
 		self.is_focused = false
 		$Setting.button_pressed = false
 
-func _unhandled_key_input(event: InputEvent) -> void:
+func _input(event: InputEvent) -> void:
 	if self.is_focused and event.key_label == -1:
 		# If this is a toggle event, move focus in/out of the option
 		if IS_TOGGLE_STYLE:

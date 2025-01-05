@@ -124,12 +124,24 @@ func _explode_version_string(version: String) -> int:
 	bits[3] = bits[3].trim_prefix("dev")
 	return int(bits[0]) * 1_000_000 + int(bits[1]) * 10_000 + int(bits[2]) * 100 + int(bits[3])
 
-func _unhandled_input(event: InputEvent) -> void:
+func _input(event: InputEvent) -> void:
+	# Don't accept any non-keyboard input
 	if not event.is_class("InputEventKey"):
+		get_tree().get_root().set_input_as_handled()
 		return
+
+	# ALWAYS set the input as handled to prevent Godot default InputMap
+	# from trying to manage UI. The only input that should propagate to
+	# handlers is from BCP (which has key_label -1)
+	if event.key_label != -1:
+		get_tree().get_root().set_input_as_handled()
+	else:
+		return
+
 	# Don't support holding down a key
 	if event.is_echo():
 		return
+
 	var keycode = OS.get_keycode_string(event.get_key_label_with_modifiers()).to_upper()
 	#print(keycode)
 	if keycode == "ESCAPE" and self.get_config_value("gmc", "exit_on_esc", false):
@@ -172,4 +184,3 @@ func _unhandled_input(event: InputEvent) -> void:
 				MPF.server.send_switch(cfg[1], state)
 			_:
 				return
-		get_tree().get_root().set_input_as_handled()

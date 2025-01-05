@@ -52,7 +52,7 @@ func focus_child(direction: int, wrap_around=false):
 					return
 				parent = parent.get_parent()
 
-func _unhandled_key_input(event):
+func _input(event):
 	if not self.is_focused or event.key_label != -1:
 		return
 
