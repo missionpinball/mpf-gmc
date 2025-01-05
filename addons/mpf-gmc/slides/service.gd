@@ -59,7 +59,7 @@ func _input(event):
 	# Ignore actual key inputs, only manage artificial ones triggered
 	# by BCP commands. This ensures that menu behavior is accurate for
 	# hardware-connected switches and is not using the keyboard.
-	if event.key_label != -1:
+	if not event.is_class("InputEventKey") or event.key_label != -1:
 		return
 
 	# Last tab is always exit

@@ -53,7 +53,9 @@ func focus_child(direction: int, wrap_around=false):
 				parent = parent.get_parent()
 
 func _input(event):
-	if not self.is_focused or event.key_label != -1:
+	if not event.is_class("InputEventKey") or event.key_label != -1:
+		return
+	if not self.is_focused:
 		return
 
 	if List.get_child(focused_index).has_focus():

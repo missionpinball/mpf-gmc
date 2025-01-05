@@ -11,7 +11,9 @@ func _ready():
 
 
 func _input(event):
-	if not self.is_focused or event.key_label != -1:
+	if not event.is_class("InputEventKey") or event.key_label != -1:
+		return
+	if not self.is_focused:
 		return
 
 	if event.keycode == KEY_ENTER or event.keycode == KEY_CAPSLOCK:

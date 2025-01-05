@@ -69,38 +69,42 @@ func _focus_exited() -> void:
 		$Setting.button_pressed = false
 
 func _input(event: InputEvent) -> void:
-	if self.is_focused and event.key_label == -1:
-		# If this is a toggle event, move focus in/out of the option
-		if IS_TOGGLE_STYLE:
-			if event.keycode == KEY_CAPSLOCK:
-				get_window().set_input_as_handled()
-				if self.has_focus():
-					is_option_focused = true
-					if callback:
-						callback.call_func()
-					else:
-						$Option.grab_focus()
-						self.set_setting_background_color(true)
+	if not event.is_class("InputEventKey") or event.key_label != -1:
+		return
+	if not self.is_focused:
+		return
+
+	# If this is a toggle event, move focus in/out of the option
+	if IS_TOGGLE_STYLE:
+		if event.keycode == KEY_CAPSLOCK:
+			get_window().set_input_as_handled()
+			if self.has_focus():
+				is_option_focused = true
+				if callback:
+					callback.call_func()
 				else:
-					self.grab_focus()
-					self.set_setting_background_color(false)
-					is_option_focused = false
-					self.save()
-			elif is_option_focused:
-				if event.keycode == KEY_ESCAPE:
-					get_window().set_input_as_handled()
-					select_option(-1)
-				elif event.keycode == KEY_ENTER:
-					get_window().set_input_as_handled()
-					select_option(1)
-		# If this is not toggle style, left and right hit the options directly
-		else:
+					$Option.grab_focus()
+					self.set_setting_background_color(true)
+			else:
+				self.grab_focus()
+				self.set_setting_background_color(false)
+				is_option_focused = false
+				self.save()
+		elif is_option_focused:
 			if event.keycode == KEY_ESCAPE:
 				get_window().set_input_as_handled()
 				select_option(-1)
 			elif event.keycode == KEY_ENTER:
 				get_window().set_input_as_handled()
 				select_option(1)
+	# If this is not toggle style, left and right hit the options directly
+	else:
+		if event.keycode == KEY_ESCAPE:
+			get_window().set_input_as_handled()
+			select_option(-1)
+		elif event.keycode == KEY_ENTER:
+			get_window().set_input_as_handled()
+			select_option(1)
 
 func save() -> void:
 	MPF.server.send_event("service_trigger&action=setting&variable=%s&value=%s" % [variable, selected_value])
