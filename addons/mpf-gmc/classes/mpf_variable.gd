@@ -43,7 +43,7 @@ func _ready() -> void:
 		var_template = ("%0"+str(min_digits)+"d")
 	if variable_type == VariableType.MACHINE_VAR:
 		self.update_text(MPF.game.machine_vars.get(self.variable_name))
-		# TODO: Dynamically update machine vars?
+		MPF.game.connect("machine_update", self._on_machine_update)
 	elif variable_type == VariableType.EVENT_ARG:
 		var parent_slide = MPF.util.find_parent_slide_or_widget(self)
 		parent_slide.register_updater(self)
@@ -116,6 +116,10 @@ func update_text(value) -> void:
 		self.text = template_string % value
 	else:
 		self.text = value
+
+func _on_machine_update(var_name: String, value: Variant) -> void:
+	if var_name == variable_name:
+		self.update_text(value)
 
 func _on_player_update(var_name: String, value: Variant) -> void:
 	if var_name == variable_name:
