@@ -21,16 +21,16 @@ func _ready() -> void:
 		if self.config.has_section_key(config_section, child.name):
 			value = self.config.get_value(config_section, child.name)
 		if child is TextEdit:
-			if value != null:
-				child.text = value
+			child.text = value if value else ""
 			child.text_changed.connect(self._set_dirty)
 		elif child is CheckButton:
-			if value != null:
-				child.button_pressed = value
+			child.button_pressed = value if value else false
 			child.pressed.connect(self._set_dirty)
 		elif child is OptionButton:
 			if value != null:
 				self._set_option_button(child, value)
+			else:
+				child.select(0)
 			child.item_selected.connect(self._set_dirty)
 
 func _set_option_button(button: OptionButton, value: int) -> int:

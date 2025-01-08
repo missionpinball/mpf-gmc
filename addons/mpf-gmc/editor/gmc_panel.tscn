@@ -226,7 +226,6 @@ text = "Exit Game on ESC"
 
 [node name="exit_on_esc" type="CheckButton" parent="main/flags_bottom"]
 layout_mode = 2
-button_pressed = true
 
 [node name="fullscreen-label" type="Label" parent="main/flags_bottom"]
 visible = false
