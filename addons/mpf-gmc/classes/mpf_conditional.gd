@@ -115,8 +115,8 @@ func _find_target():
 			if MPF.game.players.size() > 2:
 				base = MPF.game.players[2]
 		VariableType.PLAYER_4:
-			if MPF.game.players.size() > 4:
-				base = MPF.game.players[4]
+			if MPF.game.players.size() > 3:
+				base = MPF.game.players[3]
 	if "." in self.variable_name and base != null:
 		var nested = self.variable_name.split(".")
 		while nested.size() > 1:

@@ -36,6 +36,7 @@ var _trackers = {}
 var version: String
 
 signal game_started
+signal machine_update(variable_name, value)
 signal player_update(variable_name, value)
 signal player_added(total_players)
 signal credits
@@ -112,6 +113,7 @@ func update_machine(kwargs: Dictionary) -> void:
 
 	else:
 		machine_vars[var_name] = value
+		emit_signal("machine_update", var_name, value)
 		if var_name.begins_with("credits"):
 			emit_signal("credits", var_name, kwargs)
 		elif var_name.ends_with("_volume"):
