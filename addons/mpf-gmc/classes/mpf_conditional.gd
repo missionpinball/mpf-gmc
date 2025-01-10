@@ -1,5 +1,5 @@
 class_name MPFConditional
-extends Node2D
+extends Control
 ## A node that conditionally appears or hides based on a condition.
 
 

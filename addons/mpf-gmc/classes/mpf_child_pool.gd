@@ -1,5 +1,5 @@
 class_name MPFChildPool
-extends Node2D
+extends Control
 ## Chooses one child to display when entering the scene tree.
 
 enum PlaybackMethod {

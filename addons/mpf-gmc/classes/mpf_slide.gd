@@ -1,7 +1,7 @@
 class_name MPFSlide
 extends MPFSceneBase
 
-var _widgets: Node2D
+var _widgets: Control
 
 ## A scene root node for creating a Slide that can be added to a display stack using events and the slide_player.
 
@@ -12,7 +12,7 @@ func initialize(n: String, settings: Dictionary, c: String, p: int = 0, kwargs: 
 
 func process_widget(widget_name: String, action: String, settings: Dictionary, c: String, p: int = 0, kwargs: Dictionary = {}) -> void:
 	if not self._widgets:
-		self._widgets = Node2D.new()
+		self._widgets = Control.new()
 		self._widgets.name = "_%s_widgets" % self.name
 		self.add_child(self._widgets)
 	self.process_action(widget_name, self._widgets.get_children(), action, settings, c, p, kwargs)

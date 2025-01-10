@@ -1,5 +1,5 @@
 class_name MPFCarousel
-extends Node2D
+extends Control
 
 ## Shows and hides child nodes based on the selection of an MPF Carousel mode.
 ##

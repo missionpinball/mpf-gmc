@@ -20,12 +20,12 @@ grow_horizontal = 2
 grow_vertical = 2
 color = Color(0, 0, 0, 1)
 
-[node name="MPFConditionalChildren" type="Node2D" parent="."]
+[node name="MPFConditionalChildren" type="Control" parent="."]
 script = ExtResource("3_ted12")
 variable_type = 1
 variable_name = "entry"
 
-[node name="initial" type="Node2D" parent="MPFConditionalChildren"]
+[node name="initial" type="Control" parent="MPFConditionalChildren"]
 visible = false
 
 [node name="bonus_entry_score" type="Label" parent="MPFConditionalChildren/initial"]
@@ -39,7 +39,7 @@ script = ExtResource("2_6rn1m")
 variable_name = "ball"
 template_string = "End of Ball %s"
 
-[node name="__default__" type="Node2D" parent="MPFConditionalChildren"]
+[node name="__default__" type="Control" parent="MPFConditionalChildren"]
 visible = false
 
 [node name="bonus_entry_name" type="Label" parent="MPFConditionalChildren/__default__"]
@@ -67,7 +67,7 @@ variable_type = 1
 variable_name = "score"
 comma_separate = true
 
-[node name="subtotal" type="Node2D" parent="MPFConditionalChildren"]
+[node name="subtotal" type="Control" parent="MPFConditionalChildren"]
 visible = false
 
 [node name="Label" type="Label" parent="MPFConditionalChildren/subtotal"]
@@ -92,7 +92,7 @@ variable_type = 1
 variable_name = "score"
 comma_separate = true
 
-[node name="multiplier" type="Node2D" parent="MPFConditionalChildren"]
+[node name="multiplier" type="Control" parent="MPFConditionalChildren"]
 visible = false
 
 [node name="Label" type="Label" parent="MPFConditionalChildren/multiplier"]
@@ -117,7 +117,7 @@ variable_type = 1
 variable_name = "score"
 template_string = "%sX"
 
-[node name="total" type="Node2D" parent="MPFConditionalChildren"]
+[node name="total" type="Control" parent="MPFConditionalChildren"]
 visible = false
 
 [node name="Label" type="Label" parent="MPFConditionalChildren/total"]
