@@ -291,10 +291,10 @@ func _thread_poll(_userdata=null) -> void:
 			call_deferred("stop")
 			return
 
-		var cstat = _client.get_status()
-		if cstat != StreamPeerTCP.Status.STATUS_CONNECTED:
+		if not _client or _client.get_status() != StreamPeerTCP.Status.STATUS_CONNECTED:
 			self.log.info("BCP client disconnected.")
 			_mutex.unlock()
+
 			call_deferred("stop")
 			return
 
