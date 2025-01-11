@@ -77,6 +77,7 @@ func stash_preloaded_scene(path: String, scene: PackedScene):
 func reset() -> void:
 	players = []
 	player = {}
+	num_players = 0
 	for tracker in self._trackers.values():
 		if tracker["_reset_on_game_end"]:
 			tracker.clear()
