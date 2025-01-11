@@ -2,6 +2,13 @@
 
 The Godot Media Controller is a plugin for the Godot game engine that provides integration with the Mission Pinball Framework for using Godot as the media engine on top of an MPF game.
 
+## Video Guide
+
+There is a multi-video tutorial series on YouTube for setting up and working with MPF and GMC.
+
+[![MPF GMC Tutorial Video](https://img.youtube.com/vi/rQqKG2Ie6KM/0.jpg)](https://www.youtube.com/watch?v=rQqKG2Ie6KM)
+
+*Click the above thumbnail to go to YouTube and watch*
 
 ## Installation
 
@@ -23,7 +30,7 @@ Alternatively, you can clone the MPF GMC repository from https://github.com/miss
 
 The plugin provides the necessary framework to build MPF-responsive scenes in your project, but does not provide access to MPF data and communications.
 
-**You must go to *Project Settings -> Globals* and select */addons/mpf-gmc/mpf_gmc.gd* as a Global and give it the name `MPF`.** Add and enable this global, then restart the Godot editor.
+**You must go to *Project Settings -> Globals* and select */addons/mpf-gmc/mpf_gmc.gd* as an AutoLoad and give it the name `MPF`.** Add and enable this autoload, then restart the Godot editor.
 
 > [!CAUTION]
 > It is critical that the Global has the name `MPF` in order for the GMC to function properly!
