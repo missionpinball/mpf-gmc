@@ -24,6 +24,7 @@
 * Fix GMC panel options showing enabled but being undefined (disabled)
 * Fix `MPFConditional` crashing on player 4
 * Fix Service mode crashing if a switch has no `number:` defined
+* Fix `MPF.game.num_players` not resetting after each game
 * Catch possible race condition on BCP client shutdown causing a crash
 
 ## 0.1.2
