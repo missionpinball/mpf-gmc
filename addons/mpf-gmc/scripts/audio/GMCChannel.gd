@@ -208,4 +208,4 @@ func _trigger_events(state: String, events: Array) -> void:
 	self.stream.remove_meta("events_when_%s" % state)
 
 func _to_string() -> String:
-	return "<GMCChannel:%s:current_stream=%s>" % [self.name, "%s" % self.stream if self.stream else "None"]
+	return "<GMCChannel:%s:current_stream=%s>" % [self.name, "%s" % self.stream.resource_path.get_file() if self.stream else "None"]
