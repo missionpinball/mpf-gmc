@@ -116,9 +116,11 @@ func update_text(value) -> void:
 		self.text = ""
 		return
 	if value is int or value is float:
+		# Comma-sep generates a string
 		if comma_separate and value >= 1000:
 			value = MPF.util.comma_sep(value)
-		else:
+		# If it's a number and there's no template string, use the default string template
+		elif not template_string:
 			value = var_template % value
 	if template_string:
 		self.text = template_string % value

@@ -21,8 +21,10 @@
 ### Bug Fixes
 
 * Fix `MPFVariable.initialize_empty` not properly behaving
+* Fix music bus not resuming faded out music during replacement
 * Fix GMC panel options showing enabled but being undefined (disabled)
 * Fix `MPFConditional` crashing on player 4
+* Fix `MPFVariable` crashing when using template strings on numbers
 * Fix Service mode crashing if a switch has no `number:` defined
 * Fix `MPF.game.num_players` not resetting after each game
 * Catch possible race condition on BCP client shutdown causing a crash
