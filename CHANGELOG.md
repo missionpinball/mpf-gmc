@@ -17,6 +17,7 @@
 * `MPFVariable` will now subscribe and update machine variables in realtime
 * Service mode improved handling of inputs and keyboard emulation
 * Keyboard events in *gmc.cfg* now support kwargs
+* New method `MPF.util.mins_secs()` to convert a seconds integer to formatted clock time
 
 ### Bug Fixes
 
@@ -27,6 +28,7 @@
 * Fix `MPFVariable` crashing when using template strings on numbers
 * Fix Service mode crashing if a switch has no `number:` defined
 * Fix `MPF.game.num_players` not resetting after each game
+* Fix `[filter]` config option not rendering shader filters
 * Catch possible race condition on BCP client shutdown causing a crash
 
 ## 0.1.2

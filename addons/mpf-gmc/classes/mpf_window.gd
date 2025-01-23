@@ -102,6 +102,7 @@ func _check_config() -> void:
 				if prop == "filter":
 					continue
 				filter.material.set_shader_parameter(prop, MPF.get_config_value("filter", prop))
+			filter_parent.show()
 	# For safety, disable all filters
 	elif filter_parent:
 		filter_parent.hide()
