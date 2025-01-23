@@ -51,6 +51,16 @@ static func comma_sep(n: int) -> String:
 static func pluralize(template: String, val: int, suffix: String = "s") -> String:
 	return template % ("" if val == 1 else suffix)
 
+## Receive a number of seconds and return a M:SS formatted string
+static func mins_secs(n: int, min_min_digits=1, min_sec_digits=2, include_leading_delim=false) -> String:
+	var minutes := n / 60
+	var seconds := n % 60
+	if minutes or min_min_digits:
+		return "%0*d:%0*d" % [min_min_digits, minutes, min_sec_digits, seconds]
+
+	var template := ":%0*d" if include_leading_delim else "%0*d"
+	return template % [min_sec_digits, seconds]
+
 static func to_int(x) -> int:
 	return int(x)
 
