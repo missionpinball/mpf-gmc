@@ -18,6 +18,7 @@
 * Service mode improved handling of inputs and keyboard emulation
 * Keyboard events in *gmc.cfg* now support kwargs
 * New method `MPF.util.mins_secs()` to convert a seconds integer to formatted clock time
+* Optional method to allow GUI input events (for GMC Toolkit)
 
 ### Bug Fixes
 
