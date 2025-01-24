@@ -14,6 +14,8 @@ var keyboard: = {}
 var config
 var local_config
 
+var _suppress_input := true
+
 func _init():
 
 	# Configure logging with the value from the config, if provided.
@@ -124,7 +126,13 @@ func _explode_version_string(version: String) -> int:
 	bits[3] = bits[3].trim_prefix("dev")
 	return int(bits[0]) * 1_000_000 + int(bits[1]) * 10_000 + int(bits[2]) * 100 + int(bits[3])
 
+func ignore_input() -> void:
+	self._suppress_input = false
+
 func _input(event: InputEvent) -> void:
+	if not self._suppress_input:
+		return
+
 	# Don't accept any non-keyboard input
 	if not event.is_class("InputEventKey"):
 		get_tree().get_root().set_input_as_handled()
