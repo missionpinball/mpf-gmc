@@ -342,13 +342,13 @@ func _thread_poll(_userdata=null) -> void:
 					_send("hello")
 					call_deferred("_on_connect", message)
 				"item_highlighted":
-					call_deferred("emit_signal", "item_highlighted", message)
+					item_highlighted.emit.call_deferred(message)
 				"list_coils":
-					call_deferred("emit_signal", "service", message)
+					service.emit.call_deferred(message)
 				"list_lights":
-					call_deferred("emit_signal", "service", message)
+					service.emit.call_deferred(message)
 				"list_switches":
-					call_deferred("emit_signal", "service", message)
+					service.emit.call_deferred(message)
 				"machine_variable":
 					call_deferred("deferred_game", "update_machine", message)
 				"mode_list":
@@ -382,7 +382,7 @@ func _thread_poll(_userdata=null) -> void:
 					for e in self.registered_events + self.auto_signals:
 						_send("register_trigger?event=%s" % e)
 				"service":
-					call_deferred("emit_signal", "service", message)
+					service.emit.call_deferred(message)
 				"service_mode_entered":
 					# The default service.yaml includes a slide_player for service slide
 					pass
@@ -396,15 +396,15 @@ func _thread_poll(_userdata=null) -> void:
 					# TBD: Need to distinguish slides/widgets/sounds?
 					# Don't think so, all config_players have the same callback
 					# so all three will post at the same time.
-					call_deferred("emit_signal", "clear", message.context)
+					clear.emit.call_deferred(message.context)
 				"sounds_clear":
 					pass
 				"sounds_play":
 					call_deferred("deferred_mc", "play", message)
 				"text_input":
-					call_deferred("emit_signal", "text_input", message)
+					text_input.emit.call_deferred(message)
 				"timer":
-					call_deferred("emit_signal", "mpf_timer", message)
+					mpf_timer.emit.call_deferred(message)
 				"widgets_play":
 					call_deferred("deferred_mc", "play", message)
 				_:

@@ -59,7 +59,7 @@ func add_player(kwargs: Dictionary) -> void:
 		"number": kwargs.player_num
 	})
 	num_players = players.size()
-	emit_signal("player_added", num_players)
+	player_added.emit(num_players)
 
 # Called with a dynamic path value, must use load()
 func preload_scene(path: String, delay_secs: int = 0, persist: bool = false) -> void:
@@ -83,7 +83,7 @@ func reset() -> void:
 			tracker.clear()
 			# Restore the value
 			tracker["_reset_on_game_end"] = true
-	emit_signal("game_started")
+	game_started.emit()
 
 func retrieve_preloaded_scene(path: String) -> PackedScene:
 	var scene: PackedScene
@@ -114,11 +114,11 @@ func update_machine(kwargs: Dictionary) -> void:
 
 	else:
 		machine_vars[var_name] = value
-		emit_signal("machine_update", var_name, value)
+		machine_update.emit(var_name, value)
 		if var_name.begins_with("credits"):
-			emit_signal("credits", var_name, kwargs)
+			credits.emit(var_name, kwargs)
 		elif var_name.ends_with("_volume"):
-			emit_signal("volume", var_name, value, kwargs.get("change", 0))
+			volume.emit(var_name, value, kwargs.get("change", 0))
 	# If this machine var is a setting, update the value of the setting
 	if settings.has(var_name):
 		settings[var_name].value = value
@@ -141,7 +141,7 @@ func update_player(kwargs: Dictionary) -> void:
 			if kwargs.name in auto_signal_vars:
 				emit_signal(kwargs.name, kwargs.value)
 			# Also broadcast the general update for all subscribers
-			emit_signal("player_update", kwargs.name, kwargs.value)
+			player_update.emit(kwargs.name, kwargs.value)
 
 func update_settings(result: Dictionary) -> void:
 	var _settingType: String
