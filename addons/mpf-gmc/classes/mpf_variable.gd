@@ -30,14 +30,17 @@ const numbered_players = [VariableType.PLAYER_1, VariableType.PLAYER_2, Variable
 var var_template: String = "%s"
 ## Track the player number this variable applies to
 var player_number: int = -1
-## Track the initial text
-var _is_changed: bool = false
+## Track the initial text to know whether it needs to be initialized empty
+var _initial_text: String = ""
+
+func _init():
+	_initial_text = self.text
 
 func _enter_tree():
 	# Wait until entering the tree for the parent slide update methods to
 	# possible propagate values. If the parent did not change the value and
 	# initialize empty is true, clear the text (except in editor)
-	if initialize_empty and not _is_changed and not Engine.is_editor_hint():
+	if initialize_empty and self.text == _initial_text and not Engine.is_editor_hint():
 		self.text = ""
 
 func _ready() -> void:
@@ -68,12 +71,6 @@ func _exit_tree() -> void:
 	if variable_type == VariableType.EVENT_ARG:
 		var parent_slide = MPF.util.find_parent_slide_or_widget(self)
 		parent_slide.remove_updater(self)
-
-func set_text(value: String) -> void:
-	text = value
-	# Track when the text has been modified to know whether to empty
-	# it as part of initialize_empty
-	_is_changed = true
 
 func update(settings: Dictionary, kwargs: Dictionary = {}) -> void:
 	if variable_type != VariableType.EVENT_ARG:
