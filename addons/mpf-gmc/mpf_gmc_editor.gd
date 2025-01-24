@@ -73,6 +73,6 @@ func _exit_tree():
 	# remove_control_from_container(CONTAINER_TOOLBAR, mpf_launch)
 	# mpf_launch.free()
 	remove_debugger_plugin(mpf_debugger)
-	mpf_debugger.free()
+	# mpf_debugger.free()
 	remove_export_plugin(gmc_export)
-	gmc_export.free()
+	# gmc_export.free()
