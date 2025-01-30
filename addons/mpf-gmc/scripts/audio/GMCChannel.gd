@@ -55,7 +55,11 @@ func play_with_settings(settings: Dictionary) -> AudioStream:
 			if self.stream is AudioStreamOggVorbis or self.stream is AudioStreamMP3:
 				self.stream.loop = true
 			elif self.stream is AudioStreamWAV:
-				self.stream.loop_mode = 1
+				self.stream.loop_mode = AudioStreamWAV.LoopMode.LOOP_FORWARD
+				# This file might have been imported with a loop end, respect that if present
+				if not self.stream.loop_end:
+					# Loop end is in samples, so multiple sample rate * length
+					self.stream.loop_end = self.stream.mix_rate * self.stream.get_length()
 			else:
 				self._connect_loop(settings["loops"])
 		else:
