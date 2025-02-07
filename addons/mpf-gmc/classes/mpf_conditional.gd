@@ -37,6 +37,8 @@ var target
 
 func _enter_tree() -> void:
 	self.log = preload("res://addons/mpf-gmc/scripts/log.gd").new("Conditional<%s>" % self.name)
+	if self.min_players or self.max_players:
+		MPF.game.player_added.connect(self._on_player_added)
 
 func _ready() -> void:
 	if not Engine.is_editor_hint():
@@ -48,6 +50,9 @@ func _exit_tree() -> void:
 	var parent_slide: MPFSceneBase = MPF.util.find_parent_slide_or_widget(self)
 	parent_slide.remove_updater(self)
 
+func _on_player_added(_num_players) -> void:
+	self.show_or_hide()
+
 @warning_ignore("native_method_override")
 func show():
 	if self.visible:
@@ -55,7 +60,7 @@ func show():
 	if not self.initialized:
 		self._initialize()
 	else:
-		self._show_or_hide()
+		self.show_or_hide()
 
 func update(settings: Dictionary, kwargs: Dictionary = {}):
 	if self.variable_type == VariableType.EVENT_ARG:
@@ -67,7 +72,7 @@ func update(settings: Dictionary, kwargs: Dictionary = {}):
 	self.show_or_hide()
 
 ## Override this method to pass in the correct value and set visibility
-func _show_or_hide():
+func show_or_hide():
 	if self.min_players and MPF.game.num_players < self.min_players:
 		self.log.info("Minimum players not met, hiding")
 		self.visible = false
@@ -75,10 +80,12 @@ func _show_or_hide():
 		self.log.info("Maximum players exceeded, hiding")
 		self.visible = false
 	elif self.target:
-		self.show_or_hide()
+		self.show_or_hide_from_condition()
 
-func show_or_hide():
-	self.visible = self.evaluate(self.condition_value)
+func show_or_hide_from_condition():
+	var do_show:bool = self.evaluate(self.condition_value)
+	self.log.info("Condition evaluates to %s, will %s", [do_show, "show" if do_show else "hide"])
+	self.visible = do_show
 
 func evaluate(value):
 	var t = self.target.get(self.true_variable_name)
@@ -93,7 +100,7 @@ func _initialize():
 	# Look up the operator
 	self.operator = self._find_operator()
 	self.target = self._find_target()
-	self._show_or_hide()
+	self.show_or_hide()
 
 func _find_target():
 	var base

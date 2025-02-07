@@ -12,7 +12,7 @@ func _validate_property(property: Dictionary) -> void:
 		property.usage = PROPERTY_USAGE_NO_EDITOR
 
 ## Override this method to pass in the correct value and set visibility
-func show_or_hide() -> void:
+func show_or_hide_from_condition() -> void:
 	var has_visible_children := false
 	var fallback_child: Node = null
 	for c in self.get_children():

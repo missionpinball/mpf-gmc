@@ -1,5 +1,17 @@
 # MPF-GMC Changelog
 
+## 0.1.4
+*Unreleased, available on `main` branch*
+
+### Improvements
+
+* `MPFConditional` with min/max players will auto-update when player count changes
+
+### Bug Fixes
+
+* Fix WAV files not looping properly without loop metadata via re-import
+* Fix `MPFConditional` not checking min/max players when conditional value changes
+
 ## 0.1.3
 *24 January 2025*
 
