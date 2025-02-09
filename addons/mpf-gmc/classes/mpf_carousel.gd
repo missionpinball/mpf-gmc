@@ -40,6 +40,12 @@ func _on_item_highlighted(payload: Dictionary) -> void:
 			self.log.debug("Showing carousel child '%s'", c.name)
 			found_child = true
 			c.show()
+			# Check whether the carousel item contains an AnimationPlayer with an animation
+			# named item_highlight_anim and play if so. Seek to beginning of animation first
+			# in case the player changes highlighted item faster than animation can complete.
+			if c.get_node("AnimationPlayer").has_animation("item_highlight_anim"):
+				c.get_node("AnimationPlayer").seek(0)
+				c.get_node("AnimationPlayer").play("item_highlight_anim",-1,1,false)
 		else:
 			c.hide()
 	if not found_child:
