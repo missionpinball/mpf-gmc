@@ -82,6 +82,9 @@ func process_action(child_name: String, children: Array, action: String, setting
 		"update":
 			if child:
 				child.action_update(settings, kwargs)
+		"animation":
+			if child:
+				child.action_animation(settings, kwargs)
 		"method":
 			if child and child.has_method(settings.method):
 				var callable = Callable(child, settings.method)
@@ -102,6 +105,20 @@ func action_queue(_action: String, _slide_name: String, _settings: Dictionary, _
 func action_update(settings: Dictionary, kwargs: Dictionary = {}) -> void:
 	for c in self._updaters:
 		c.update(settings, kwargs)
+
+func action_animation(settings: Dictionary, kwargs: Dictionary = {}) -> void:
+	if not self.animation_player:
+		self.log.error("No animation_player property defined. Please attach an AnimationPlayer node.")
+		return
+	var anim_name: String = settings.get("animation")
+	if not self.animation_player.has_animation(anim_name):
+		self.log.error("No animation named '%s'", anim_name)
+		return
+	# If this animation is already going, restart it
+	if self.animation_player.assigned_animation == anim_name and settings.get("from_start", true):
+		self.animation_player.seek(0)
+	self.animation_player.play(anim_name,
+		settings.get("custom_blend", -1), settings.get("custom_speed", 1), settings.get("from_end", false))
 
 func register_updater(node: Node) -> void:
 	if self._updaters.find(node) == -1:
