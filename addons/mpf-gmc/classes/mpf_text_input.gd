@@ -99,6 +99,8 @@ func generate_character(text: String, is_special_char:=false) -> MPFTextInputCha
 	return charact
 
 func _on_text_input_event(payload):
+	if not payload.has("action"):
+		return
 	match payload.action:
 		"left":
 			self._on_move_input(true)
@@ -109,27 +111,42 @@ func _on_text_input_event(payload):
 
 func _on_select():
 	var selection = self.get_child(selected_index)
+	var new_text = String(current_text)
 	match selection.text:
 		"SPACE":
-			current_text += " "
+			new_text += " "
 		"DEL":
-			current_text = current_text.left(-1)
+			new_text = new_text.left(-1)
 		"END":
-			MPF.server.send_event("text_input_%s_complete&text=%s" % [self.input_name, self.current_text.strip_edges()])
+			# Strip whitespace and escape the name before sending
+			var final_text := current_text.strip_edges().uri_encode()
+			MPF.server.send_event("text_input_%s_complete&text=%s" % [self.input_name, final_text])
 			return
 		_:
-			current_text += selection.text
+			new_text += selection.text
+	# If the new text would be longer than the max length, do nothing
+	if new_text.length() > max_length:
+		return
+
+	current_text = new_text
 	self.text_changed.emit(current_text)
 	self._update_preview("" if selection.is_special_char else selection.text)
 
+	# If that's the max length, jump to the end
+	if current_text.length() == max_length:
+		self._focus_item(self.get_child_count() -1)
 
 func _on_move_input(reverse:=false) -> void:
+	var new_index = self.selected_index + (-1 if reverse else 1)
+	if new_index < 0:
+		new_index = self.get_child_count() - 1
+	elif new_index >= self.get_child_count():
+		new_index = 0
+	self._focus_item(new_index)
+
+func _focus_item(new_index: int) -> void:
 	self.get_child(selected_index).unfocus()
-	selected_index += -1 if reverse else 1
-	if selected_index < 0:
-		selected_index = self.get_child_count() - 1
-	elif selected_index >= self.get_child_count():
-		selected_index = 0
+	selected_index = new_index
 	var new_selection = self.get_child(selected_index)
 	new_selection.focus()
 	if preview_character:

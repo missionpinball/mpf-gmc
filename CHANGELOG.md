@@ -3,14 +3,28 @@
 ## 0.1.4
 *Unreleased, available on `main` branch*
 
+### New Features
+
+* New slide_player / widget_player `action: animation` to play an animation from a triggering event. Include `animation: <animation_name>` in the player config to specify which animation to play. The corresponding MPFSlide/MPFWidget must have an `animation_player` node assigned in the Inspector panel.
+
+```
+slide_player:
+  item_highlighted:
+    carousel_slide:
+	  action: animation
+	  animation: item_highlight_anim
+```
+
 ### Improvements
 
 * `MPFConditional` with min/max players will auto-update when player count changes
+* BCP Signals now use `Callable.emit.call_deferred()` instead of `call_deferred("emit_signal", "Callable")`
 
 ### Bug Fixes
 
-* Fix WAV files not looping properly without loop metadata via re-import
+* Fix WAV audio files not looping properly when not explicitly re-imported with loop metadata
 * Fix `MPFConditional` not checking min/max players when conditional value changes
+* Fix `MPFTextInput` not respecting `max_length` parameter during text input (e.g. high score entry)
 
 ## 0.1.3
 *24 January 2025*
