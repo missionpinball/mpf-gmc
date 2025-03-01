@@ -28,7 +28,7 @@ func _init():
 	var perr = plugin_config.load("res://addons/mpf-gmc/plugin.cfg")
 	if perr != OK:
 		self.log.error("Error loading GMC plugin file.")
-	self.log.log("Initializing GMC version %s" % plugin_config.get_value("plugin", "version"))
+	self.log.log("Initializing GMC version %s" % plugin_config.get_value("plugin", "version", "UNKNOWN"))
 
 	for cfg in [[CONFIG_PATH, "config"], [LOCAL_CONFIG_PATH, "local_config"]]:
 		self[cfg[1]] = ConfigFile.new()
