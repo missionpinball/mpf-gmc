@@ -208,9 +208,8 @@ func _on_clear(context_name: String) -> void:
 func _build_slide_container(cname: String) -> Control:
 	var container := Control.new()
 	container.name = cname
+	# Set the container to fill the size of the display
 	container.set_anchors_preset(PRESET_FULL_RECT)
-	container.size_flags_horizontal = SIZE_EXPAND
-	container.size_flags_vertical = SIZE_EXPAND
 	return container
 
 func _get_overlay_slide() -> MPFSlide:

@@ -14,6 +14,7 @@ func process_widget(widget_name: String, action: String, settings: Dictionary, c
 	if not self._widgets:
 		self._widgets = Control.new()
 		self._widgets.name = "_%s_widgets" % self.name
+		self._widgets.set_anchors_preset(PRESET_FULL_RECT)
 		self.add_child(self._widgets)
 	self.process_action(widget_name, self._widgets.get_children(), action, settings, c, p, kwargs)
 
