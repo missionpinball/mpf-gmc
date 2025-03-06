@@ -19,6 +19,7 @@ slide_player:
 
 * `MPFConditional` with min/max players will auto-update when player count changes
 * BCP Signals now use `Callable.emit.call_deferred()` instead of `call_deferred("emit_signal", "Callable")`
+* Better handling of `ps` command when spawning MPF process (Mac and Linux)
 
 ### Bug Fixes
 

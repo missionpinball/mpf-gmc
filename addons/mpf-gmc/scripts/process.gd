@@ -74,7 +74,8 @@ func _spawn_mpf():
 		self._debug_mpf(exec, mpf_args)
 		return
 
-	EngineDebugger.send_message("mpf_log_created:process", [log_file_path])
+	if EngineDebugger.is_active():
+		EngineDebugger.send_message("mpf_log_created:process", [log_file_path])
 	launch_timer.start(ATTEMPT_WAIT_TIME_SECS)
 
 	# Only subscribe on the first loop through
@@ -82,7 +83,7 @@ func _spawn_mpf():
 		return
 
 	var result = await self.mpf_spawned
-	self.log.debug("MPF spawn returned result %s" % result)
+	self.log.debug("MPF spawn returned result %s", result)
 	if result == -1:
 		MPF.server.set_status(MPF.server.ServerStatus.ERROR)
 		self._debug_mpf(exec, mpf_args)
@@ -91,7 +92,22 @@ func _check_mpf():
 	# Detect if the pid is still alive
 	self.log.debug("Checking MPF PID %s...", mpf_pid)
 	var output = []
-	OS.execute("ps", [mpf_pid, "-o", "state="], output, true, true)
+	var ps_cmd: String
+	var ps_args: Array
+
+	match OS.get_name():
+		"Windows":
+			ps_cmd = "find"
+			ps_args = [mpf_pid]
+		"macOS":
+			ps_cmd = "ps"
+			ps_args = [mpf_pid, "-o", "state="]
+		"Linux":
+			ps_cmd = "ps"
+			ps_args = ["-q", mpf_pid, "-o", "state", "--no-headers"]
+		_:
+			self.log.error("Unable to generate PS process on %s", OS.get_name())
+	OS.execute(ps_cmd, ps_args, output, true, true)
 	if not output:
 		return
 	var result = output[0].strip_edges()
