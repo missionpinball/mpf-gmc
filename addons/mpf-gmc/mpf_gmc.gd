@@ -86,6 +86,14 @@ func _enter_tree():
 	self.add_child(process)
 	self.add_child(game)
 
+	# Initialize window parameters
+	var scale = self.get_config_value("window", "scale", 1.0)
+	if scale != 1.0:
+		get_window().content_scale_factor = scale
+	var size = self.get_config_value("window", "size", null)
+	if size:
+		get_window().size = size
+
 func _ready():
 	if self.config.has_section("keyboard"):
 		for key in self.config.get_section_keys("keyboard"):

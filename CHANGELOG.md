@@ -15,6 +15,8 @@ slide_player:
 	  animation: item_highlight_anim
 ```
 
+* New _gmc.cfg_ section `[window]` with support for `scale: (float)` and `size: (Vector2)` properties
+
 ### Improvements
 
 * `MPFConditional` with min/max players will auto-update when player count changes
