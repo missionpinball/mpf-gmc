@@ -1,6 +1,6 @@
 # Base singleton for managing all MC-related references,
 # including windows, displays, slides, and widgets
-extends LoggingNode
+extends GMCNode
 class_name GMCMedia
 
 var sound: Node
@@ -82,8 +82,8 @@ func _get_scene(scene_name: String, collection: Dictionary, preload_only: bool =
 func traverse_tree_for(obj_type: String, acc: Dictionary, ext="tscn") -> void:
 	# Look for a specified content root
 	var content_root: String = "res://%s" % obj_type
-	if MPF.has_config_section("gmc"):
-		var root = MPF.get_config_value("gmc", "content_root", "")
+	if self.mpf.has_config_section("gmc"):
+		var root = self.mpf.get_config_value("gmc", "content_root", "")
 		if root:
 			content_root = "res://%s/%s" % [root, obj_type]
 	# Start by traversing the root folder for this object type

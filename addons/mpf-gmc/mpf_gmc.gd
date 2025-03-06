@@ -71,7 +71,10 @@ func _init():
 		if script:
 			self[s[0]] = load(script).new()
 		else:
-			self[s[0]] = s[1].new()
+			if s[0] == "media":
+				self[s[0]] = s[1].new(self)
+			else:
+				self[s[0]] = s[1].new()
 		# If an explicit value is set for this log, use it
 		if self[s[0]] is LoggingNode:
 			var script_log_level = self.get_config_value("gmc", "logging_%s" % s[0], -1)
