@@ -18,5 +18,7 @@ enum VariableType {
 	## Player 3
 	PLAYER_3,
 	## Player 4
-	PLAYER_4
+	PLAYER_4,
+	## The currently active slide name
+	ACTIVE_SLIDE
 }

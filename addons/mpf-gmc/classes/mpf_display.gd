@@ -4,6 +4,8 @@ extends MPFSceneBase
 
 ## A container for slides and widgets. Each display is tracked separately and maintains its own stack of slides.
 
+signal slide_changed(active_slide: MPFSlide)
+
 ## If checked, slides played without a display target will be shown on this display.
 @export var is_default: bool = false
 ## The scene to render on this display during startup
@@ -93,7 +95,7 @@ func action_remove(slide: Node, kwargs: Dictionary = {}) -> void:
 	self._slide_stack.erase(slide)
 	self._update_stack(kwargs)
 
-func get_slide(slide_name) -> Node:
+func get_slide(slide_name=null) -> Node:
 	if not slide_name:
 		return self._current_slide
 	elif slide_name == "_overlay":
@@ -141,6 +143,7 @@ func _update_stack(kwargs: Dictionary = {}) -> void:
 	var old_slide: MPFSlide = self._current_slide
 	if new_slide != old_slide:
 		new_slide.on_active()
+		self.slide_changed.emit(new_slide)
 		if old_slide:
 			var is_removed: bool = self._slide_stack.find(old_slide) == -1
 			MPF.server.send_event_with_args("slide_%s_inactive" % old_slide.key,
@@ -218,6 +221,12 @@ func _get_overlay_slide() -> MPFSlide:
 	var overlay_container: Control = self._build_slide_container("%s_overlay" % self.name)
 	self._overlay_slide = MPFSlide.new()
 	self._overlay_slide.name = "%s_overlay_slide" % self.name
+	# Set a z-index of the overlay slide. Not only is the overlay on top of the
+	# stack, it also has a z-index to appear over other slides in the stack that
+	# may have z-indexes (e.g. UI slides that are kept "below" the active slide
+	# and use z-index to stay on top). The max value is 4096, so custom slides
+	# can explicitly set themselves above the overlay if desired.
+	self._overlay_slide.z_index = 4000
 	overlay_container.add_child(self._overlay_slide)
 	self.add_child(overlay_container)
 	return self._overlay_slide
@@ -226,7 +235,6 @@ func _register_display_in_window() -> void:
 	var window: MPFWindow = MPF.util.find_parent_window(self)
 	if window:
 		window.register_display(self)
-
 
 func _render_preview() -> void:
 	var preview_colors := ["ff002e", "004eff", "ff7d00", "00ff9a", "9900ff", "ffc500"]
