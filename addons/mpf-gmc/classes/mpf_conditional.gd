@@ -94,13 +94,26 @@ func evaluate(value):
 	if not t:
 		return false
 	var v = type_convert(value, typeof(t))
-	return self.operator.call(t, v)
+	# For production builds, just evaluate and return
+	if OS.has_feature("template"):
+		return self.operator.call(t, v)
+	# For development, this block will test case-sensitivity
+	var result: bool = self.operator.call(t, v)
+	if not result and typeof(v) in [TYPE_STRING, TYPE_STRING_NAME]:
+		if self.operator.call(t.to_lower(), v.to_lower()):
+			self.log.warning("Conditional %s didn't match target value '%s' to conditional value '%s'. Matches are case-sensitive!." %
+				[self.name, t, v])
+	return result
 
 func _initialize():
 	# Look up the operator
 	self.operator = self._find_operator()
 	self.target = self._find_target()
-	self.show_or_hide()
+
+func _on_slide_changed(active_slide):
+	# For ACTIVE_SLIDE conditionals, re-evaluate when the slide changes
+	self.target = active_slide
+	self.show_or_hide_from_condition()
 
 func _find_target():
 	var base
@@ -124,6 +137,12 @@ func _find_target():
 		VariableType.PLAYER_4:
 			if MPF.game.players.size() > 3:
 				base = MPF.game.players[3]
+		VariableType.ACTIVE_SLIDE:
+			var display: MPFDisplay = MPF.util.find_parent_display(self)
+			if not display:
+				return
+			display.slide_changed.connect(self._on_slide_changed)
+			base = display.get_slide()
 	if "." in self.variable_name and base != null:
 		var nested = self.variable_name.split(".")
 		while nested.size() > 1:
