@@ -90,7 +90,7 @@ func _enter_tree():
 	var scale = self.get_config_value("window", "scale", 1.0)
 	if scale != 1.0:
 		get_window().content_scale_factor = scale
-	var size = self.get_config_value("window", "size", null)
+	var size = self.get_config_value("window", "size", 0)
 	if size:
 		get_window().size = size
 
