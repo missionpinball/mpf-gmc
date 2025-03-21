@@ -139,21 +139,11 @@ func _update_stack(kwargs: Dictionary = {}) -> void:
 			self._current_slide = null
 		return
 
-	var new_slide: MPFSlide = self._slide_stack[-1]
+	var new_slide: MPFSlide = self._find_active_slide()
 	var old_slide: MPFSlide = self._current_slide
 	if new_slide != old_slide:
-		new_slide.on_active()
-		self.slide_changed.emit(new_slide)
-		if old_slide:
-			var is_removed: bool = self._slide_stack.find(old_slide) == -1
-			MPF.server.send_event_with_args("slide_%s_inactive" % old_slide.key,
-				{"is_removing": is_removed})
-
-		# Copy the original kwargs and remove 'name' before sending active event
-		var evt_kwargs = kwargs.duplicate()
-		evt_kwargs.erase("name")
-		MPF.server.send_event_with_args("slide_%s_active" % new_slide.key, evt_kwargs)
-		self._current_slide = new_slide
+		if new_slide and not new_slide.mask_from_active:
+			self._make_slide_active(new_slide, old_slide, kwargs)
 		# If the old slide is removed, check for animations
 		if old_slide and old_slide not in self._slide_stack:
 			# Store the old slide key in case its removed
@@ -168,6 +158,28 @@ func _update_stack(kwargs: Dictionary = {}) -> void:
 			if is_instance_valid(old_slide):
 				await old_slide.remove(old_slide.priority >= new_slide.priority)
 			MPF.server.send_event("slide_%s_removed" % old_slide_key)
+
+func _find_active_slide():
+	var top_slide: MPFSlide = self._slide_stack[-1]
+	if not top_slide.mask_from_active:
+		return top_slide
+	for i in range(1, len(self._slide_stack)):
+		top_slide = self._slide_stack[-1 - i]
+		if not top_slide.mask_from_active:
+			return top_slide
+
+func _make_slide_active(new_slide: MPFSlide, old_slide: MPFSlide, kwargs: Dictionary) -> void:
+	new_slide.on_active()
+	self.slide_changed.emit(new_slide)
+	if old_slide:
+		MPF.server.send_event_with_args("slide_%s_inactive" % old_slide.key,
+			{"is_removing": old_slide not in self._slide_stack})
+
+	# Copy the original kwargs and remove 'name' before sending active event
+	var evt_kwargs = kwargs.duplicate()
+	evt_kwargs.erase("name")
+	MPF.server.send_event_with_args("slide_%s_active" % new_slide.key, evt_kwargs)
+	self._current_slide = new_slide
 
 func _manage_queue(action: String) -> void:
 	if action == "clear":
