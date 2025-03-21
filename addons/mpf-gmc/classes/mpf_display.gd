@@ -88,7 +88,7 @@ func action_queue(action: String, slide_name: String, settings: Dictionary, c: S
 	if self._queue.size() == 1 or action == "queue_immediate":
 		return self._process_queue()
 
-func update_stack(kwargs: Dictionary) -> void:
+func update_stack(kwargs: Dictionary = {}) -> void:
 	self._update_stack(kwargs)
 
 func action_remove(slide: Node, kwargs: Dictionary = {}) -> void:
