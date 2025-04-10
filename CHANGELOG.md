@@ -7,6 +7,8 @@
 
 * New `MPFConditional` variable type `ACTIVE_SLIDE` to match conditions based on the active slide (most likely the variable name "name" to match the name of the active slide). Will automatically re-evaluate when the slides change.
 
+* New `MPFSlide` property `mask_from_active` to prevent designated slides from being considered "active" (will not post *slide_(name)_active* events or match against `MPFConditional.ACTIVE_SLIDE` conditions).
+
 * New slide_player / widget_player `action: animation` to play an animation from a triggering event. Include `animation: <animation_name>` in the player config to specify which animation to play. The corresponding MPFSlide/MPFWidget must have an `animation_player` node assigned in the Inspector panel.
 
 ```
@@ -17,23 +19,26 @@ slide_player:
 	  animation: item_highlight_anim
 ```
 
-* New _gmc.cfg_ section `[window]` with support for `scale: (float)` and `size: (Vector2)` properties
+* New _gmc.cfg_ section `[window]` with support for `scale: (float)` and `size: (Vector2)` properties. Especially useful when used in _gmc.local.cfg_ for designating a downsized window on a development computer but full-size (multi-monitor-spanning) displays on the physical machine.
+
+* Default slides for Tilt mode now included with GMC.
 
 ### Improvements
 
 * `MPFConditional` with min/max players will auto-update when player count changes
-* BCP Signals now use `Callable.emit.call_deferred()` instead of `call_deferred("emit_signal", "Callable")`
+* BCP Signals now use `Callable.emit.call_deferred()` instead of `call_deferred("emit_signal", "Callable")`, per Godot guidance
 * Better handling of `ps` command when spawning MPF process (Mac and Linux)
 
 ### Bug Fixes
 
 * Fix WAV audio files not looping properly when not explicitly re-imported with loop metadata
 * Fix `MPFConditional` not checking min/max players when conditional value changes
+* Fix `MPFConditional` always evaluating false if the comparison value is falsey (e.g. `0`)
 * Fix `MPFTextInput` not respecting `max_length` parameter during text input (e.g. high score entry)
 
 ### Other Changes
 
-* The special slide target `_overlay` now has an explicit z-index of 4000 to ensure it is positioned above other slides, even if they have a z-index defined (e.g. UI slides lower-priority to avoid being "active" but still rendered on top of the "active" slide). The maximum z-index is 4096 so other slides can still supersede the overlay slide if desired.
+* The special slide target `_overlay` now has an explicit z-index of 4000 to ensure it is positioned above other slides, even if they have a z-index defined (e.g. UI slides rendered on top of the "active" slide). The maximum z-index is 4096 so other slides can still supersede the overlay slide if desired.
 
 ## 0.1.3
 *24 January 2025*
