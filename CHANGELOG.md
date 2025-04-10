@@ -1,7 +1,7 @@
 # MPF-GMC Changelog
 
 ## 0.1.4
-*Unreleased, available on `main` branch*
+*10 April 2025*
 
 ### New Features
 
