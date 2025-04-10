@@ -88,11 +88,12 @@ func show_or_hide_from_condition():
 	self.visible = do_show
 
 func evaluate(value):
+	# If there is no target, evaluate false
+	if not self.target:
+		self.log.debug("Cannot evaluate value '%s' because no conditional target exists.", value)
+		return false
 	var t = self.target.get(self.true_variable_name)
 	self.log.debug("Evaluating value '%s' against current %s value '%s'", [value, self.true_variable_name, t])
-	# If there is no target, evaluate false
-	if not t:
-		return false
 	var v = type_convert(value, typeof(t))
 	# For production builds, just evaluate and return
 	if OS.has_feature("template"):

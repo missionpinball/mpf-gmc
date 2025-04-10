@@ -63,6 +63,7 @@ func duck(settings) -> void:
 	self._duck_release_timer.start(settings.duration)
 
 func duck_release() -> void:
+	# TODO: Use a uuid to identify which ducking to release
 	# Remove this duck from the list of duckings
 	var last_duck: DuckSettings = self._duck_release_timer.get_meta("ducking")
 	self.duckings.erase(last_duck)
@@ -172,6 +173,7 @@ func play(filename: String, settings: Dictionary = {}) -> void:
 		# If this came from an MPFSoundAsset the ducking is already configured
 		var duck_settings: DuckSettings = settings.ducking if settings.ducking is DuckSettings else DuckSettings.new(settings.ducking)
 		duck_settings.calculate_release_time(Time.get_ticks_msec(), stream)
+		# TODO: Generate a uuid for the ducking and append to stream metadata
 		duck_settings.bus.duck(duck_settings)
 
 func clear_context(context_name: String) -> void:
@@ -181,6 +183,7 @@ func clear_context(context_name: String) -> void:
 		channel.stream.get_meta("context") == context_name and \
 		channel.playing and not channel.get_meta("is_stopping", false):
 			channel.stop_with_settings()
+	# TODO: Only clear the ducking of streams impacted by the context
 	self._abort_ducking_check()
 
 func clear_queue() -> void:
