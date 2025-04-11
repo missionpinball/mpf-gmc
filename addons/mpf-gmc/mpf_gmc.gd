@@ -41,6 +41,9 @@ func _init():
 		if err != OK:
 			# Error 7 is file not found, that's okay
 			if err == ERR_FILE_NOT_FOUND:
+				# But still, everybody *should* have a gmc.cfg
+				if cfg[0] == CONFIG_PATH:
+					self.log.warning("Unable to find gmc.cfg in the project root.")
 				pass
 			else:
 				self.log.error("Error loading GMC config file '%s': %s" % [cfg[0], error_string(err)])

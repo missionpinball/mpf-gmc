@@ -22,6 +22,7 @@ func _init(n: String, log_level: int = 30):
 	self._bus_index = AudioServer.get_bus_index(self.name)
 	assert(self._bus_index != -1, "No audio bus %s configured in Godot Audio layout." % n)
 	self._full_volume_db = AudioServer.get_bus_volume_db(self._bus_index)
+	self.log.debug("Initialized audio bus '%s' at index %s with volume %s" % [self.name, self._bus_index, db_to_linear(self._full_volume_db)])
 
 func create_channel(channel_name: String) -> GMCChannel:
 	var channel = GMCChannel.new(channel_name, self)
@@ -137,7 +138,7 @@ func play(filename: String, settings: Dictionary = {}) -> void:
 	# If the available channel we got back is already playing, it's playing this file
 	# and we don't need to do anything further.
 	if available_channel and available_channel.playing:
-		self.log.debug("Recevied available channel that's already playing, no-op.")
+		self.log.debug("Received available channel that's already playing, no-op.")
 		return
 
 	# If this is a solo bus, stop any other playback

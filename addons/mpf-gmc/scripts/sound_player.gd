@@ -99,6 +99,14 @@ func play_sounds(s: Dictionary) -> void:
 		else:
 			assert(false, "Cannot play sound of class %s" % config.get_class())
 
+		if OS.has_feature("debug"):
+			if settings.get("bus"):
+				if not settings["bus"] in self.buses:
+					self.log.error("Unknown bus '%s' for playing sound with settings %s" % [settings["bus"], settings])
+					return
+			elif not self.default_bus:
+				self.log.error("Sound played without bus param and no default bus is specified: %s" % settings)
+				return
 		var bus: GMCBus = self.buses[settings["bus"]] if settings.get("bus") else self.default_bus
 		var action: String = settings.get("action", "play")
 
