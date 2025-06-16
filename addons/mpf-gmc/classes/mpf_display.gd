@@ -233,6 +233,8 @@ func _get_overlay_slide() -> MPFSlide:
 	var overlay_container: Control = self._build_slide_container("%s_overlay" % self.name)
 	self._overlay_slide = MPFSlide.new()
 	self._overlay_slide.name = "%s_overlay_slide" % self.name
+	# The overlay slide should also be full rect
+	self._overlay_slide.set_anchors_and_offsets_preset(PRESET_FULL_RECT)
 	# Set a z-index of the overlay slide. Not only is the overlay on top of the
 	# stack, it also has a z-index to appear over other slides in the stack that
 	# may have z-indexes (e.g. UI slides that are kept "below" the active slide

@@ -6,7 +6,7 @@ extends ServicePage
 
 func _ready():
 	List = $MarginContainer/VBoxContainer
-	var SettingsItemScene = preload("res://addons/mpf-gmc/slides/service/Settings_item.tscn")
+	var SettingsItemScene = preload("res://addons/mpf-gmc/slides/service/Settings_Item.tscn")
 	var settings = MPF.game.settings.values().filter(
 		func (s): return s.type == settingType
 	)
