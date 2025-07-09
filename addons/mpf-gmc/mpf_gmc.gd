@@ -13,6 +13,7 @@ var util
 var keyboard: = {}
 var config
 var local_config
+var version: String
 
 var _suppress_input := true
 
@@ -28,7 +29,8 @@ func _init():
 	var perr = plugin_config.load("res://addons/mpf-gmc/plugin.cfg")
 	if perr != OK:
 		self.log.error("Error loading GMC plugin file.")
-	self.log.log("Initializing GMC version %s" % plugin_config.get_value("plugin", "version", "UNKNOWN"))
+	self.version = plugin_config.get_value("plugin", "version", "UNKNOWN")
+	self.log.log("Initializing GMC version %s" % self.version)
 
 	for cfg in [[CONFIG_PATH, "config"], [LOCAL_CONFIG_PATH, "local_config"]]:
 		self[cfg[1]] = ConfigFile.new()
@@ -127,8 +129,8 @@ func has_config_section(section: String) -> bool:
 func has_local_config_value(section: String, key: String) -> bool:
 	return self.local_config.has_section_key(section, key)
 
-func validate_min_version(compare_version: String) -> bool:
-	return _explode_version_string(compare_version) >= _explode_version_string(MPF_MIN_VERSION)
+func validate_min_version(compare_version: String, min_version: String) -> bool:
+	return _explode_version_string(compare_version) >= _explode_version_string(min_version)
 
 func _explode_version_string(version: String) -> int:
 	var bits = version.split(".")

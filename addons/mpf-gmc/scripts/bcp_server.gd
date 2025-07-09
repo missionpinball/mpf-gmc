@@ -75,9 +75,14 @@ func _process(_delta: float) -> void:
 ## Handle connection validation before public on_connect method
 func _on_connect(payload: Dictionary) -> void:
 	if payload.controller_name == "Mission Pinball Framework":
-		if not MPF.validate_min_version(payload.controller_version):
-			self.log.error("MPF %s does not meet minimum version requirement %s", [payload.controller_version, MPF.MPF_MIN_VERSION])
+		if not MPF.validate_min_version(payload.controller_version, MPF.MPF_MIN_VERSION):
+			self.log.error("MPF %s does not meet GMC's minimum version requirement %s", [payload.controller_version, MPF.MPF_MIN_VERSION])
+			self.stop(true)
 			assert(false, "GMC requires MPF version %s, but found %s." % [MPF.MPF_MIN_VERSION, payload.controller_version])
+		if not MPF.validate_min_version(MPF.version, payload.gmc_version):
+			self.log.error("GMC %s does not meet MPF's minimum version requirement %s", [MPF.version, payload.gmc_version])
+			self.stop(true)
+			assert(false, "MPF requires GMC version %s, but found %s." % [payload.gmc_version, MPF.version])
 	self.on_connect()
 
 ###
