@@ -2,7 +2,7 @@ extends LoggingNode
 
 const CONFIG_PATH = "res://gmc.cfg"
 const LOCAL_CONFIG_PATH = "user://gmc.local.cfg"
-const MPF_MIN_VERSION = "0.80.0"
+const MPF_MIN_VERSION = "0.80.0.dev9"
 
 var game
 var media
