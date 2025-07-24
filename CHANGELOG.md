@@ -1,5 +1,23 @@
 # MPF-GMC Changelog
 
+## 0.1.5
+*24 July 2025*
+
+### New Features
+
+* MPF Version Check to ensure cross-compatibility between MPF and GMC versions
+
+### Improvements
+
+* Reset anchors and offsets on slide and widget nodes for better dynamic layouts
+* Overlay slide layout to full rect
+* Substantially more logging on sound playback
+
+### Bug Fixes
+
+* Fixed a case mismatch on Settings Item
+* Fix a crash if no gmc.cfg file is present
+
 ## 0.1.4
 *10 April 2025*
 
