@@ -62,4 +62,4 @@ text = "Player N:"
 script = ExtResource("3_hewrl")
 variable_type = 1
 variable_name = "player_num"
-template_string = "Player %s:"
+template_string = "Player %d:"
