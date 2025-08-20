@@ -67,8 +67,8 @@ func play_with_settings(settings: Dictionary) -> AudioStream:
 			self._connect_loop(settings["loops"])
 
 	# TODO: Support marker events
-	if settings.get("events_when_started"):
-		for e in settings["events_when_started"]:
+	if settings.get("events_when_played"):
+		for e in settings["events_when_played"]:
 			MPF.server.send_event(e)
 	if settings.get("events_when_stopped"):
 		# Store a reference to the callable so it can be disconnected
