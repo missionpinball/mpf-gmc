@@ -11,7 +11,7 @@ enum ServerStatus { IDLE, WAITING, LAUNCHING, CONNECTED, ERROR }
 
 signal bonus(payload)
 signal clear(mode_name)
-signal item_highlighted(payload)
+signal carousel_item_highlighted(payload)
 signal mpf_timer(payload)
 signal options(payload)
 signal player_var(value, prev_value, change, player_num)
@@ -346,8 +346,8 @@ func _thread_poll(_userdata=null) -> void:
 				"hello":
 					_send("hello")
 					call_deferred("_on_connect", message)
-				"item_highlighted":
-					item_highlighted.emit.call_deferred(message)
+				"carousel_item_highlighted":
+					carousel_item_highlighted.emit.call_deferred(message)
 				"list_coils":
 					service.emit.call_deferred(message)
 				"list_lights":
@@ -380,7 +380,7 @@ func _thread_poll(_userdata=null) -> void:
 					_send("monitor_start?category=player_vars")
 					_send("monitor_start?category=machine_vars")
 					# Standard events
-					_send("register_trigger?event=item_highlighted")
+					_send("register_trigger?event=carousel_item_highlighted")
 					_send("register_trigger?event=text_input")
 					_send("register_trigger?event=bonus_entry")
 					# Custom events
