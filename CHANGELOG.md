@@ -31,10 +31,10 @@
 
 ```
 slide_player:
-  item_highlighted:
+  carousel_item_highlighted:
     carousel_slide:
-	  action: animation
-	  animation: item_highlight_anim
+      action: animation
+      animation: item_highlight_anim
 ```
 
 * New _gmc.cfg_ section `[window]` with support for `scale: (float)` and `size: (Vector2)` properties. Especially useful when used in _gmc.local.cfg_ for designating a downsized window on a development computer but full-size (multi-monitor-spanning) displays on the physical machine.

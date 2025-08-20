@@ -26,12 +26,12 @@ func _ready():
 		carousel_name = self.name
 	if not carousel_name in MPF.game.active_modes and OS.has_feature("debug"):
 		self.log.warning("No active mode '%s', carousel will not function until that mode is active.", [carousel_name])
-	MPF.server.item_highlighted.connect(self._on_item_highlighted)
-	self.log.debug("Carousel active and waiting for 'carousel=%s' item_highlighted events.", carousel_name)
+	MPF.server.carousel_item_highlighted.connect(self._on_item_highlighted)
+	self.log.debug("Carousel active and waiting for carousel_item_highlighted events for 'carousel=%s'.", carousel_name)
 
 func _on_item_highlighted(payload: Dictionary) -> void:
 	if payload.get("carousel") != self.carousel_name:
-		self.log.debug("carousel_name does not match item_highlighted carousel name '%s', ignoring.", payload.get("carousel"))
+		self.log.debug("GMC node carousel_name does not match carousel_item_highlighted parameter carousel '%s', ignoring.", payload.get("carousel"))
 		return
 	self.log.debug("Carousel looking for child matching name '%s'", payload.item)
 	var found_child := false
