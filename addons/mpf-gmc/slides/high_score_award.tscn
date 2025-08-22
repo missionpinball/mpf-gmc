@@ -1,0 +1,52 @@
+[gd_scene load_steps=3 format=3 uid="uid://fcdwlg4u44ft"]
+
+[ext_resource type="Script" uid="uid://6mdcui7wkc47" path="res://addons/mpf-gmc/classes/mpf_slide.gd" id="1_8uavx"]
+[ext_resource type="Script" uid="uid://cm7sg7wq6hq8s" path="res://addons/mpf-gmc/classes/mpf_variable.gd" id="2_8uavx"]
+
+[node name="HighScoreAward" type="Control"]
+layout_mode = 3
+anchors_preset = 0
+script = ExtResource("1_8uavx")
+
+[node name="MPFVariable - Award" type="Label" parent="."]
+layout_mode = 0
+offset_left = 236.0
+offset_top = -11.0
+offset_right = 941.0
+offset_bottom = 194.0
+theme_override_font_sizes/font_size = 150
+text = "Award!"
+horizontal_alignment = 1
+script = ExtResource("2_8uavx")
+variable_type = 1
+variable_name = "award"
+metadata/_custom_type_script = "uid://cm7sg7wq6hq8s"
+
+[node name="MPFVariable - Player Name" type="Label" parent="."]
+layout_mode = 0
+offset_left = 236.0
+offset_top = 187.0
+offset_right = 941.0
+offset_bottom = 392.0
+theme_override_font_sizes/font_size = 150
+text = "NO1"
+horizontal_alignment = 1
+script = ExtResource("2_8uavx")
+variable_type = 1
+variable_name = "player_name"
+metadata/_custom_type_script = "uid://cm7sg7wq6hq8s"
+
+[node name="MPFVariable - Value" type="Label" parent="."]
+layout_mode = 0
+offset_left = 225.0
+offset_top = 390.0
+offset_right = 930.0
+offset_bottom = 595.0
+theme_override_font_sizes/font_size = 150
+text = "1,000,000"
+horizontal_alignment = 1
+script = ExtResource("2_8uavx")
+variable_type = 1
+variable_name = "value"
+comma_separate = true
+metadata/_custom_type_script = "uid://cm7sg7wq6hq8s"
