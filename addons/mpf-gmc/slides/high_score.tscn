@@ -1,7 +1,8 @@
-[gd_scene load_steps=3 format=3 uid="uid://lqeoxevsy0ex"]
+[gd_scene load_steps=4 format=3 uid="uid://lqeoxevsy0ex"]
 
 [ext_resource type="Script" path="res://addons/mpf-gmc/classes/mpf_slide.gd" id="1_adeqt"]
 [ext_resource type="Script" path="res://addons/mpf-gmc/classes/mpf_text_input.gd" id="2_6uslk"]
+[ext_resource type="Script" path="res://addons/mpf-gmc/classes/mpf_variable.gd" id="3_hewrl"]
 
 [node name="HighScore" type="Control"]
 layout_mode = 3
@@ -17,19 +18,48 @@ offset_bottom = 246.0
 
 [node name="MPFTextInput" type="HFlowContainer" parent="." node_paths=PackedStringArray("display_node")]
 layout_mode = 0
-offset_left = 720.0
-offset_top = 419.0
-offset_right = 1259.0
-offset_bottom = 605.0
+offset_left = 329.0
+offset_top = 551.0
+offset_right = 868.0
+offset_bottom = 632.0
+scale = Vector2(4, 4)
 script = ExtResource("2_6uslk")
 grid_width = 30
 display_node = NodePath("../RichTextLabel")
 
 [node name="RichTextLabel" type="RichTextLabel" parent="."]
 layout_mode = 0
-offset_left = 664.0
-offset_top = 72.0
-offset_right = 1264.0
-offset_bottom = 332.0
+offset_left = 663.0
+offset_top = 258.0
+offset_right = 1284.0
+offset_bottom = 345.0
+scale = Vector2(3.5, 3.5)
 theme_override_font_sizes/normal_font_size = 60
 bbcode_enabled = true
+text = "[pulse freq=3.0 color=#ff00ffff ease=-1.0]A[/pulse]"
+
+[node name="event_award" type="Label" parent="."]
+layout_mode = 0
+offset_left = 758.0
+offset_top = 61.0
+offset_right = 2046.0
+offset_bottom = 231.0
+theme_override_font_sizes/font_size = 100
+text = "Award Name"
+horizontal_alignment = 1
+script = ExtResource("3_hewrl")
+variable_type = 1
+variable_name = "award"
+
+[node name="event_player" type="Label" parent="."]
+layout_mode = 0
+offset_left = 152.0
+offset_top = 330.0
+offset_right = 595.0
+offset_bottom = 476.0
+theme_override_font_sizes/font_size = 100
+text = "Player N:"
+script = ExtResource("3_hewrl")
+variable_type = 1
+variable_name = "player_num"
+template_string = "Player %d:"
