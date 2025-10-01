@@ -121,6 +121,11 @@ func _on_select():
 			# Strip whitespace and escape the name before sending
 			var final_text := current_text.strip_edges().uri_encode()
 			MPF.server.send_event("text_input_%s_complete&text=%s" % [self.input_name, final_text])
+
+			# once the value is submitted, clear the text and reset selected letter to first option
+			current_text = ""
+			self._update_preview("")
+			self._focus_item(0)
 			return
 		_:
 			new_text += selection.text
