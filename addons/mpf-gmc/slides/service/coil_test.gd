@@ -20,7 +20,7 @@ func _on_service(payload):
 			var list_item = list_button.instantiate()
 			list_item.name = coil[0]  # name
 			list_item.text = coil[1]  # label
-			list_item.tooltip_text = coil[2]  # number
+			list_item.tooltip_text = "%s" % coil[2]  # number
 			List.add_child(list_item)
 		select_option(List.get_child(0), "Coil")
 	elif payload.cmd == "list_lights":
@@ -30,7 +30,7 @@ func _on_service(payload):
 			var list_item = list_button.instantiate()
 			list_item.name = light[0]  # name
 			list_item.text = light[1]  # label
-			list_item.tooltip_text = light[2][0] # number
+			list_item.tooltip_text = "%s" % light[2][0] # number
 			$instructions.text = "Color: white"
 			List.add_child(list_item)
 		select_option(List.get_child(0), "Light")
