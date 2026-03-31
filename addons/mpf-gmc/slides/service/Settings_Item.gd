@@ -121,6 +121,7 @@ func select_option(direction: int = 0) -> void:
 		selected_value = keys[next]
 		$Option.text = options[selected_value]
 		set_option_text_color()
+		save()
 
 func set_option_text_color() -> void:
 	var color := Color(1,1,1,1) if selected_value == default else Color(0.98,0.34,0,1)
