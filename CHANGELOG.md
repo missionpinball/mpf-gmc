@@ -1,5 +1,23 @@
 # MPF-GMC Changelog
 
+## 1.0.0
+*25 April 2026*
+
+### New Features
+
+Full release to match MPF 0.80.0!
+
+### Requirements
+
+MPF 0.80.0 requires MPF-GMC 1.0.0 at minimum.
+
+### Improvements
+* reduce \*nix process monitoring warnings due to process state
+
+### Bug Fixes
+* Changing settings in the service menu actually makes the changes now
+
+
 ## 0.1.6
 *14 December 2025*
 
@@ -22,7 +40,6 @@
 * Fix sound hook to properly use `events_when_played`, not `events_when_started`
 * Fix missing light and coil names in service mode
 * Fix exports missing resources due to global MPF missing during export
-
 
 ## 0.1.5
 *24 July 2025*
