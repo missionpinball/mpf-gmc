@@ -55,8 +55,7 @@ func ready():
 		assert(selected_value in options, "Setting %s has no option for selected value %s. Available options: %s" % [title, selected_value, options])
 		if options[selected_value] == null:
 			options[selected_value] = "None"
-		$Option.text = options[selected_value]
-	set_option_text_color()
+		set_option_text_and_color()
 
 func _focus_entered() -> void:
 	self.is_focused = true
@@ -119,13 +118,16 @@ func select_option(direction: int = 0) -> void:
 		next = posmod(next, keys.size())
 	if next >= 0 and next < keys.size():
 		selected_value = keys[next]
-		$Option.text = options[selected_value]
-		set_option_text_color()
+		set_option_text_and_color()
 		save()
 
-func set_option_text_color() -> void:
-	var color := Color(1,1,1,1) if selected_value == default else Color(0.98,0.34,0,1)
-	$Option.set("theme_override_colors/font_color", color)
+func set_option_text_and_color() -> void:
+	if selected_value == default:
+		$Option.text = options[selected_value] + " (default)"
+		$Option.set("theme_override_colors/font_color", Color(1,1,1,1))
+	else:
+		$Option.text = options[selected_value]
+		$Option.set("theme_override_colors/font_color", Color(0.98,0.34,0,1))
 
 func set_setting_background_color(is_invoked: bool) -> void:
 	if not is_invoked:
