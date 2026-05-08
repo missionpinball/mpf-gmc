@@ -13,10 +13,9 @@ class_name MPFPlayerFilter
 var known_player_count: int
 
 func _ready() -> void:
-	self.known_player_count = MPF.game.num_players
+	self._update_known_players(MPF.game.num_players)
 	# Always listen for player count changes
 	MPF.game.connect("player_added", self._update_known_players)
-	self._update_visibility()
 
 func _should_show() -> bool:
 	if self.player_number > 0:
