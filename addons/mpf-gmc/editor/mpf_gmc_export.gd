@@ -19,6 +19,13 @@ func _export_begin(features: PackedStringArray, is_debug: bool, path: String, fl
 	var traversal_data = PackedDataContainer.new()
 	traversal_data.pack(traversal)
 	ResourceSaver.save(traversal_data, "res://_media.res")
+	_cleanup_export_mpf(mpf)
+
+func _cleanup_export_mpf(mpf: MPFGMC) -> void:
+	for child in [mpf.server, mpf.media, mpf.process, mpf.game, mpf.util]:
+		if is_instance_valid(child):
+			child.free()
+	mpf.free()
 
 func _export_end() -> void:
 	# Remove the temporary media traversal file
