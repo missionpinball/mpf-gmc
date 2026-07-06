@@ -31,6 +31,13 @@ var port := 5050
 var poll_fps: int = 120
 # The current status of the server
 var status: ServerStatus = ServerStatus.IDLE
+# The most recent carousel_item_highlighted payload, keyed by carousel name.
+# MPF posts a carousel's highlight once when its mode starts. If the MPFCarousel
+# node is created after that emit (for example when a mode that owns a carousel
+# stops and starts again), the one-shot signal is missed and the carousel shows
+# nothing until the next advance. Keeping the last payload lets a freshly
+# created carousel replay it from _ready().
+var last_carousel_highlight := {}
 
 # A library of static methods for parsing the incoming BCP data
 var _bcp_parse = preload("bcp_parse.gd")
@@ -347,6 +354,11 @@ func _thread_poll(_userdata=null) -> void:
 					_send("hello")
 					call_deferred("_on_connect", message)
 				"carousel_item_highlighted":
+					# Buffer the latest highlight per carousel so a node created
+					# after this one-shot emit can replay it from _ready(). See
+					# last_carousel_highlight above.
+					if message.has("carousel"):
+						last_carousel_highlight[message.carousel] = message
 					carousel_item_highlighted.emit.call_deferred(message)
 				"list_coils":
 					service.emit.call_deferred(message)
