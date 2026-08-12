@@ -288,6 +288,7 @@ func _thread_poll(_userdata=null) -> void:
 	while _client:
 		# If the mutex is locked, the system is shutting down
 		if not _mutex.try_lock():
+			self.log.info("BCP poll thread exiting: mutex unavailable.")
 			return
 		var err = _client.poll()
 		if err != OK:
@@ -305,6 +306,11 @@ func _thread_poll(_userdata=null) -> void:
 
 		var bytes = _client.get_available_bytes()
 		if not bytes:
+			# Release the mutex before looping. Mutex is recursive, so skipping
+			# the unlock at the bottom of this loop leaks one lock level per
+			# idle poll instead of deadlocking, and try_lock() above fails for
+			# good once the recursion counter saturates.
+			_mutex.unlock()
 			OS.delay_msec(delay)
 			continue
 
