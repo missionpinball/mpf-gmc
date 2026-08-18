@@ -27,6 +27,13 @@ func _ready():
 	if not carousel_name in MPF.game.active_modes and OS.has_feature("debug"):
 		self.log.warning("No active mode '%s', carousel will not function until that mode is active.", [carousel_name])
 	MPF.server.carousel_item_highlighted.connect(self._on_item_highlighted)
+	# MPF posts a carousel's highlight once when its mode starts. If this node
+	# was created after that emit (for example when a mode that owns a carousel
+	# stops and starts again), the signal was already missed and no child would
+	# show until the next advance. Replay the last buffered highlight so the
+	# current item appears immediately on mount.
+	if MPF.server.last_carousel_highlight.has(carousel_name):
+		self._on_item_highlighted(MPF.server.last_carousel_highlight[carousel_name])
 	self.log.debug("Carousel active and waiting for carousel_item_highlighted events for 'carousel=%s'.", carousel_name)
 
 func _on_item_highlighted(payload: Dictionary) -> void:
