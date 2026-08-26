@@ -29,7 +29,7 @@ const numbered_players = [VariableType.PLAYER_1, VariableType.PLAYER_2, Variable
 
 var var_template: String = "%s"
 ## Track the player number this variable applies to
-var player_number: int = -1
+var numbered_players_player_number: int = -1
 ## Track the initial text to know whether it needs to be initialized empty
 var _initial_text: String = ""
 
@@ -138,7 +138,7 @@ func _on_player_added(total_players: int) -> void:
 	elif max_players > 0 and total_players > max_players:
 		self.hide()
 	# If this player number exceeds the number of players, don't show
-	elif self.player_number > total_players:
+	elif self.numbered_players_player_number > total_players:
 		self.hide()
 	else:
 		# TODO: There is a gap here where a min/max var that applies to the current
@@ -152,13 +152,13 @@ func _calculate_player_value() -> bool:
 		MPF.log.warning("MPFVariable '%s' is a player variable and should only exist in game modes.", self.name)
 		return false
 	if variable_type == VariableType.CURRENT_PLAYER:
-		self.player_number = mpf_player_num
+		self.numbered_players_player_number = mpf_player_num
 	elif variable_type in numbered_players:
-		self.player_number = numbered_players.find(variable_type) + 1
-	var is_current_player = self.player_number == MPF.game.player.get('number')
+		self.numbered_players_player_number = numbered_players.find(variable_type) + 1
+	var is_current_player = self.numbered_players_player_number == MPF.game.player.get('number')
 	if is_current_player:
 		self.update_text(MPF.game.player.get(self.variable_name))
 		return true
-	elif MPF.game.players.size() >= self.player_number:
-		self.update_text(MPF.game.players[self.player_number - 1].get(self.variable_name))
+	elif MPF.game.players.size() >= self.numbered_players_player_number:
+		self.update_text(MPF.game.players[self.numbered_players_player_number - 1].get(self.variable_name))
 	return false
