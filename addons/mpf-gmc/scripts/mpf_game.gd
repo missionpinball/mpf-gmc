@@ -37,6 +37,7 @@ var version: String
 
 signal game_started
 signal machine_update(variable_name, value)
+signal setting_update(variable_name, value)
 signal player_update(variable_name, value)
 signal player_added(total_players)
 signal credits
@@ -123,6 +124,7 @@ func update_machine(kwargs: Dictionary) -> void:
 	# If this machine var is a setting, update the value of the setting
 	if settings.has(var_name):
 		settings[var_name].value = value
+		setting_update.emit(var_name, value)
 
 func update_modes(kwargs: Dictionary) -> void:
 	active_modes = []
@@ -163,9 +165,14 @@ func update_settings(result: Dictionary) -> void:
 		s.type = option[6]
 		_settingType = s.type
 		s.options = {}
-		# By default, store the setting as the default value.
-		# This will be overridden later with a machine_var update
-		s.value = s.default
+
+		# If MPF already initialized this value as a machine var during boot, use it.
+		# Otherwise, fall back to the default.
+		if machine_vars.has(option[0]):
+			s.value = machine_vars[option[0]]
+		else:
+			s.value = s.default
+
 		# Not all settings options include values (e.g. hw_volume)
 		if option[5]:
 			for key in option[5].keys():
