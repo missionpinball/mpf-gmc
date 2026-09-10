@@ -46,12 +46,27 @@ func _enter_tree():
 func _ready() -> void:
 	if min_digits > 0:
 		var_template = ("%0"+str(min_digits)+"d")
+
 	if variable_type == VariableType.MACHINE_VAR:
 		self.update_text(MPF.game.machine_vars.get(self.variable_name))
 		MPF.game.connect("machine_update", self._on_machine_update)
+
+	elif variable_type == VariableType.SETTING:
+		var setting_obj = MPF.game.settings.get(self.variable_name)
+		if setting_obj:
+			# Extract the literal value (e.g. 1) or its user-friendly text string if it exists in options
+			var raw_val = setting_obj.get("value")
+			var display_val = setting_obj.get("options", {}).get(raw_val, raw_val)
+			self.update_text(display_val)
+		else:
+			self.update_text(null)
+
+		MPF.game.connect("setting_update", self._on_setting_update)
+
 	elif variable_type == VariableType.EVENT_ARG:
 		var parent_slide = MPF.util.find_parent_slide_or_widget(self)
 		parent_slide.register_updater(self)
+
 	else:
 		var is_current_player = self._calculate_player_value()
 		if is_current_player:
@@ -103,7 +118,9 @@ func update_text(value) -> void:
 			VariableType.MACHINE_VAR:
 				value = MPF.game.machine_vars
 			VariableType.SETTING:
-				value = MPF.game.settings
+				value = {}
+				for k in MPF.game.settings:
+					value[k] = MPF.game.settings[k].get("value")
 			_:
 				if variable_type in numbered_players:
 					value = MPF.game.players[numbered_players.find(variable_type)]
@@ -121,8 +138,10 @@ func update_text(value) -> void:
 			value = var_template % value
 	if template_string:
 		self.text = template_string % value
+	elif value is bool:
+		self.text = "True" if value else "False"
 	else:
-		self.text = value
+		self.text = str(value)
 
 func _on_machine_update(var_name: String, value: Variant) -> void:
 	if var_name == variable_name:
@@ -131,6 +150,12 @@ func _on_machine_update(var_name: String, value: Variant) -> void:
 func _on_player_update(var_name: String, value: Variant) -> void:
 	if var_name == variable_name:
 		self.update_text(value)
+
+func _on_setting_update(setting_name: String, value: Variant) -> void:
+	if setting_name == variable_name:
+		var setting_obj = MPF.game.settings.get(setting_name)
+		var display_val = setting_obj.get("options", {}).get(value, value) if setting_obj else value
+		self.update_text(display_val)
 
 func _on_player_added(total_players: int) -> void:
 	if min_players > 0 and min_players > total_players:
