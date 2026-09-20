@@ -37,7 +37,7 @@ var version: String
 
 signal game_started
 signal machine_update(variable_name, value)
-signal player_update(variable_name, value)
+signal player_update(variable_name, value, player_num, prev_value, change)
 signal player_added(total_players)
 signal credits
 signal volume(bus, value, change)
@@ -141,8 +141,11 @@ func update_player(kwargs: Dictionary) -> void:
 			# Support specific events for designated listeners
 			if kwargs.name in auto_signal_vars:
 				emit_signal(kwargs.name, kwargs.value)
-			# Also broadcast the general update for all subscribers
-			player_update.emit(kwargs.name, kwargs.value)
+
+			var change = kwargs.get("change", null)
+			var prev_value = kwargs.get("prev_value", null)
+			var player_num = kwargs.get("player_num", null)
+			player_update.emit(kwargs.name, kwargs.value, player_num, prev_value, change)
 
 func update_settings(result: Dictionary) -> void:
 	var _settingType: String

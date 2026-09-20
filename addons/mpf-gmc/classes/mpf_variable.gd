@@ -128,7 +128,7 @@ func _on_machine_update(var_name: String, value: Variant) -> void:
 	if var_name == variable_name:
 		self.update_text(value)
 
-func _on_player_update(var_name: String, value: Variant) -> void:
+func _on_player_update(var_name: String, value: Variant, player_num: Variant, prev_value: Variant, change: Variant) -> void:
 	if var_name == variable_name:
 		self.update_text(value)
 
