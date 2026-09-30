@@ -19,7 +19,7 @@ func _on_service(payload):
 		for coil in payload.coils:
 			var list_item = list_button.instantiate()
 			list_item.name = coil[0]  # name
-			list_item.text = coil[1]  # label
+			list_item.text = coil[0] if (coil[1] == "%" or not coil[1]) else coil[1]
 			list_item.tooltip_text = "%s" % coil[2]  # number
 			List.add_child(list_item)
 		select_option(List.get_child(0), "Coil")
@@ -29,7 +29,7 @@ func _on_service(payload):
 		for light in payload.lights:
 			var list_item = list_button.instantiate()
 			list_item.name = light[0]  # name
-			list_item.text = light[1]  # label
+			list_item.text = light[0] if (light[1] == "%" or not light[1]) else light[1]
 			list_item.tooltip_text = "%s" % light[2][0] # number
 			$instructions.text = "Color: white"
 			List.add_child(list_item)
