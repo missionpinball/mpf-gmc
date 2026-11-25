@@ -79,6 +79,9 @@ func show_or_hide():
 	elif self.max_players and MPF.game.num_players > self.max_players:
 		self.log.info("Maximum players exceeded, hiding")
 		self.visible = false
+	elif self._find_target() == null:
+		self.log.debug("Could not find target, hiding")
+		self.visible = false
 	elif self.target:
 		self.show_or_hide_from_condition()
 
@@ -127,23 +130,21 @@ func _find_target():
 			base = MPF.game.settings
 		VariableType.EVENT_ARG:
 			base = null
-		VariableType.PLAYER_1:
-			base = MPF.game.players[0]
-		VariableType.PLAYER_2:
-			if MPF.game.players.size() > 1:
-				base = MPF.game.players[1]
-		VariableType.PLAYER_3:
-			if MPF.game.players.size() > 2:
-				base = MPF.game.players[2]
+		VariableType.PLAYER_1, \
+		VariableType.PLAYER_2, \
+		VariableType.PLAYER_3, \
 		VariableType.PLAYER_4:
-			if MPF.game.players.size() > 3:
-				base = MPF.game.players[3]
+			base = _get_player_by_type(self.variable_type)
 		VariableType.ACTIVE_SLIDE:
 			var display: MPFDisplay = MPF.util.find_parent_display(self)
 			if not display:
 				return
 			display.slide_changed.connect(self._on_slide_changed)
 			base = display.get_slide()
+
+	if base == null:
+		return null
+
 	if "." in self.variable_name and base != null:
 		var nested = self.variable_name.split(".")
 		while nested.size() > 1:
@@ -153,6 +154,20 @@ func _find_target():
 	else:
 		self.true_variable_name = self.variable_name
 	return base
+
+func _get_player_by_type(type) -> Variant:
+	var player_index: int = -1
+	match type:
+		VariableType.PLAYER_1: player_index = 0
+		VariableType.PLAYER_2: player_index = 1
+		VariableType.PLAYER_3: player_index = 2
+		VariableType.PLAYER_4: player_index = 3
+
+	if MPF.game.players.size() > player_index:
+		return MPF.game.players[player_index]
+
+	self.log.warning("Conditional attempted to access player %s but the player is not defined", player_index + 1)
+	return null
 
 func _find_operator():
 	match self.condition_type:
